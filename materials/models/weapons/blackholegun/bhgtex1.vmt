@@ -1,0 +1,10 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/weapons/blackholegun/bhgtex1"
+	"$bumpmap" "models/weapons/blackholegun/bhgnormal"
+	"$envmap" "env_cubemap"
+	"$normalmapalphaenvmapmask" "1"
+	"$envmaptint" "[0.6 0.6 0.6]"
+	"$envmapsaturation" "1"
+	"$selfillum" "1"
+}

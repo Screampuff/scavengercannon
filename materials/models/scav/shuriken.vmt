@@ -1,0 +1,10 @@
+"VertexLitGeneric"
+{
+//http://www.completemartialarts.com/information/weapons/images/shuriken.gif
+"$basetexture" "models/scav/shuriken.vtf"
+"$bumpmap" "models/scav/shuriken_normal.vtf"
+"$envmap" "env_cubemap"
+"$normalmapalphaenvmapmask" 1
+//"$envmapcontrast" 1
+"$envmapsaturation" 0.4
+}

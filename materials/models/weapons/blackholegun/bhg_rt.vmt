@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/weapons/blackholegun/BHG_RT"
+	"$selfillum" "1"
+	"$selfillummask" "models/weapons/blackholegun/BHG_RT"
+	"$model" "1"
+}

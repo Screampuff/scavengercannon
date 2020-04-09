@@ -1,0 +1,9 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/Items/Ammo/frag12round"
+	"$model" "1"
+	"$envmap" "env_cubemap"
+	"$basealphaenvmapmask" "1"
+	"$envmaptint" "[1 0.8 0.8]"
+	"$envmapsaturation" "0.5"
+}

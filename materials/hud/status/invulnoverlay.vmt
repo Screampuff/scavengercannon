@@ -1,0 +1,23 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "HUD/status/invulnoverlay"
+	"$envmap" "env_cubemap"
+	//"$vertexalpha" "1"
+	//"$vertexcolor" "1"
+	"$selfillum" "1"
+	"Proxies"
+	{
+		"TextureScroll"
+		{
+			texturescrollvar $baseTextureTransform
+			texturescrollrate 1
+			texturescrollangle 90
+		}
+		"Equals"
+		{
+			srcVar1 $color
+			resultVar $selfillumtint
+		}
+
+	}
+}

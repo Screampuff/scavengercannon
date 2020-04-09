@@ -1,0 +1,66 @@
+--Ghor's todo list
+--I'll work on this as much as I can myself but some of this is a bit obtuse and I don't know what he could be referring to --Anya
+
+--important
+
+	--be sure the convar for scav projectile life is working
+	--chargeattacks don't work properly when the weapon is being forced to refrain from holstering?
+	--SPECTATORS CAN FLASHLIGHT
+	--see about making getmodelinfo available on the client, using CreateClientModel instead of ents.Create("prop_physics")
+
+	--get rid of blue death cloud on props that die normally
+	--frozen status should cause phys objects to stop moving
+	--toggleable visor that highlights objects that can be enabled with context menu, shows what players are carrying in slot 1 (name? + icon)
+	---offset BHG impact with the normal of the hit surface
+	
+	--SCAVENGER DEATHMATCH	
+
+	--improved team-join menu, show brief summary of subgamemode (could be a vgui panel intead of just a simple string, allowing for images), show on startup
+	--per-firemode kill messages?
+		--notifications need to be bigger
+		--give gprojectiles a fake "inflictorname" the PlayerDeath gamemode hook can take
+		--rockets and other projectiles should be easy enough
+		--if the mode is hitscan simply getting the current mode of the scavgun will be enough
+	--map/setting voting menu for scav DM
+	--help tab on the menu?
+	--add particle flames to scav_furnace
+		--add lights inside the furnace as a visual cue for the closing sequence
+		--make red/blue bases more clear
+		--extend the bases?
+			--unopenable doors (of the blast variety?)
+		--more handrails?
+		--more pipes/signs?
+		--brighter env_projectedtexture?
+	--more user-friendly mapping tools, maybe a gamemode?
+		--ents should highlight, selecting an entity with a certain weapon/tool will open a menu
+		--should be based on keyvalues/inputs
+		--targetnames
+		--teleporter ents?
+	--model for weapon locker (bookshelf + vertical sliding door)
+	--instead of auto-draining items from the scav gun, give the collection points their own menus. This will work great with the new item system.
+	--healing station/weapon station?
+		--weapon stations are weapons that will always be there but appear for the given player only once per life?
+		--combine together like the shops in dead space?
+		--protective bubbles around these areas?
+	--option to remove all physics props on map start or leave them be
+	--maybe make use of noscav props to make scav_mars nicer
+	
+	
+--not as important
+	--use more decals
+	--improve sonic boom interactions (water, explosion)
+	--see about ice chunks stuck in surfaces from the gas?,
+	--see about laser sights as an upgrade/option,
+	--there should be different magnitudes of the prop spawn particle effect
+		--rings and lightning?
+	--use stencil buffer to create outlines around objects the player is looking at that he can pick up
+	--make sure the music system for scav dm isn't broken or something, it seems to like playing the same song over and over again..
+	--make spectator mode more substantial, get rid of useless HUD elements and make important ones visible
+	--frag counter at the top for team dm?
+	--flash of light at the start of a new round
+		--teleportation spawn effect?
+	--clean up arrows, maybe make the pinning/ragdolling code a scavdata function
+	--make detonators
+	--antlion guards should give bugbait, among other things
+	--make the scope easier to use, available on more weapons, update tip
+	--replace self.Owner:EmitSound with self.Weapon:EmitSound

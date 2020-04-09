@@ -1,0 +1,5 @@
+"UnlitGeneric"
+{
+	"$basetexture" "HUD/alchemy_gun/earth"
+	"$alphatest" 1
+}

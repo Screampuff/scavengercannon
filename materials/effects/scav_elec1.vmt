@@ -1,0 +1,14 @@
+"UnlitGeneric"
+{
+	"$basetexture" "effects/strider_pinch_dx70"
+	"$additive" "1"
+	"Proxies"
+	{
+		"AnimatedTexture"
+		{
+			"animatedtexturevar" "$basetexture"
+			"animatedtextureframenumvar" "$frame"
+			"animatedtextureframerate" 25
+		}
+	}
+}

@@ -1,0 +1,27 @@
+"SpawnMenu"
+
+{
+
+	"Information"
+
+	{
+
+		"version" "2"
+
+		"name" "The Scavenger Cannon - Add to this yourself!"
+
+	}
+
+	"Entries"
+
+	{
+
+		"1"	"models/items/boxsrounds.mdl"
+		"2"	"models/items/boxmrounds.mdl"
+		"3"	"models/items/boxbuckshot.mdl"
+		"4"	"models/items/grenadeammo.mdl"
+		"5"	"models/items/battery.mdl"
+		"6"	"models/healthvial.mdl"
+		"7"	"models/weapons/w_physics.mdl"
+	}
+}

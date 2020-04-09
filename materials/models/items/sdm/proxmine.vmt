@@ -1,0 +1,10 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/items/sdm/proxmine"
+	"$selfillum" "1"
+	"$envmap" "env_cubemap"
+	"$bumpmap" "models/items/sdm/proxmine_normal"
+	"$normalmapalphaenvmapmask" "1"
+	"$envmapsaturation" "0.2"
+	"$envmaptint" "[0.3 0.3 0.3]"
+}

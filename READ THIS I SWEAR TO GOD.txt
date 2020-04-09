@@ -1,0 +1,9 @@
+OK SO, this has basically been like 70% recoded to actually work in GM13 and I'm actually in the process of improving the original programming even after being ported, so please bear in mind that THIS ADDON IS /REALLY UNFINISHED/ AND YOU WILL COME ACROSS WEIRD SHIT
+
+PLEASE, PLEASE do not repost this on the workshop, github, etc.  This is a work in progress in its current state and I would prefer to release it when it's completely done and ready for the best experience for everyone.
+
+This doesn't include the Scav DM mapping tools or Scav DM, those will come later
+
+Thanks <3
+
+-Anya O'Quinn

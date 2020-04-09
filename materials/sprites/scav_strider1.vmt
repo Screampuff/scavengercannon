@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "sprites/blueglow2.vtf"
+	"$additive" 1
+	"$vertexcolor" 1
+	"$ignoreZ" 1
+}

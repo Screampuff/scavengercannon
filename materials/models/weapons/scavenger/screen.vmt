@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/weapons/scavenger/screen"
+	//"$translucent" "1"
+	//"$selfillum" "1"
+	//"$model" "1"
+}

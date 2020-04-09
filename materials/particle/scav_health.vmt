@@ -1,0 +1,8 @@
+"UnlitGeneric"
+{
+	"$basetexture" "particle/scav_health"
+	"$additive" 1
+	"$translucent" 1
+	"$vertexalpha" 1
+	"$vertexcolor" 1
+}

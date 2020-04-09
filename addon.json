@@ -1,0 +1,10 @@
+{
+	"title"		:	"Scavenger Cannon",
+	"type"		:	"weapon",
+	"tags"		:	["fun"],
+	"ignore"	:
+	[
+		".git/*",
+		".gitignore"
+	]
+}

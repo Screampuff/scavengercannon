@@ -1,0 +1,6 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/weapons/scavenger/block"
+	"$selfillum" "1"
+	"$selfillumtint" "[0.84 1 0.47]"
+}

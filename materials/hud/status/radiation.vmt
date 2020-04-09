@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "HUD/status/radiation"
+	"$nolod" 1
+	"$translucent" 1
+}

@@ -1,0 +1,7 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/weapons/backuppistol/bpistol_sheet.vtf"
+	"$envmap" "env_cubemap"
+	"$envmapmask" "models/weapons/backuppistol/bpistol_spec.vtf"
+	"$selfillum" 1
+}

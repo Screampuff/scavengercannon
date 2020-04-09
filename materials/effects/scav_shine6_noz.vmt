@@ -1,0 +1,25 @@
+"UnlitGeneric"
+{
+	"$basetexture" "effects/scav_shine5"
+	"$additive" 1
+	"$vertexcolor" 1
+	"$ignorez" 1
+"Proxies"
+	{
+	"AnimatedTexture"
+		{
+		"animatedtexturevar" "$basetexture"
+		"animatedtextureframenumvar" "$frame"
+		"animatedtextureframerate" 16
+		}
+	"Sine"
+		{
+			"resultVar"	"$alpha"
+			"sineperiod"	0.2
+			"sinemin"	0
+			"sinemax"	1
+		}
+	}
+
+
+}

@@ -1,0 +1,8 @@
+"VertexlitGeneric"
+{
+"$basetexture" "models/scav/nail.vtf"
+"$envmap" "env_cubemap"
+"$envmapmask" "models/scav/nail_shinymask.vtf"
+"$model" 1
+"$vertexcolor" 1
+}

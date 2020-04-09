@@ -1,0 +1,8 @@
+"UnlitGeneric"
+{
+	"$basetexture" "HUD/scav_crosshair_brace"
+	"$additive" 0
+	"$translucent" 1
+	"$vertexalpha" 1
+	"$vertexcolor" 1
+}

@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "HUD/weapons/weapon_backuppistol.vtf"
+	"$vertexcolor" 1
+	"$vertexalpha" 1
+}

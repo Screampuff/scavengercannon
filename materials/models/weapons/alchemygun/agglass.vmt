@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/weapons/alchemygun/agglass"
+	//"$gradienttexture" "models/weapons/alchemygun/bulbgradient"
+	"$model" 1
+	"$translucent" 1
+}

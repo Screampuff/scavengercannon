@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "HUD/status/frozen"
+	"$additive" 1
+	"$nolod" 1
+	"$translucent" 1
+}

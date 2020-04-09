@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/weapons/scavenger/frontsheet_q"
+	"$selfillum" "1"
+}

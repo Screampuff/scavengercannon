@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "HUD/status/deaf"
+	"$nolod" 1
+	"$translucent" 1
+}

@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "HUD/status/burning"
+	"$nolod" 1
+	"$translucent" 1
+}

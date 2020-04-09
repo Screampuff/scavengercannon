@@ -1,0 +1,8 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/weapons/scavenger/frontsheet_thx"
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[0.86 0.65 0]" //gold
+	"$envmapmask" "models/weapons/scavenger/frontspec_thx"
+	"$selfillum" "1"
+}

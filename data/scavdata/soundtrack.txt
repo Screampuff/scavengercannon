@@ -1,0 +1,84 @@
+"Out"
+{
+	"Guard Down"
+	{
+		"file"		"music/VLVX_song4.mp3"
+		"source"	"Half-Life 2: Episode One"
+	}
+
+	"What kind of hospital is this?"
+	{
+		"file"		"music/VLVX_song18.mp3"
+		"source"	"Half-Life 2: Episode One"
+	}
+	"Last Legs"
+	{
+		"file"		"music/VLVX_song24.mp3"
+		"source"	"Half-Life 2: Episode Two"
+	}
+	"Abandoned in Place"
+	{
+		"file"		"music/VLVX_song25.mp3"
+		"source"	"Half-Life 2: Episode Two"
+	}
+	"VLVX_song27"
+	{
+		"file"		"music/VLVX_song27.mp3"
+		"source"	"Half-Life 2: Episode Two"
+	}
+	"HL2_song16"
+	{
+		"file"		"music/HL2_song16.mp3"
+		"source"	"Half-Life 2"
+	}
+	"HL2_song14"
+	{
+		"file"		"music/HL2_song14.mp3"
+		"source"	"Half-Life 2"
+	}
+	"HL2_song15"
+	{
+		"file"		"music/HL2_song14.mp3"
+		"source"	"Half-Life 2"
+	}
+	"CP Violation (submix)"
+	{
+		"file"		"music/HL2_song20_submix4.mp3"
+		"source"	"Half-Life 2"
+	}
+	"HL2_song29"
+	{
+		"file"		"music/HL2_song29.mp3"
+		"source"	"Half-Life 2"
+	}
+	"HL2_song3"
+	{
+		"file"		"music/HL2_song3.mp3"
+		"source"	"Half-Life 2"
+	}
+	"HL2_song12_long"
+	{
+		"file"		"music//HL2_song12_long.mp3"
+		"source"	"Half-Life 2"
+	}
+	"HL1_song10"
+	{
+		"file"		"music/HL1_song10.mp3"
+		"source"	"Half-Life"
+	}
+	"HL1_song15"
+	{
+		"file"		"music/HL1_song15.mp3"
+		"source"	"Half-Life"
+	}
+	"HL1_song17"
+	{
+		"file"		"music/HL1_song17.mp3"
+		"source"	"Half-Life"
+	}
+	"Half-Life Credits"
+	{
+		"file"		"music/HL1_song25_REMIX3.mp3"
+		"source"	"Half-Life"
+	}
+}
