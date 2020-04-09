@@ -554,7 +554,7 @@ function ITEM:SetSubammo(amount) --not networked
 		net.Start("scv_setsub")
 			local rf = RecipientFilter()
 			rf:AddAllPlayers()
-			net.WriteInt(self,16)
+			net.WriteEntity(self)
 			net.WriteInt(self.ID,9)
 			net.WriteInt(self.subammo,16)
 		net.Send(rf)
