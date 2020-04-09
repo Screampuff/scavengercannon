@@ -307,10 +307,12 @@ if SERVER then
 		end
 		
 		if game.SinglePlayer() then
+			local rf = RecipientFilter()
+			rf:AddAllPlayers()
 			net.Start("scv_setsubammo")
 				net.WriteEntity(self)
 				net.WriteInt(item.subammo,16)
-			net.Send(self)
+			net.Send(rf)
 		end
 		
 		if item == item and item.subammo <= 0 then
@@ -865,9 +867,10 @@ if CLIENT then
 	
 	if game.SinglePlayer() then
 		net.Receive("scv_setsubammo", function() 
-			local self = net.ReadEntity() 
-			if self.inv.items[1] then 
-				self.inv.items[1].subammo = net.ReadInt(16) 
+			local self = net.ReadEntity()
+			local int = net.ReadInt(16)
+			if IsValid(self) and int and self.inv.items[1] then 
+				self.inv.items[1].subammo = int
 			end 
 		end)
 	end

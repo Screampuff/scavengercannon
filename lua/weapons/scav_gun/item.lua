@@ -554,7 +554,7 @@ function ITEM:SetSubammo(amount) --not networked
 		net.Start("scv_setsub")
 			local rf = RecipientFilter()
 			rf:AddAllPlayers()
-			net.WriteEntity(self)
+			net.WriteInt(self.parent.ID,16)
 			net.WriteInt(self.ID,9)
 			net.WriteInt(self.subammo,16)
 		net.Send(rf)
@@ -684,7 +684,7 @@ function ITEM:TakeSubammo(amount)
 		net.Start("scv_setsub")
 			local rf = RecipientFilter()
 			rf:AddAllPlayers()
-			net.WriteInt(self,16)
+			net.WriteInt(self.parent.ID,16)
 			net.WriteInt(self.ID,9)
 			net.WriteInt(self.subammo,16)
 		net.Send(rf)
@@ -702,8 +702,9 @@ if CLIENT then
 	net.Receive("scv_setsub",function()
 		local inv = ScavInventories[net.ReadInt(16)]
 		local id = net.ReadInt(9)
-		if inv and inv.itemids and inv.itemids[id] then
-			inv.itemids[id]:SetSubammo(net.ReadInt(16))
+		local amt = net.ReadInt(16)
+		if inv and id and amt and inv.itemids and inv.itemids[id] then
+			inv.itemids[id]:SetSubammo(amt)
 		end
 	end)
 end
