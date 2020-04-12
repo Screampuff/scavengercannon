@@ -137,7 +137,7 @@ function Status2.Inflict(ent,statustype,duration,value,inflictor,infinite) --ent
 	end
 end
 	
-STATUS_ENT.InflictStatus = Status2.Inflict
+STATUS_ENT.InflictStatusEffect = Status2.Inflict
 
 function Status2.New(statustype)
 	local ef = Status2.AllEffects[statustype]
@@ -180,13 +180,13 @@ function Status2.PurgeEnt(self)
 	end
 end
 	
-STATUS_ENT.ClearStatus = Status2.PurgeEnt
+STATUS_ENT.ClearStatusEffect = Status2.PurgeEnt
 
 function Status2.Register(name,stattable)
 	Status2.AllEffects[name] = table.Inherit(stattable,Status2.base)
 end
 	
-function STATUS_ENT:GetStatus(name)
+function STATUS_ENT:GetStatusEffect(name)
 	if not self.StatusTable then
 		return
 	end
@@ -284,7 +284,7 @@ if !STATUS_PLY.SetWalkSpeedOld then
 		function STATUS_ENT:Ignite(duration,radius,inflictor)
 			if !radius then radius = 0 end
 			if !inflictor then inflictor = STATUS_ENT end
-			self:InflictStatus("Burning",duration,radius,inflictor)
+			self:InflictStatusEffect("Burning",duration,radius,inflictor)
 		end
 		
 		STATUS_ENT.ExtinguishOld = STATUS_ENT.Extinguish
@@ -345,8 +345,8 @@ local STATUS = {}
 	
 	hook.Add("Move","StatusSpeedSlow",function(pl,movedata)
 		local scale = 1
-		local speedstatus = pl:GetStatus("Speed")
-		local slowstatus = pl:GetStatus("Slow")
+		local speedstatus = pl:GetStatusEffect("Speed")
+		local slowstatus = pl:GetStatusEffect("Slow")
 		if speedstatus then
 			scale = speedstatus.Value
 		end
@@ -488,7 +488,7 @@ local STATUS = {}
 				dmginfo:ScaleDamage(10)
 			end
 			if ent.Status_frozen and ((dmginfo:GetDamageType() == DMG_DIRECT) or (dmginfo:GetDamageType() == DMG_BURN) or (dmginfo:GetDamageType() == DMG_SLOWBURN)) then
-				ent:InflictStatus("Frozen",-1,1)
+				ent:InflictStatusEffect("Frozen",-1,1)
 				return true
 			end
 			if ent.Status_frozen and (dmginfo:GetDamageType() == DMG_FREEZE) then
@@ -609,7 +609,7 @@ local STATUS = {}
 			else
 				self.Owner:Freeze(false)
 				self.Owner:ViewPunch(Angle(60,math.random(-10,10),math.random(-10,10)))
-				self.Owner:InflictStatus("Shock",2,10)
+				self.Owner:InflictStatusEffect("Shock",2,10)
 			end
 		end
 		self.Owner:SetMoveType(self.movetype)
@@ -691,7 +691,7 @@ local STATUS = {}
 		if self.StatusTable then
 			for k,v in ipairs(self.StatusTable) do
 				if v.Name == "Burning" then
-					self:InflictStatus("Burning",CurTime()-v.EndTime,0)
+					self:InflictStatusEffect("Burning",CurTime()-v.EndTime,0)
 				end
 			end
 		end
@@ -912,11 +912,11 @@ local STATUS = {}
 		hook.Add("EntityTakeDamage","StatusDamageX",function(ent,dmginfo)
 			local attacker = dmginfo:GetAttacker()
 			local inflictor = dmginfo:GetAttacker()
-			if attacker:GetStatus("DamageX") then
-				dmginfo:ScaleDamage(attacker:GetStatus("DamageX").Value)
+			if attacker:GetStatusEffect("DamageX") then
+				dmginfo:ScaleDamage(attacker:GetStatusEffect("DamageX").Value)
 				sound.Play("player/crit_hit"..math.random(2,5)..".wav",dmginfo:GetDamagePosition())
-			elseif inflictor:GetStatus("DamageX") then
-				dmginfo:ScaleDamage(inflictor:GetStatus("DamageX").Value)
+			elseif inflictor:GetStatusEffect("DamageX") then
+				dmginfo:ScaleDamage(inflictor:GetStatusEffect("DamageX").Value)
 				sound.Play("player/crit_hit"..math.random(2,5)..".wav",dmginfo:GetDamagePosition())
 			end
 		end)
@@ -1014,7 +1014,7 @@ local STATUS = {}
 	
 	if SERVER then
 		hook.Add("EntityTakeDamage","StatusInvuln",function(ent,dmginfo)
-			if ent:GetStatus("Invuln") then
+			if ent:GetStatusEffect("Invuln") then
 				return true
 			end
 		end)
@@ -1135,7 +1135,7 @@ local STATUS = {}
 		self.Value = math.max(self.Value,value)	
 	end
 	if CLIENT then
-		hook.Add("HUDShouldDraw","SENumbness",function(name) if ((name == "CHudDamageIndicator") or (name == "CHudHealth")) and GetViewEntity():GetStatus("Numb") then return false end end)
+		hook.Add("HUDShouldDraw","SENumbness",function(name) if ((name == "CHudDamageIndicator") or (name == "CHudHealth")) and GetViewEntity():GetStatusEffect("Numb") then return false end end)
 	end
 	Status2.Register("Numb",STATUS)
 	
@@ -1148,7 +1148,7 @@ if CLIENT then
 			render.SetBlend(0.6)
 			render.MaterialOverride(matfreeze)
 			for k,v in ipairs(ents.GetAll()) do
-				if v:GetStatus("Frozen") then
+				if v:GetStatusEffect("Frozen") then
 					v:DrawModel()
 				end
 			end

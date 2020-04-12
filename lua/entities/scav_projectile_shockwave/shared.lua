@@ -49,7 +49,7 @@ function ENT:OnImpact(hitent)
 	for k,v in ipairs(ent) do
 		local intensity = (300-pos:Distance(pos+v:OBBCenter()))/15
 		if (v:IsPlayer() || v:IsNPC()) && !v:IsFriendlyToPlayer(self.Owner) then
-			v:InflictStatus("Deaf",intensity,0)
+			v:InflictStatusEffect("Deaf",intensity,0)
 			local dmg = DamageInfo()
 			dmg:SetDamage(intensity)
 			dmg:SetDamageType(DMG_SONIC)

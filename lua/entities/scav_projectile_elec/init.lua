@@ -33,7 +33,7 @@ function ENT:OnImpact(hitent)
 	dmg:SetDamageType(DMG_SHOCK)
 	dmg:SetDamagePosition(pos)
 	if hitent:IsPlayer() then
-		hitent:InflictStatus("Shock",20,20)
+		hitent:InflictStatusEffect("Shock",20,20)
 	end
 	hitent:TakeDamageInfo(dmg)
 	//self:SetNetworkedVector("vel",self.vel)

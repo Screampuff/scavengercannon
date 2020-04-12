@@ -34,7 +34,7 @@ function ENT:OnImpact(hitent)
 	if hitent.Status_frozen then
 		statusduration = math.min(10-(hitent.Status_frozen.EndTime-CurTime()),10)
 	end
-	hitent:InflictStatus("Frozen",statusduration,0,self:GetOwner())
+	hitent:InflictStatusEffect("Frozen",statusduration,0,self:GetOwner())
 	ParticleEffect("scav_exp_ice",pos,Angle(0,0,0),game.GetWorld())
 	return true
 end

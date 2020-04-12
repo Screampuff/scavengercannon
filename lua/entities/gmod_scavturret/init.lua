@@ -274,12 +274,12 @@ ENT.Firefuncs = {}
 				dmg:SetDamagePosition(tr.HitPos)
 				dmg:SetDamageType(DMG_FREEZE)
 				tr.Entity:TakeDamageInfo(dmg)
-				if !ent:GetStatus("Frozen") || (ent:GetStatus("Frozen").EndTime-30 < CurTime()) then
-				ent:InflictStatus("Slow",0.1,-10,self.Owner)
+				if !ent:GetStatusEffect("Frozen") || (ent:GetStatusEffect("Frozen").EndTime-30 < CurTime()) then
+				ent:InflictStatusEffect("Slow",0.1,-10,self.Owner)
 					if ent:IsPlayer() && (ent:GetWalkSpeed() == 0) then
-						ent:InflictStatus("Frozen",0.1,0,self.Owner)
-					elseif !ent:IsPlayer() && ((ent:IsNPC() && ((ent:Health() < 10) || (ent:GetStatus("Slow").EndTime > CurTime()+10))) || !ent:IsNPC()) then
-						ent:InflictStatus("Frozen",0.2,0,self.Owner)
+						ent:InflictStatusEffect("Frozen",0.1,0,self.Owner)
+					elseif !ent:IsPlayer() && ((ent:IsNPC() && ((ent:Health() < 10) || (ent:GetStatusEffect("Slow").EndTime > CurTime()+10))) || !ent:IsNPC()) then
+						ent:InflictStatusEffect("Frozen",0.2,0,self.Owner)
 					end
 				end
 			end

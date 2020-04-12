@@ -47,7 +47,7 @@ function ENT:OnImpact(hitent)
 	for k,v in ipairs(ent) do
 		local intensity = (300-pos:Distance(v:GetPos()+v:OBBCenter()))/15
 		if (v:IsPlayer() || v:IsNPC()) && !v:IsFriendlyToPlayer(self.Owner) then
-			v:InflictStatus("Disease",intensity,2)
+			v:InflictStatusEffect("Disease",intensity,2)
 		end
 	end
 	return true

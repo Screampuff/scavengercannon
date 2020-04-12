@@ -599,8 +599,8 @@ local ScavData = ScavData
 			tab.Level = 6
 			if SERVER then
 				tab.FireFunc = function(self,item)
-						self.Owner:InflictStatus("Speed",20,3)
-						self.Owner:InflictStatus("Shock",30,40)
+						self.Owner:InflictStatusEffect("Speed",20,3)
+						self.Owner:InflictStatusEffect("Shock",30,40)
 						self.Owner:EmitSound("player/pl_scout_dodge_can_open.wav")
 						self.Owner:EmitSound("player/pl_scout_dodge_can_drink_fast.wav")
 						return true
@@ -619,7 +619,7 @@ local ScavData = ScavData
 				timer.Simple(1, function() cloakcheck(self) end)
 			else
 				if SERVER && self.Cloak then
-					self.Owner:InflictStatus("Cloak",-self.Cloak.subammo,1)
+					self.Owner:InflictStatusEffect("Cloak",-self.Cloak.subammo,1)
 					self:RemoveItemValue(self.Cloak)
 				end
 				self.Cloak = false
@@ -635,20 +635,20 @@ local ScavData = ScavData
 					if self.Cloak && (self.Cloak != item) then
 						local leftover = item.subammo-self.Cloak.subammo
 						self.Cloak = item
-						self.Owner:InflictStatus("Cloak",leftover,1)
+						self.Owner:InflictStatusEffect("Cloak",leftover,1)
 					elseif !self.Cloak then
-						self.Owner:InflictStatus("Cloak",item.subammo,1)
+						self.Owner:InflictStatusEffect("Cloak",item.subammo,1)
 						self.Cloak = item
 						timer.Simple(1, function() cloakcheck(self) end)
 					else
-						self.Owner:InflictStatus("Cloak",-self.Cloak.subammo,1)
+						self.Owner:InflictStatusEffect("Cloak",-self.Cloak.subammo,1)
 						self.Cloak = false				
 					end
 				end
 					
 				function tab.PostRemove(self,item)
 					if item == self.Cloak then
-						self.Owner:InflictStatus("Cloak",-self.Cloak.subammo,1)
+						self.Owner:InflictStatusEffect("Cloak",-self.Cloak.subammo,1)
 						self.Cloak = false
 					end
 				end
@@ -3098,7 +3098,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 				tab.Callback = function(self,tr)
 						if tr.Entity && tr.Entity:IsValid() then
 							if tr.Entity:IsPlayer() || tr.Entity:IsNPC() then
-								tr.Entity:InflictStatus("Disease",5,1)
+								tr.Entity:InflictStatusEffect("Disease",5,1)
 							end
 							local dmg = ScavData.models["models/weapons/w_models/w_syringegun.mdl"].dmginfo
 							dmg:SetDamage(1)
@@ -3531,7 +3531,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					local function callback(self,tr)
 						local ent = tr.Entity
 						if ent && ent:IsValid() && (!ent:IsPlayer()||gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
-							ent:InflictStatus("Acid",100,(self.deathtime-CurTime())/2,self:GetOwner())
+							ent:InflictStatusEffect("Acid",100,(self.deathtime-CurTime())/2,self:GetOwner())
 							ent:EmitSound("ambient/levels/canals/toxic_slime_sizzle"..math.random(2,4)..".wav")
 						end
 						if !tr.Entity:IsPlayer() || !tr.Entity:IsNPC() then
@@ -3622,17 +3622,17 @@ PrecacheParticleSystem("scav_exp_plasma")
 							dmg:SetDamageType(DMG_FREEZE)
 							tr.Entity:TakeDamageInfo(dmg)
 							local slowfactor = 0.8
-							local slowstatus = ent:GetStatus("Slow")
+							local slowstatus = ent:GetStatusEffect("Slow")
 							if slowstatus then
 								slowfactor = slowstatus.Value*0.8
 							end
-							ent:InflictStatus("Slow",0.1,slowfactor,self:GetOwner())
-							local slow = ent:GetStatus("Slow")
+							ent:InflictStatusEffect("Slow",0.1,slowfactor,self:GetOwner())
+							local slow = ent:GetStatusEffect("Slow")
 							if slow then
 								if ent:IsPlayer() && (slow.Value < 0.3) then
-									ent:InflictStatus("Frozen",0.1,0,self:GetOwner())
+									ent:InflictStatusEffect("Frozen",0.1,0,self:GetOwner())
 								elseif !ent:IsPlayer() && ((ent:IsNPC() && ((ent:Health() < 10) || (slow.EndTime > CurTime()+10))) || !ent:IsNPC()) then
-									ent:InflictStatus("Frozen",0.2,0,self:GetOwner())
+									ent:InflictStatusEffect("Frozen",0.2,0,self:GetOwner())
 								end
 							end
 						end
@@ -4025,7 +4025,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 							local ent = tr.Entity
 							if ent && ent:IsValid() && !ent:IsWorld() then
 								if !ent:IsFriendlyToPlayer(self.Owner) then
-									ent:InflictStatus("Radiation",10,3,self.Owner)
+									ent:InflictStatusEffect("Radiation",10,3,self.Owner)
 									local dmg = tab.dmginfo
 									dmg:SetAttacker(self.Owner)
 									dmg:SetInflictor(self)
