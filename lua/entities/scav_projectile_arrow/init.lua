@@ -160,7 +160,7 @@ function ENT:Think()
 						local arrow = self:CreateArrowProp()
 						arrow:GetPhysicsObject():Wake()
 						arrow:GetPhysicsObject():SetVelocity(self.vel*-0.2)
-						arrow:GetPhysicsObject():AddAngleVelocity(Angle(math.Rand(-120,120),math.Rand(-120,120),math.Rand(-120,120)))
+						arrow:GetPhysicsObject():AddAngleVelocity(Vector(math.Rand(-120,120),math.Rand(-120,120),math.Rand(-120,120)))
 						if IsValid(self.trail) then
 							local target = ents.Create("info_target")
 							target:SetPos(self:GetPos())
