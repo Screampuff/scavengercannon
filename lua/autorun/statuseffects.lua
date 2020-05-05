@@ -283,7 +283,7 @@ if !STATUS_PLY.SetWalkSpeedOld then
 		STATUS_ENT.IgniteOld = STATUS_ENT.Ignite
 		function STATUS_ENT:Ignite(duration,radius,inflictor)
 			if !radius then radius = 0 end
-			if !inflictor then inflictor = STATUS_ENT end
+			if !inflictor then inflictor = self end
 			self:InflictStatusEffect("Burning",duration,radius,inflictor)
 		end
 		
