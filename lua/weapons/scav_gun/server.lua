@@ -180,13 +180,13 @@ if SERVER then
 			postremoved = itemold:GetFiremodeTable().PostRemove
 		end
 		
-		itemold:Remove()
-		
-		local itemnew = self:GetCurrentItem()
-		
 		if postremoved then
 			postremoved(self,itemold)
 		end
+		
+		itemold:Remove()
+		
+		local itemnew = self:GetCurrentItem()
 		
 		if not itemnew then
 			self:SetBarrelRestSpeed(0)

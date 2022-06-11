@@ -58,8 +58,8 @@ if CLIENT then
 		
 	end)
 
-	function SWEP:RemoveItem(pos)
-
+	function SWEP:RemoveItem(pos) --Doesn't seem to ever get called?
+		print("I am here!")
 		if self.inv and self.inv.items[pos] then
 		
 			self.inv.items[pos].icon:Remove()

@@ -41,7 +41,7 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						proj:SetAngles(self:GetAimVector():Angle())
 						proj:SetOwner(self.Owner)
 						--Look for seeking items
-						for i,v in pairs(self.inv.items) do
+						for _,v in pairs(self.inv.items) do
 							if ScavData.models[v.ammo].Name == "Auto-Targeting System" then
 								tab.Seeking = ScavData.models[v.ammo].On
 								break
@@ -66,10 +66,10 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								self.Owner:EmitSound("weapons/rocket_shoot.wav",75,100)
 							end
 						elseif item.ammo == "models/buildables/sentry3_rockets.mdl" then --TF2 sentry
-							self.Owner:EmitSound("weapons/sentry_rocket.wav",75,100) --crit sound
+							self.Owner:EmitSound("weapons/sentry_rocket.wav",75,100)
 						elseif item.ammo == "models/weapons/w_models/w_rocket_airstrike/w_rocket_airstrike.mdl" then --TF2 Air Strike
 							if self.Owner:GetStatusEffect("DamageX") then
-								self.Owner:EmitSound("weapons/airstrike_fire_crit.wav",75,100)
+								self.Owner:EmitSound("weapons/airstrike_fire_crit.wav",75,100) --crit sound
 							else
 								self.Owner:EmitSound("weapons/airstrike_fire_01.wav",75,100)
 							end
@@ -2645,56 +2645,42 @@ local tab = {}
 			tab.anim = ACT_VM_IDLE
 			tab.Level = 1
 			tab.fov = 2
+			local zoomhook = function()
+				hook.Add("AdjustMouseSensitivity","ScavZoomedIn", function()
+					return tab.fov / GetConVar("fov_desired"):GetFloat()
+				end)
+			end
 			tab.FireFunc = function(self,item)
-								local tab = ScavData.models[item.ammo]
-								if !self.dt.Zoomed then
-									tab.fov = 10
-									self.dt.Zoomed = true
-									hook.Add("AdjustMouseSensitivity","ScavZoomedIn", function()
-										if ScavData.models[self:GetCurrentItem().ammo].fov == nil then --BUG TODO: this stops us from spamming errors if we remove this prop while zoomed, but if it's the only prop in the player's inventory it still errors out. I haven't been able to find a fix for that, yet.
-											self.dt.Zoomed = false
-											hook.Remove("AdjustMouseSensitivity","ScavZoomedIn")
-											return 10 / GetConVar("fov_desired"):GetFloat()
-										end
-										return ScavData.models[self:GetCurrentItem().ammo].fov / GetConVar("fov_desired"):GetFloat()
-									end)
-								elseif (tab.fov == 10) && self.dt.Zoomed then
-									tab.fov = 5
-									hook.Add("AdjustMouseSensitivity","ScavZoomedIn", function()
-										if ScavData.models[self:GetCurrentItem().ammo].fov == nil then
-											self.dt.Zoomed = false
-											hook.Remove("AdjustMouseSensitivity","ScavZoomedIn")
-											return 10 / GetConVar("fov_desired"):GetFloat()
-										end
-										return ScavData.models[self:GetCurrentItem().ammo].fov / GetConVar("fov_desired"):GetFloat()
-									end)
-								elseif tab.fov == 5 then
-									tab.fov = 2
-									hook.Add("AdjustMouseSensitivity","ScavZoomedIn", function()
-										if ScavData.models[self:GetCurrentItem().ammo].fov == nil then
-											self.dt.Zoomed = false
-											hook.Remove("AdjustMouseSensitivity","ScavZoomedIn")
-											return 10 / GetConVar("fov_desired"):GetFloat()
-										end
-										return ScavData.models[self:GetCurrentItem().ammo].fov / GetConVar("fov_desired"):GetFloat()
-									end)
-								elseif tab.fov == 2 then
-									tab.fov = 1
-									hook.Add("AdjustMouseSensitivity","ScavZoomedIn", function()
-										if ScavData.models[self:GetCurrentItem().ammo].fov == nil then
-											self.dt.Zoomed = false
-											hook.Remove("AdjustMouseSensitivity","ScavZoomedIn")
-											return 10 / GetConVar("fov_desired"):GetFloat()
-										end
-										return ScavData.models[self:GetCurrentItem().ammo].fov / GetConVar("fov_desired"):GetFloat()
-									end)
-								elseif tab.fov == 1 then
-									tab.fov = 10
-									self.dt.Zoomed = false
-									hook.Remove("AdjustMouseSensitivity","ScavZoomedIn")
-								end
-								self.Owner:EmitSound("buttons/lightswitch2.wav")
-							end
+				if !self.dt.Zoomed then
+					tab.fov = 10
+					self.dt.Zoomed = true
+					zoomhook()
+				elseif tab.fov == 10 then
+					tab.fov = 5
+					zoomhook()
+				elseif tab.fov == 5 then
+					tab.fov = 2
+					zoomhook()
+				elseif tab.fov == 2 then
+					tab.fov = 1
+					zoomhook()
+				elseif tab.fov == 1 then
+					tab.fov = 10
+					self.dt.Zoomed = false
+					hook.Remove("AdjustMouseSensitivity","ScavZoomedIn")
+				end
+				self.Owner:EmitSound("buttons/lightswitch2.wav")
+			end
+			tab.PostRemove = function(self,item)
+				if CLIENT then
+					tab.fov = GetConVar("fov_desired"):GetFloat()
+				else
+					tab.fov = 90
+				end
+				self.dt.Zoomed = false
+				print(tab.fov,tostring(self.dt.Zoomed))
+				hook.Remove("AdjustMouseSensitivity","ScavZoomedIn")
+			end
 			tab.Cooldown = 0.25
 			if SERVER then
 				ScavData.CollectFuncs["models/props_combine/combine_binocular01.mdl"] = ScavData.GiveOneOfItemInf

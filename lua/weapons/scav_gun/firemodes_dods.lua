@@ -478,6 +478,7 @@ end
 			--tab.Particle = nil
 			local function mgcooloff(self,item)
 				if item:IsValid() then
+					local tab = ScavData.models[item.ammo]
 					if not (self:ProcessLinking(item) && self:StopChargeOnRelease()) then
 						if tab.Heat > 0 then
 							if SERVER then
@@ -515,6 +516,7 @@ end
 			end
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
+					local tab = ScavData.models[item.ammo]
 					if SERVER then
 						tab.Heat = math.min(100,tab.Heat + 1)
 						if tab.Heat >= 100 then

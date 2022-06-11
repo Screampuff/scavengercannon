@@ -475,6 +475,15 @@ function ITEM:Remove(silent,pl) --Calling this on the server will send a net mes
 	
 	for k,v in ipairs(self.parent.items) do
 		if v == self then
+			local postremoved = nil
+			local olditem = self.parent.items[k]
+			if SERVER and olditem and olditem:GetFiremodeTable() then
+				postremoved = olditem:GetFiremodeTable().PostRemove
+			end
+			if postremoved then
+				postremoved(self.parent.Owner,olditem)
+			end
+			
 			table.remove(self.parent.items,k)
 			self.valid = false
 			break
