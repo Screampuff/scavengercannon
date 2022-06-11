@@ -76,12 +76,21 @@ local function MakeRagdoll(ent)
 	else
 		rag = ents.Create("prop_ragdoll")
 	end
+	if ent:GetShouldServerRagdoll() then
+		return false
+	end
 	rag:SetModel(ent:GetModel())
 	rag:SetPos(ent:GetPos())
 	rag:SetAngles(ent:GetAngles())
 	rag:SetColor(ent:GetColor())
 	rag:SetMaterial(ent:GetMaterial())
-	rag:SetBodygroup(ent:GetBodygroup())
+	local bodygroupstring = ""
+	for i=0,#ent:GetBodyGroups()-1 do
+		bodygroupstring = bodygroupstring .. tonumber(ent:GetBodygroup(i),36) --SetBodyGroups numbers are base 36 (1-z)
+	end
+	--print(bodygroupstring)
+	rag:SetBodyGroups(bodygroupstring)
+	rag:SetSkin(ent:GetSkin())
 	rag:Spawn()
 	rag:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
 	rag:Fire("Kill",1,60)
@@ -143,7 +152,7 @@ function ENT:Think()
 					return
 				end
 				if tr.Entity:IsValid() then
-					if tr.Entity:IsPlayer() && (GetConVarNumber("mp_teamplay") == 1) && (tr.Entity:Team() == self.Owner:Team()) then
+					if tr.Entity:IsPlayer() && GetConVar("mp_teamplay"):GetBool() && (tr.Entity:Team() == self.Owner:Team()) then
 						table.insert(self.filter,tr.Entity)
 						self:NextThink(CurTime()+0.01)
 						return true

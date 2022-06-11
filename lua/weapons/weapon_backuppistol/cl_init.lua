@@ -4,8 +4,12 @@ local illumtint = mat:GetVector("$selfillumtint")
 local colvec = Vector(1,1,1)
 SWEP.Slot = 1
 SWEP.SlotPos = 0
-SWEP.PrintName = "Backup Pistol"
-SWEP.Category = "Scavenger Deathmatch"
+SWEP.PrintName = language.GetPhrase("scav.backup.name")
+SWEP.Category = language.GetPhrase("scav.category")
+SWEP.Author = "Ghor"
+SWEP.Contact = ""
+SWEP.Purpose = language.GetPhrase("scav.backup.purpose")
+SWEP.Instructions = language.GetPhrase("scav.backup.instructions")
 killicon.Add("weapon_backuppistol","hud/weapons/weapon_backuppistol",color_white)
 
 local selecttex = surface.GetTextureID("hud/weapons/weapon_backuppistol")
@@ -55,6 +59,7 @@ PANEL.Weapon = NULL
 function PANEL:Init()
 	self.AmmoLabel = vgui.Create("DLabel",self)
 	self.AmmoLabel:SetFont("Scav_HUDNumber5")
+	self.AmmoLabel:SetTextColor(color_white)
 	self.Initialized = true
 end
 
@@ -81,6 +86,7 @@ function PANEL:InvalidateLayout()
 		return
 	end
 	self.AmmoLabel:SizeToContents()
+	self.AmmoLabel:SetTextColor(color_white)
 	self.AmmoLabel:SetPos((self:GetWide()-self.AmmoLabel:GetWide())/2,(self:GetTall()-self.AmmoLabel:GetTall())/2)
 end
 

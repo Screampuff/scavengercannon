@@ -12,7 +12,7 @@ end
 CreateConVar("scav_itemdebug",0,FCVAR_REPLICATED)
 
 local function debugprint(infotype,message)
-	if GetConVarNumber("scav_itemdebug") == 1 then
+	if GetConVar("scav_itemdebug"):GetBool() then
 		print(state..infotype..": "..message)
 	end
 end
@@ -412,9 +412,10 @@ if CLIENT then
 		if data ~= 0 and (not ScavData.models[model] or not ScavData.models[model].noskin) then
 			skin = data
 		end
-		
+		--func_physboxes
 		if string.find(model,"*%d",0,false) then
 			model = "models/error.mdl"
+			--model = "models/hunter/triangles/1x1x2carved.mdl" --TODO: figure out how to get the texture off of the physbox and put it on here. Something along the lines of - GetBrushSurfaces()[1]:GetName() - 
 		end
 		
 		local item = nil
@@ -492,9 +493,7 @@ if CLIENT then
 		local inv = ScavInventories[net.ReadInt(16)]
 		if inv then
 			local id = net.ReadInt(9)
-			if inv.itemids[id] then
-				timer.Simple(0.05, function() inv.itemids[id]:Remove() end)
-			end
+				timer.Simple(0.05, function()if inv.itemids[id] then inv.itemids[id]:Remove() end end)
 		end
 	end)
 end

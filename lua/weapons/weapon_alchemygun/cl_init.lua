@@ -2,10 +2,16 @@ include("shared.lua")
 include("surfaces.lua")
 include("ghost.lua")
 include("meltdown.lua")
+CreateClientConVar("scav_ag_model","models/props_debris/metal_panel02a.mdl",true,true)
+CreateClientConVar("scav_ag_skin",0,true,true)
 include("menu.lua")
 
-SWEP.PrintName = "Alchemy Gun"
-SWEP.Category = "Scavenger Deathmatch"
+SWEP.PrintName = language.GetPhrase("scav.alchemy.name")
+SWEP.Category = language.GetPhrase("scav.category")
+SWEP.Author = "Ghor"
+SWEP.Contact = ""
+SWEP.Purpose = language.GetPhrase("scav.alchemy.purpose")
+SWEP.Instructions = language.GetPhrase("scav.alchemy.instructions")
 SWEP.Slot = 2
 SWEP.SlotPos = 0
 SWEP.DrawAmmo = false
@@ -14,8 +20,6 @@ SWEP.wmodel = NULL
 killicon.Add("weapon_alchemygun","hud/weapons/weapon_alchemygun",color_white) --This will probably never be seen, but it is possible.
 killicon.Add("scav_alchghost","hud/weapons/weapon_alchemygun",color_white)
 
-CreateClientConVar("scav_ag_model","models/props_debris/metal_panel02a.mdl",true,true)
-CreateClientConVar("scav_ag_skin",0,true,true)
 
 local shinymat = Material("models/shiny")
 

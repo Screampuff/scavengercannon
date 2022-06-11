@@ -40,7 +40,7 @@ hook.Add("Think","StatusThink", function()
 				v:NextThink(CurTime() + 0.1)
 			end
 		end
-		
+
 		if v.EndTime < CurTime() and not v.Infinite then
 			if v.Finish and IsValid(v.Owner) then
 				v:Finish()
@@ -49,7 +49,29 @@ hook.Add("Think","StatusThink", function()
 		elseif v.infinite then
 			v.EndTime = CurTime() + 10
 		end
-		
+
+		if CLIENT and IsValid(v.Owner) and GetConVar("cl_scav_colorblindmode"):GetBool() == true and v.Owner:GetStatusEffect("Cloak") == nil and GetViewEntity() ~= v.Owner then
+					--colorblind mode is on, the entity isn't invisible and isn't what we're looking through (we'll see the status on our HUD if we're looking through it)
+			for j,k in ipairs(v.Owner.StatusTable) do
+				local emitter = ParticleEmitter(v.Owner:GetPos())
+				if IsValid(emitter) then
+					local size = 8
+					--local vec = v.Owner:GetPos() - GetViewEntity():GetPos() --introduces a bit of "warping" at edges of view
+					local vec = EyeAngles()
+					vec.z = 0 --we don't care about the Z, don't let it confuse us
+					vec = vec:Right()
+					local statpos = (j-(#k.Owner.StatusTable+1)/2)*size*2
+					local part = emitter:Add("hud/status/" .. k.Name,emitter:GetPos()+Vector(vec.x*statpos,vec.y*statpos,k.Owner:OBBMaxs().z+size*2))
+					if part then
+						part:SetDieTime(.01)
+						part:SetStartAlpha(25)
+						part:SetStartSize(size)
+						part:SetEndSize(size)
+					end
+					emitter:Finish()
+				end
+			end
+		end
 	end
 	
 end)
@@ -300,6 +322,16 @@ local STATUS = {}
 	function STATUS:Initialize()
 	end
 	
+	if SERVER then
+		hook.Add("EntityTakeDamage","Speed",function(ent,dmginfo)
+			if ent:GetStatusEffect("Speed") and dmginfo:IsDamageType(DMG_FALL) then
+				local reduced = math.max(1,dmginfo:GetDamage() * 0.25) --take only 25% fall damage (at least 1)
+				dmginfo:SetDamage(reduced)
+				return dmginfo
+			end
+		end)
+	end
+
 	function STATUS:Think()
 	end
 	
@@ -370,6 +402,8 @@ local STATUS = {}
 	
 	STATUS.Name = "Cloak"
 	STATUS.color = Color(0,0,0,0)
+--	TODO- make NPCs totally ignore cloaked players. Probably need a table of them with their current relationships that can be reset when cloak is off
+--				Making enemies neutral means traps won't activate from them, need a better way. Some npc perception hook we could get in?
 
 	function STATUS:Initialize()
 		local r,g,b,a = self.Owner:GetColor().r,self.Owner:GetColor().g,self.Owner:GetColor().b,self.Owner:GetColor().a
@@ -380,6 +414,16 @@ local STATUS = {}
 				v:SetColor(Color(r,g,b,0))
 				v:SetRenderMode(RENDERMODE_TRANSALPHA)
 			end
+			/*if SERVER then
+				for i, npc in ipairs( ents.FindByClass( "npc_*" ) ) do
+					if IsValid( npc ) and npc:IsNPC() then
+						if IsValid(npc:GetEnemy()) and npc:GetEnemy() == self.Owner then
+							npc:AddEntityRelationship(self.Owner,D_NU,1)
+							npc:MarkEnemyAsEluded(self.Owner)
+						end
+					end
+				end
+			end*/
 		end
 		if CLIENT then
 			if (self.Owner == LocalPlayer()) then
@@ -388,14 +432,28 @@ local STATUS = {}
 				self.Owner:SetPos(pos)
 				//self.Owner:GetViewModel():SetMaterial("models/shadertest/predator")
 				self.Owner:GetViewModel():SetMaterial("models/props_combine/com_shield001a")
+				self.Owner:GetHands():SetMaterial("models/props_combine/com_shield001a")
 			end
-		else
+		end
+		if IsMounted(440) then --only use TF2 sounds if TF2 is mounted
 			self.Owner:EmitSound("player/spy_cloak.wav")
+		else
+			self.Owner:EmitSound("friends/friend_online.wav")
 		end
 		self.Owner.Status_cloak = true
 	end
 	
 	function STATUS:Think()
+		/*if SERVER then
+			for i, npc in ipairs( ents.FindByClass( "npc_*" ) ) do
+				if IsValid( npc ) and npc:IsNPC() then
+					if IsValid(npc:GetEnemy()) and npc:GetEnemy() == self.Owner then
+						npc:AddEntityRelationship(self.Owner,D_NU,1)
+						npc:MarkEnemyAsEluded(self.Owner)
+					end
+				end
+			end
+		end*/
 	end
 	
 	function STATUS:Finish()
@@ -407,13 +465,27 @@ local STATUS = {}
 				v:SetColor(Color(r,g,b,255))
 				v:SetRenderMode(RENDERMODE_NORMAL)
 			end
+			/*if SERVER then
+				for i, npc in ipairs( ents.FindByClass( "npc_*" ) ) do
+					if IsValid( npc ) and npc:IsNPC() then
+						if npc:GetRelationship(self.Owner) == D_NU then --and npc:GetRelationship(CLASS_PLAYER) == D_HT then --Not sure how to test for this
+							npc:AddEntityRelationship(self.Owner,D_HT,1)
+							--npc:MarkEnemyAsEluded(self.Owner)
+						end
+					end
+				end
+			end*/
 		end
 		if CLIENT then
 			if (self.Owner == LocalPlayer()) then
 				self.Owner:GetViewModel():SetMaterial()
+				self.Owner:GetHands():SetMaterial()
 			end
-		else
+		end
+		if IsMounted(440) then --only use TF2 sounds if TF2 is mounted
 			self.Owner:EmitSound("player/spy_uncloak.wav")
+		else
+			self.Owner:EmitSound("npc/turret_floor/die.wav")
 		end
 		self.Owner.Status_cloak = false
 	end
@@ -489,6 +561,7 @@ local STATUS = {}
 			end
 			if ent.Status_frozen and ((dmginfo:GetDamageType() == DMG_DIRECT) or (dmginfo:GetDamageType() == DMG_BURN) or (dmginfo:GetDamageType() == DMG_SLOWBURN)) then
 				ent:InflictStatusEffect("Frozen",-1,1)
+				ent:InflictStatusEffect("Acid",1,0.025) --sizzle
 				return true
 			end
 			if ent.Status_frozen and (dmginfo:GetDamageType() == DMG_FREEZE) then
@@ -580,7 +653,9 @@ local STATUS = {}
 		end
 		self.Owner.Status_frozen = false
 		if SERVER then
-			self.Owner:EmitSound("physics/glass/glass_sheet_break1.wav")
+			if not self.Owner:GetStatusEffect("Acid") then
+				self.Owner:EmitSound("physics/glass/glass_sheet_break1.wav")
+			end
 			if self.Owner:IsNPC() then
 				self.Owner:SetNPCState(NPC_STATE_ALERT)
 				self.Owner:SetSchedule(SCHED_NONE)
@@ -711,12 +786,47 @@ local STATUS = {}
 	end
 	
 	function STATUS:Think()
+		--Put ourselves out in water
+		if self.Owner:WaterLevel() > 2 then
+			self.EndTime = self.EndTime - 2.0
+		elseif self.Owner:WaterLevel() > 1 then
+			self.EndTime = self.EndTime - 1.0
+		elseif self.Owner:WaterLevel() > 0 then
+			self.EndTime = self.EndTime - 0.5
+		end
+		--Put ourselves out on Frozen (melt ice, too)
+		if self.Owner:GetStatusEffect("Frozen") then
+			self.Owner:InflictStatusEffect("Acid",1,0.025) --sizzling (acid multiplies its value by 5 for its added duration)
+			--self.Owner:InflictStatusEffect("Frozen",-.1,0) --freezing does this already
+			self.EndTime = self.EndTime - 0.1
+		end
+	end
+	if SERVER then
+		hook.Add("EntityTakeDamage","FireDmg",function(ent,dmginfo)
+			if dmginfo:GetDamageType() == DMG_FREEZE then
+				ent:InflictStatusEffect("Burning",-1,1)
+				ent:InflictStatusEffect("Acid",1,0.025) --sizzle
+				return true
+			end
+			return
+		end)
+
+		hook.Add("Touch","FireTouch",function(ent) --TODO: only seems to be called for props with it enabled in their flags.
+				local dmg = DamageInfo()
+					dmg:SetDamageType(DMG_BURN)
+					dmg:SetInflictor(self)
+					dmg:AddDamage(1)
+				ent:TakedamageInfo(dmg)
+				return true
+		end)
 	end
 
 	function STATUS:Finish()
 		if SERVER then
 			self.Owner:ExtinguishOld()
 		end
+		hook.Remove("EntityTakeDamage","FireDmg")
+		hook.Remove("Touch","FireTouch")
 	end
 	
 	function STATUS:Add(duration,value)
@@ -995,14 +1105,27 @@ local STATUS = {}
 			self.Owner.Status_InvulnSnd:Play()
 			if self.Owner == LocalPlayer() then
 				local _,_,_,a = self.Owner:GetViewModel():GetColor()
-				local col = team.GetColor(self.Owner:Team())
+				local _,_,_,a2 = self.Owner:GetHands():GetColor()
+				local col = color_white
+				if self.Owner:Team() == 1001 then --unassigned
+					col = Color(self.Owner:GetPlayerColor().x*255,self.Owner:GetPlayerColor().y*255,self.Owner:GetPlayerColor().z*255,255)
+				else
+					col = team.GetColor(self.Owner:Team())
+				end
 				self.Owner:GetViewModel():SetColor(Color(col.r,col.g,col.b,a))
+				self.Owner:GetHands():SetColor(Color(col.r,col.g,col.b,a2))
 				self.Owner:GetViewModel():SetMaterial("hud/status/invulnoverlay")
+				self.Owner:GetHands():SetMaterial("hud/status/invulnoverlay")
 			end
 		end
 		if self.Owner:IsPlayer() then
 			local _,_,_,a = self.Owner:GetColor()
-			local col = team.GetColor(self.Owner:Team())
+			local col = color_white
+			if self.Owner:Team() == 1001 then --unassigned
+				col = Color(self.Owner:GetPlayerColor().x*255,self.Owner:GetPlayerColor().y*255,self.Owner:GetPlayerColor().z*255,255)
+			else
+				col = team.GetColor(self.Owner:Team())
+			end
 			self.Owner:SetColor(Color(col.r,col.g,col.b,a))
 			for k,v in ipairs(self.Owner:GetWeapons()) do
 				v:SetColor(Color(col.r,col.g,col.b,a))
@@ -1028,8 +1151,11 @@ local STATUS = {}
 			self.Owner.Status_InvulnSnd:Stop()
 			if self.Owner == LocalPlayer() then
 				self.Owner:GetViewModel():SetMaterial()
+				self.Owner:GetHands():SetMaterial()
 				local _,_,_,a = self.Owner:GetViewModel():GetColor()
+				local _,_,_,a2 = self.Owner:GetHands():GetColor()
 				self.Owner:GetViewModel():SetColor(Color(255,255,255,a))
+				self.Owner:GetHands():SetColor(Color(255,255,255,a2))
 			end
 		end
 		if self.Owner:IsPlayer() then
@@ -1159,3 +1285,144 @@ if CLIENT then
 	end)
 
 end
+
+//Temporary Health
+--Functions like in L4D, slowly decays over time, isn't used before permanent health is down to 1
+
+local STATUS = {}
+	
+	STATUS.Name = "TemporaryHealth"
+	STATUS.MaxDrain = 0
+	local nextThink = 0
+	function STATUS:Initialize()
+		self.Value = 0
+		self.MaxDrain = math.floor(self.EndTime - self.StartTime)
+		--Reduce our status effect if we didn't apply our whole health bonus to the player (so we don't take away permanent health)
+		local hypotheticalhealth = self.Owner:Health() + self.MaxDrain
+		self.Owner:SetHealth(math.min(hypotheticalhealth,self.Owner:GetMaxHealth()))
+		if hypotheticalhealth > self.Owner:GetMaxHealth() then
+			self.MaxDrain = self.MaxDrain - (hypotheticalhealth - self.Owner:GetMaxHealth())
+			self.EndTime = self.MaxDrain - self.Value + CurTime()
+		end
+		nextThink = self.nextthinktime --sync up our slower think with the entity's think time
+	end
+	
+	function STATUS:Think()
+		--the player's been damaged down to 1 permanent health, so our duration is going to be lowered
+		if self.MaxDrain - self.Value > self.Owner:Health() - 1 then
+			self.MaxDrain = self.Owner:Health() - 1
+			self.Value = 0
+			self.EndTime = self.MaxDrain - self.Value + CurTime()
+		end
+		 --our slowed down think function for removing health
+		if nextThink < CurTime() then
+			if self.Owner:Health() <= 1.1 then --Make sure we're removed if player is at 1 health (with a little extra for precision error)
+				self.Value = self.MaxDrain
+				self.Owner:InflictStatusEffect("TemporaryHealth",-1 * self.EndTime,1,self.Inflictor) --make sure we end
+			elseif self.Value < self.MaxDrain then
+				self.Owner:SetHealth(math.max(1,self.Owner:Health() - 1)) --Max 1 failsafe to make sure we don't kill the player
+				self.Value = self.Value + 1
+				self.EndTime = self.MaxDrain - self.Value + CurTime()
+			end
+			nextThink = self.nextthinktime + 1 --sync up our slower think with the entity's think time
+		end
+	end
+	
+	function STATUS:Finish()
+		self.Owner:SetHealth(math.max(1,self.Owner:Health() - math.max(0,self.MaxDrain - self.Value))) --if we have any health left to drain, do it.
+	end
+	
+	function STATUS:Add(duration,value) --for now, we don't allow another source of temporary health to be applied while one's active
+		--self.EndTime = self.EndTime + duration
+	end
+	
+	Status2.Register("TemporaryHealth",STATUS)
+	
+	if CLIENT then
+		hook.Add("HUDDrawTargetID","TemporaryHealth",function() end)
+	end
+
+//Drunk
+
+local STATUS = {}
+	
+	STATUS.Name = "Drunk"
+	STATUS.LastValue = 0
+	STATUS.StartTime = 0
+	if CLIENT then
+		local function DrawToyTown( NumPasses, H )
+			cam.Start2D()
+		
+			surface.SetMaterial( matToytown )
+			surface.SetDrawColor( 255, 255, 255, 255 )
+		
+			for i = 1, NumPasses do
+		
+				render.CopyRenderTargetToTexture( render.GetScreenEffectTexture() )
+		
+				surface.DrawTexturedRect( 0, 0, ScrW(), H )
+				surface.DrawTexturedRectUV( 0, ScrH() - H, ScrW(), H, 0, 1, 1, 0 )
+		
+			end
+		
+			cam.End2D()
+		end
+	end
+
+	function STATUS:Initialize()
+		self.StartTime = CurTime()
+		self.Value = 1
+		if CLIENT then
+			hook.Add( "RenderScreenspaceEffects", "ScavDrunk", function()
+				DrawMaterialOverlay( "effects/water_warp01", 0.02 )
+				surface.SetDrawColor(0,255,0,6)
+				surface.DrawRect(0,0,ScrW(),ScrH())
+				local H = math.floor( ScrH() * 0.69 )
+
+				DrawToyTown( 3, H )
+			end )
+		end
+	end
+	
+--if SERVER then
+	function STATUS:Think()
+		if SERVER then
+			self.Owner:ViewPunch(Angle(math.Rand(-self.Value,self.Value),math.Rand(-self.Value,self.Value),0))
+		else
+			hook.Add( "RenderScreenspaceEffects", "ScavDrunk", function()
+				DrawMaterialOverlay( "effects/water_warp01", 0.02 * self.Value )
+				surface.SetDrawColor(0,255,0,3*(1+self.Value))
+				surface.DrawRect(0,0,ScrW(),ScrH())
+				local H = math.floor( ScrH() * 0.29*(1+self.Value) )
+
+				DrawToyTown( 3, H )
+			end )
+		end
+		self.Value = math.max(.5,self.Value - .125/(self.EndTime - self.StartTime)) --lessen effects over time
+		self:NextThink(CurTime()+.125)
+		return true
+	end
+--end
+	
+	function STATUS:Finish()
+		if CLIENT then
+			hook.Remove( "RenderScreenspaceEffects", "ScavDrunk")
+		end
+	end
+
+	function STATUS:Add(duration,value)
+		self.EndTime = self.EndTime+duration
+		self.Value = self.Value+value
+		if CLIENT then
+			hook.Add( "RenderScreenspaceEffects", "ScavDrunk", function()
+				DrawMaterialOverlay( "effects/water_warp01", 0.02 * self.Value )
+				surface.SetDrawColor(0,255,0,3*(1+self.Value))
+				surface.DrawRect(0,0,ScrW(),ScrH())
+				local H = math.floor( ScrH() * 0.29*(1+self.Value) )
+
+				DrawToyTown( 3, H )
+			end )
+		end
+	end
+	
+	Status2.Register("Drunk",STATUS)

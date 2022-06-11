@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "HUD/status/drunk"
+	"$nolod" 1
+	"$translucent" 1
+	$color	"{80 160 20}"
+}

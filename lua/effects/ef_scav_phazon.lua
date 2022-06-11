@@ -11,7 +11,7 @@ function EFFECT:Init(data)
 	self.Weapon = self.Owner:GetActiveWeapon()
 	self.Gravity = VectorRand()*math.Rand(0,1)
 	self.LengthPerPart = math.random(2,20)
-	self.norm = (data:GetNormal()+VectorRand()*0.05):Normalize()
+	self.norm = (data:GetNormal()+VectorRand()*0.05):GetNormalized()
 	self.Created = CurTime()
 end
 
@@ -30,7 +30,7 @@ function EFFECT:Render()
 		self.points = {}
 		self.points[1] = Vector(0,0,0)
 		for i=1,9 do
-			self.norm = (self.norm+VectorRand()*0.075):Normalize()
+			self.norm = (self.norm+VectorRand()*0.075):GetNormalized()
 			table.insert(self.points,self.points[i]+self.norm*self.LengthPerPart)
 		end	
 		self.SetupBeam = true

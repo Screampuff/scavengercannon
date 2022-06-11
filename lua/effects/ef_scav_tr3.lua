@@ -15,7 +15,7 @@ function EFFECT:Init(data)
 	local startpos = self:GetTracerShootPos(self:GetPos(),self.Weapon,1)
 	local ef = EffectData()
 	ef:SetOrigin(self.endpos)
-	ef:SetNormal((startpos-self.endpos):Normalize())
+	ef:SetNormal((startpos-self.endpos):GetNormalized())
 	util.Effect("ManhackSparks",ef)
 	self.Owner:EmitSound("Weapon_PhysCannon.Launch")
 end

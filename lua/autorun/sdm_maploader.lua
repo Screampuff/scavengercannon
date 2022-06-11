@@ -152,7 +152,7 @@ if SERVER then
 	
 	concommand.Add("sdm_vote_submit",function(pl,cmd,args)
 	
-		if not tobool(GetConVarNumber("sdm_allowvote")) and GAMEMODE.Name ~= "Scavenger Deathmatch" then
+		if not GetConVar("sdm_allowvote"):GetBool() and GAMEMODE.Name ~= "Scavenger Deathmatch" then
 			pl:PrintMessage(HUD_PRINTTALK,"Cannot vote on this server. sdm_allowvote must be set to 1")
 			pl:ConCommand("sdm_vote_close")
 			return

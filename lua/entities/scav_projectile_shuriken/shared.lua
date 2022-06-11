@@ -29,7 +29,7 @@ function ENT:Initialize()
         self:SetSolid(SOLID_VPHYSICS)
         self:SetCollisionGroup(COLLISION_GROUP_PROJECTILE)
 		cleanshurikentable()
-		local shurikenstoclean = #shurikens-GetConVarNumber("scav_maxshurikens")+1
+		local shurikenstoclean = #shurikens-GetConVar("scav_maxshurikens"):GetInt()+1
 		if shurikenstoclean > 0 then
 			for i=1,shurikenstoclean do
 				for k,v in pairs(shurikens) do

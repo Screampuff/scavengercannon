@@ -20,7 +20,7 @@ function ProjectileLagCompensation(pl)
 	
 	lastplayer = pl
 	
-	if pl ~= NULL and GetConVarNumber("sv_gprojectile_lagcompensation") == 1 then
+	if pl ~= NULL and GetConVar("sv_gprojectile_lagcompensation"):GetBool() then
 		CurTime = CurTimeBacktrack
 	else
 		CurTime = CurTimeOld
