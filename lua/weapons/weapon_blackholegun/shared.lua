@@ -2,12 +2,6 @@ include("gravball.lua")
 include("waypointwarning.lua")
 include("pickup.lua")
 
-SWEP.Author = "Ghor"
-SWEP.Contact = ""
-SWEP.PrintName = "Black Hole Gun"
-SWEP.Purpose = "Use your surroundings as a weapon!"
-SWEP.Instructions = "Use Secondary Fire to collect ammunition, then hold down Primary Fire to charge up!"
-SWEP.Category = "Scavenger Deathmatch"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 SWEP.Slot = 2

@@ -8,7 +8,7 @@ ENT.lifetime = 4
 function ENT:PhysicsCollide(data,physobj)
 	if data.HitEntity && data.HitEntity:IsValid() then
 		local dir = physobj:GetVelocity():GetNormalized()
-		physobj:SetVelocity((dir-(-2*data.HitNormal*dir:DotProduct(-1*data.HitNormal)))*1500)
+		physobj:SetVelocity((dir-(-2*data.HitNormal*dir:Dot(-1*data.HitNormal)))*1500)
 		
 		local tracep = {}
 			tracep.start = self:GetPos()

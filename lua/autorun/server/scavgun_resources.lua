@@ -19,7 +19,7 @@ resource.AddDirectory("materials/vgui/sgskin/")
 
 resource.AddSingleFile("resource/fonts/inconsolata.ttf")
 
-resource.AddSingleFile("particles/scav_particles91.pcf")
+resource.AddSingleFile("particles/scav_particles93.pcf")
 resource.AddSingleFile("particles/scav_muzzleflashes.pcf")
 resource.AddSingleFile("particles/scav_altguns4.pcf")
 

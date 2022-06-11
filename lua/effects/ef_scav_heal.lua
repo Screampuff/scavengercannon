@@ -4,15 +4,17 @@ function EFFECT:Init(data)
 	self.em = ParticleEmitter(self:GetPos())
 		local owner = Entity(data:GetScale())
 		local healent = data:GetEntity()
-		sound.Play("ambient/energy/ion_cannon_shot3.wav",self:GetPos())
-		local part = self.em:Add("effects/scav_shine5",self:GetPos())
-		if part then
-			part:SetDieTime(1)
-			part:SetStartSize(16)
-			part:SetEndSize(12)
-			part:SetStartAlpha(255)
-			part:SetEndAlpha(128)
-			part.Owner = data:GetEntity()
+		--sound.Play("ambient/energy/ion_cannon_shot3.wav",self:GetPos())
+		if data:GetRadius() > 1 then --don't spam this effect if we're doing a stream of health 
+			local part = self.em:Add("effects/scav_shine5",self:GetPos())
+			if part then
+				part:SetDieTime(1)
+				part:SetStartSize(16)
+				part:SetEndSize(12)
+				part:SetStartAlpha(255)
+				part:SetEndAlpha(128)
+				part.Owner = data:GetEntity()
+			end
 		end
 --		self.em:Finish()
 		local basepos = healent:OBBCenter()

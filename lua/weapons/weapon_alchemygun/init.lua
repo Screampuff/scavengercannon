@@ -109,7 +109,7 @@ function SWEP:Scavenge(ent)
 	self.dt.Ammo2 = self.dt.Ammo2+surfaceinfo.chem*modelinfo.mass
 	self.dt.Ammo3 = self.dt.Ammo3+surfaceinfo.org*modelinfo.mass
 	self.dt.Ammo4 = self.dt.Ammo4+surfaceinfo.earth*modelinfo.mass
-	self:LearnItem(modelname,ent:GetSkin())
+	if ent:GetClass() ~= "func_physbox" then self:LearnItem(modelname,ent:GetSkin()) end
 	ent:Remove()
 end
 

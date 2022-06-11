@@ -1,7 +1,3 @@
-SWEP.Author = "Ghor"
-SWEP.Contact = ""
-SWEP.Purpose = "Sometimes you just need a gun."
-SWEP.Instructions = "Primary fire to shoot. Be careful, this gun uses your stamina for ammo!"
 SWEP.Spawnable = true
 SWEP.AdminSpawnable = true
 
@@ -127,7 +123,7 @@ local bullet = {}
 				SuppressHostEvents(attacker)
 			end
 			//end
-		elseif GetConVarNumber("cl_scav_high") == 1 then
+		elseif GetConVar("cl_scav_high"):GetBool() then
 			//makedlight(tr.HitPos)
 		end
 		//tr.Entity:TakeDamageInfo(dmginfo)

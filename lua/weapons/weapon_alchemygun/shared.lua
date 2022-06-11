@@ -1,8 +1,4 @@
 local SWEP = SWEP
-SWEP.Author = "Ghor"
-SWEP.Contact = ""
-SWEP.Purpose = "Create ammunition and valuable items by collecting materials from various objects!"
-SWEP.Instructions = "Use Secondary Fire to collect materials, open the menu to create your items."
 SWEP.Spawnable = true
 
 SWEP.ViewModel = "models/weapons/scav/c_alchgun.mdl"

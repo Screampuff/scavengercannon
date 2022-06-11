@@ -3,7 +3,9 @@ AddCSLuaFile()
 local SWEP = SWEP||weapons.GetStored("weapon_alchemygun")
 local PANEL = {}
 local color_red = Color(255,0,0,255)
+local color_red_colorblind = Color(190,76,0,255)
 local color_green = Color(0,255,0,255)
+local color_green_colorblind = Color(124,218,255,255)
 
 function PANEL:SetWeapon(wep)
 	if self.wep != wep then
@@ -57,8 +59,8 @@ function PANEL:Init()
 	self.LearnedBox = vgui.Create("DPanelList")
 	self.LearnedBox:EnableHorizontal(true)
 	self.LearnedBox:EnableVerticalScrollbar(true)
-	self.IconSheet:AddSheet("Stock Items",self.StockBox,"icon16/wrench.png",false,false)
-	self.IconSheet:AddSheet("Learned Items",self.LearnedBox,"icon16/brick_add.png",false,false)
+	self.IconSheet:AddSheet("#scav.alchemy.stockitems",self.StockBox,"icon16/wrench.png",false,false)
+	self.IconSheet:AddSheet("#scav.alchemy.learneditems",self.LearnedBox,"icon16/brick_add.png",false,false)
 	self.Initialized = true
 end
 
@@ -189,36 +191,41 @@ function PANEL:Init()
 	
 	self.HaveLabel = vgui.Create("DLabel",self)
 		self.HaveLabel:SetFont("Scav_ConsoleText")
-		self.HaveLabel:SetText("Have")
+		self.HaveLabel:SetText("#scav.alchemy.have")
+		self.HaveLabel:SetTextColor(color_white)
 		self.HaveLabel:SizeToContents()
 	self.CostLabel = vgui.Create("DLabel",self)
 		self.CostLabel:SetFont("Scav_ConsoleText")
-		self.CostLabel:SetText("Cost")
+		self.CostLabel:SetText("#scav.alchemy.cost")
+		self.CostLabel:SetTextColor(color_white)
 		self.CostLabel:SizeToContents()
 	self.items = {}
 	for i=1,4 do
 		local panel = vgui.Create("DPanel",self)
 		panel.Type = vgui.Create("DLabel",panel)
 		panel.Type:SetFont("Scav_ConsoleText")
+		panel.Type:SetTextColor(color_white)
 		panel.Image = vgui.Create("DImage",panel)
 		panel.Image:SetSize(16,16)
 		panel.Have = vgui.Create("DLabel",panel)
 		panel.Have:SetFont("Scav_ConsoleText")
 		panel.Have:SetText("0")
+		panel.Have:SetTextColor(color_white)
 		panel.Cost = vgui.Create("DLabel",panel)
 		panel.Cost:SetFont("Scav_ConsoleText")
 		panel.Cost:SetText("0")
+		panel.Cost:SetTextColor(color_white)
 		panel.RealCost = 0
 		table.insert(self.items,panel)
 	end
 	self.items[1].Image:SetImage("hud/alchemy_gun/metal")
-	self.items[1].Type:SetText("Metal")
+	self.items[1].Type:SetText("#scav.alchemy.ammometal")
 	self.items[2].Image:SetImage("hud/alchemy_gun/chemicals")
-	self.items[2].Type:SetText("Chemicals")
+	self.items[2].Type:SetText("#scav.alchemy.ammochems")
 	self.items[3].Image:SetImage("hud/alchemy_gun/org")
-	self.items[3].Type:SetText("Organics")
+	self.items[3].Type:SetText("#scav.alchemy.ammoorgan")
 	self.items[4].Image:SetImage("hud/alchemy_gun/earth")
-	self.items[4].Type:SetText("Earth")
+	self.items[4].Type:SetText("#scav.alchemy.ammoearth")
 	self.Initialized = true
 end
 
@@ -260,9 +267,17 @@ function PANEL:Update()
 	end
 	for i=1,4 do
 		if self.wep.dt["Ammo"..i] < self.items[i].RealCost then
-			self.items[i].Have:SetTextColor(color_red)
+			if not GetConVar("cl_scav_colorblindmode"):GetBool() then
+				self.items[i].Have:SetTextColor(color_red)
+			else
+				self.items[i].Have:SetTextColor(color_red_colorblind)
+			end
 		else
-			self.items[i].Have:SetTextColor(color_green)
+			if not GetConVar("cl_scav_colorblindmode"):GetBool() then
+				self.items[i].Have:SetTextColor(color_green)
+			else
+				self.items[i].Have:SetTextColor(color_green_colorblind)
+			end
 		end
 	end
 	if self.Menu then
@@ -299,7 +314,7 @@ function PANEL:Update()
 end
 
 function PANEL:AutoCosts()
-	local model = GetConVarString("scav_ag_model")
+	local model = GetConVar("scav_ag_model"):GetString()
 	local modelinfo = SWEP:GetAlchemyInfo(model)
 	local surfaceinfo = SWEP:GetSurfaceInfo(modelinfo.material)
 	self:SetCosts(surfaceinfo.metal*modelinfo.mass,surfaceinfo.chem*modelinfo.mass,surfaceinfo.org*modelinfo.mass,surfaceinfo.earth*modelinfo.mass)
@@ -378,8 +393,8 @@ local PANEL = {}
 		end
 		
 		function PANEL:Update()
-			local model = GetConVarString("scav_ag_model")
-			local skin = GetConVarNumber("scav_ag_skin")
+			local model = GetConVar("scav_ag_model"):GetString()
+			local skin = GetConVar("scav_ag_skin"):GetInt()
 			self.PreviewIcon:SetModel(model,skin)
 			self.CostBoard:AutoCosts()
 		end

@@ -7,7 +7,7 @@ end
 
 function ENT:Draw()
 	
-	if !sp && ((CurTime()-self.Created) < GetConVarNumber("cl_interp")) then
+	if !sp && (CurTime()-self.Created) < GetConVar("cl_interp"):GetFloat() then
 		return
 	end
     local ent = self.dt.StickEntity

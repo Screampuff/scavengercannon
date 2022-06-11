@@ -22,7 +22,7 @@ function EFFECT:Init(data)
 	ef:SetNormal(dir)
 	util.Effect("ManhackSparks",ef)
 	ParticleEffect("scav_exp_bp",self.endpos,dir:Angle(),Entity(0))
-	if tobool(GetConVarNumber("cl_scav_high")) then
+	if GetConVar("cl_scav_high"):GetBool() then
 		self:BuildDLight()
 	end
 	self.VPHandle = util.GetPixelVisibleHandle()

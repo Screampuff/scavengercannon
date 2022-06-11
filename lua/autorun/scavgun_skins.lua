@@ -127,7 +127,7 @@ function SKIN:DrawGenericBackgroundPlain( x, y, w, h, color )
 end
 
 function SKIN:DrawGenericBackground( x, y, w, h, color )
-	if GetConVarNumber("scav_skin_plain") != 0 then
+	if GetConVar("scav_skin_plain"):GetBool() then
 		self:DrawGenericBackgroundPlain(x,y,w,h,color)
 		return
 	end
@@ -285,7 +285,7 @@ end
 function SKIN:PaintFrame( panel )
 	local w = panel:GetWide()
 	local h = panel:GetTall()
-	if (GetConVarNumber("scav_skin_plain") == 1) then
+	if (GetConVar("scav_skin_plain"):GetBool()) then
 		self:DrawGenericBackgroundPlain(0, 28, panel:GetWide(), panel:GetTall()-28, panel.m_bgColor)
 		self:DrawGenericBackgroundPlain(0, 0, panel:GetWide(), 28, panel.m_bgColor)
 	 else
@@ -306,7 +306,7 @@ end
 function SKIN:PaintPanel( panel )
 	if (panel.m_bPaintBackground) then
 		local w, h = panel:GetSize()
-		if (GetConVarNumber("scav_skin_plain") == 1) then
+		if (GetConVar("scav_skin_plain"):GetBool()) then
 			self:DrawGenericBackgroundPlain(0,0,w,h,panel.m_bgColor)
 		else
 			self:DrawGenericBackground(0,0,w,h,panel.m_bgColor)

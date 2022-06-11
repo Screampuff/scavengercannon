@@ -37,7 +37,7 @@ function ENT:UpdateDLight()
 end
 
 function ENT:OnKill()
-	self:SetParent()
+	--self:SetParent()
 	if self.sound then
 		self.sound:Stop()
 	end
@@ -45,6 +45,10 @@ function ENT:OnKill()
 		vm = self:GetViewModel()
 		if IsValid(vm) then
 			vm:StopParticleEmission()
+		end
+		local wep = self.Weapon
+		if IsValid(wep) then
+			self.Weapon:StopParticleEmission()
 		end
 	end
 end
@@ -80,7 +84,8 @@ function ENT:OnWorldMode()
 		vm:StopParticleEmission()
 	end
 	if IsValid(wep) then
-		wep:CreateParticleEffect("scav_bigshot_charge",wep)
+		--wep:CreateParticleEffect("scav_bigshot_charge",wep)
+		ParticleEffectAttach("scav_bigshot_charge",PATTACH_POINT_FOLLOW,wep,wep:LookupAttachment("muzzle"))
 	end
 end
 

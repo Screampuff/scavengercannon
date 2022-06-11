@@ -1,4 +1,10 @@
 include("shared.lua")
+SWEP.Author = "Ghor"
+SWEP.Contact = ""
+SWEP.PrintName = language.GetPhrase("scav.bhg.name")
+SWEP.Purpose = language.GetPhrase("scav.bhg.purpose")
+SWEP.Instructions = language.GetPhrase("scav.bhg.instructions")
+SWEP.Category = language.GetPhrase("scav.category")
 SWEP.Ammo = 0
 SWEP.LastDTAmmo = 0
 killicon.Add("weapon_blackholegun","hud/weapons/weapon_blackholegun",color_white)
@@ -21,18 +27,18 @@ local BHG_RTSCREEN = GetRenderTarget("bhg_screen","256","256")
 local col_renderclear = Color(0,0,0,255)
 
 local startuplines = {
-"SCAVCO. CF-2200 v4.0",
-"Running SkyBIOS rev. 2.033",
-"INITIALIZING...",
-"] RUNNING SAFETY DIAGNOSTICS...",
-"] RECALIBRATING GRAVITY MATRIX ",
-"] CHECKING MATTER RESERVOIR",
-"] INITIALIZING COOLANT LINES",
-"] LOADING WAYPOINT VISUALIZER..",
-"] VERIFYING IDENTITY...",
-"] VERIFICATION COMPLETE",
-"] STATUS: ONLINE",
-"] ID PARSED!! WELCOME: THRILLHO"
+	language.GetPhrase("scav.bhg.startup1"),
+	language.GetPhrase("scav.bhg.startup2"),
+	language.GetPhrase("scav.bhg.startup3"),
+	language.GetPhrase("scav.bhg.startup4"),
+	language.GetPhrase("scav.bhg.startup5"),
+	language.GetPhrase("scav.bhg.startup6"),
+	language.GetPhrase("scav.bhg.startup7"),
+	language.GetPhrase("scav.bhg.startup8"),
+	language.GetPhrase("scav.bhg.startup9"),
+	language.GetPhrase("scav.bhg.startup10"),
+	language.GetPhrase("scav.bhg.startup11"),
+	language.GetPhrase("scav.bhg.startup12")
 }
 
 surface.CreateFont("BHG7", {font = "Inconsolata", size = 16, weight = 400, antialiasing = true, additive = false, outlined = false, blur = false})
@@ -52,7 +58,13 @@ function SWEP:DrawScreenBoot(progress)
 end
 
 function SWEP:DrawCharging()
-	draw.DrawText("SCAVCO. CF-2200 V4.0\nUSER: "..LocalPlayer():Nick().."\n-------------------------------\nAmmunition: "..self:GetAmmo().."/"..self:GetMaxAmmo().."\nCharge Level: "..math.floor(self.Charge).."\nAssigned Waypoints: "..self.dt.WaypointCount.."/"..self.dt.MaxWaypoints,"BHG10",5,5,col_textcol,0)
+	draw.DrawText(language.GetPhrase("scav.bhg.startup1")
+				.."\n"..language.GetPhrase("scav.bhg.user")..LocalPlayer():Nick()
+				.."\n-------------------------------\n"
+				..language.GetPhrase("scav.bhg.ammo")..self:GetAmmo().."/"..self:GetMaxAmmo()
+				.."\n"..language.GetPhrase("scav.bhg.charge")..math.floor(self.Charge)
+				.."\n"..language.GetPhrase("scav.bhg.waypoints")..self.dt.WaypointCount.."/"..self.dt.MaxWaypoints,
+				"BHG10",5,5,col_textcol,0)
 end
 
 SWEP.DeployedTime = 0

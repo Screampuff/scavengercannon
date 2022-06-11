@@ -38,7 +38,7 @@ if CLIENT then
 			//self:SetEndSize(48)
 			self:SetEndAlpha(0)
 			local dir = self:GetVelocity():GetNormalized()
-			self:SetVelocity((dir-(2*tr.HitNormal*dir:DotProduct(tr.HitNormal)))*self:GetVelocity():Length()*0.5)
+			self:SetVelocity((dir-(2*tr.HitNormal*dir:Dot(tr.HitNormal)))*self:GetVelocity():Length()*0.5)
 			
 			local part = self.em:Add("particle/smokesprites_000"..math.random(1,9),tr.HitPos)
 			if part then
@@ -75,7 +75,7 @@ if CLIENT then
 			if part then
 				local velscale = math.Rand(1,2*i)*forcescale
 				part:SetColor(211,234,134)
-				part:SetVelocity((aimvec+VectorRand()*0.1):Normalize()*100*velscale+vel)
+				part:SetVelocity((aimvec+VectorRand()*0.1):GetNormalized()*100*velscale+vel)
 				part:SetDieTime(2/velscale)
 				part:SetStartSize(2)
 				part:SetEndSize(2+math.random(0,8))

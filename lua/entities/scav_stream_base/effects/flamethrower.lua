@@ -25,21 +25,23 @@ end
 
 function ENT:BuildDLight()
 	self.dlight = DynamicLight(0)
-	self.dlight.Pos = self:GetPos()
+	local attach = self.Weapon:GetAttachment(self.Weapon:LookupAttachment("muzzle"))
+	self.dlight.Pos = attach.Pos+attach.Ang:Forward()*16
 	self.dlight.r = 255
-	self.dlight.g = 200
-	self.dlight.b = 150
-	self.dlight.Brightness = 3
-	self.dlight.Size = 500
+	self.dlight.g = 120
+	self.dlight.b = 50
+	self.dlight.Brightness = .6
+	self.dlight.Size = 300
 	self.dlight.Decay = 500
 	self.dlight.DieTime = CurTime() + 1
 end
 
 function ENT:UpdateDLight()
 	if self.dlight then
-		self.dlight.Pos = self:GetPos()
-		self.dlight.Brightness = 3
-		self.dlight.Size = 500
+		local attach = self.Weapon:GetAttachment(self.Weapon:LookupAttachment("muzzle"))
+		self.dlight.Pos = attach.Pos+attach.Ang:Forward()*16
+		self.dlight.Brightness = .6
+		self.dlight.Size = 300
 		self.dlight.DieTime = CurTime() + 1
 	else
 		self:BuildDLight()

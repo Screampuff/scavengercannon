@@ -11,7 +11,9 @@ ENT.Damage 				= 128
 ENT.Range 				= 200
 
 PrecacheParticleSystem("scav_proxmine_green")
+PrecacheParticleSystem("scav_proxmine_green_colorblind")
 PrecacheParticleSystem("scav_proxmine_red")
+PrecacheParticleSystem("scav_proxmine_red_colorblind")
 
 function ENT:SetupDataTables()
 	self:DTVar("Int",0,"state")
@@ -157,7 +159,13 @@ if SERVER then
 			if state == 1 then --friendly
 			
 				if self.dt.showrings then
-					ParticleEffectAttach("scav_proxmine_green",PATTACH_ABSORIGIN_FOLLOW,self,0)
+					if self.dt.showrings then
+						if not GetConVar("cl_scav_colorblindmode"):GetBool() then
+							ParticleEffectAttach("scav_proxmine_green",PATTACH_ABSORIGIN_FOLLOW,self,0)
+						else
+							ParticleEffectAttach("scav_proxmine_green_colorblind",PATTACH_ABSORIGIN_FOLLOW,self,0)
+						end
+					end
 				end
 				
 				self.sound1:Stop()
@@ -165,7 +173,13 @@ if SERVER then
 			elseif state == 2 then --enemy
 			
 				if self.dt.showrings then
-					ParticleEffectAttach("scav_proxmine_red",PATTACH_ABSORIGIN_FOLLOW,self,0)
+					if self.dt.showrings then
+						if not GetConVar("cl_scav_colorblindmode"):GetBool() then
+							ParticleEffectAttach("scav_proxmine_red",PATTACH_ABSORIGIN_FOLLOW,self,0)
+						else
+							ParticleEffectAttach("scav_proxmine_red_colorblind",PATTACH_ABSORIGIN_FOLLOW,self,0)
+						end
+					end
 				end
 				
 				if not self.dt.silent then

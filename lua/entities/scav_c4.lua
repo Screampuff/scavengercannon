@@ -42,6 +42,10 @@ if SERVER then
 	function ENT:Think()
 	
 		if not self.dt.Armed then return false end
+
+		if self:GetStatusEffect("Frozen") then
+			self.dt.DetonateTime = self.dt.DetonateTime + 0.1 --slow down timer if frozen
+		end
 		
 		if self.nextbeep < CurTime() then
 			local time = self.dt.DetonateTime - CurTime()
@@ -113,12 +117,12 @@ else
 			surface.SetTextColor(color_red)
 			if (time%3 < 1) then
 				surface.SetTextPos(13,0)
-				surface.DrawText("ARMED")
+				surface.DrawText("#scav.c4.armed")
 			end
 		else
 			surface.SetTextColor(color_green)
 			surface.SetTextPos(4,0)
-			surface.DrawText("DISARMED")
+			surface.DrawText("#scav.c4.disarmed")
 		end
 		
 		surface.SetTextPos(4,9)

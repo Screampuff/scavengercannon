@@ -135,7 +135,7 @@ function ENT:PhysicsCollide(data,phys)
                 dmg:SetAttacker(self)
             end
             dmg:SetInflictor(self)
-            dmg:SetDamageForce(data.OurOldVelocity*90000)
+            dmg:SetDamageForce(data.OurOldVelocity) --not multiplying this by 90,000 anymore. Why was it?
             dmg:SetDamage(self.Damage)
             ent:TakeDamageInfo(dmg)
         end
