@@ -20,8 +20,12 @@ function ENT:OnKill()
 	end
 	if CLIENT then
 		vm = self:GetViewModel()
+		local wep = self.Weapon
 		if IsValid(vm) then
 			vm:StopParticleEmission()
+		end
+		if IsValid(wep) then
+			wep:StopParticleEmission()
 		end
 	end
 end
@@ -52,7 +56,7 @@ function ENT:OnWorldMode()
 		vm:StopParticleEmission()
 	end
 	if IsValid(wep) then
-		wep:CreateParticleEffect("scav_radio",wep)
+		ParticleEffectAttach("scav_radio",PATTACH_POINT_FOLLOW,wep,wep:LookupAttachment("muzzle"))
 	end
 end
 
