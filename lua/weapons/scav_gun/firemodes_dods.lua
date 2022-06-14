@@ -30,7 +30,7 @@ local dodsshelleject = function(self,shellsize)
 				phys:SetVelocity(vecShellVelocity)
 				phys:SetAngleVelocity(angShellAngles:Forward()*1000)
 			end
-			timer.Simple(10,function() brass:Remove() end)
+			timer.Simple(10,function() if IsValid(brass) then brass:Remove() end end)
 		end
 	end
 end
@@ -368,7 +368,7 @@ end
 										phys:SetVelocity(vecShellVelocity)
 										phys:SetAngleVelocity(angShellAngles:Forward()*1000)
 									end
-									timer.Simple(10,function() ping:Remove() end)
+									timer.Simple(10,function() if IsValid(ping) then ping:Remove() end end)
 								end
 							end
 						end)

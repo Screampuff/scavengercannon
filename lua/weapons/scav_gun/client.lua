@@ -587,19 +587,43 @@ if CLIENT then
 		end
 	end
 
-	hook.Add("ScavScreenDrawOverride","NoOverride", function(check)
+	hook.Add("ScavScreenDrawOverride","NoOverride", function(self,check)
 		local runcheck = check or false
 		if check then return nil end
 	end)
 
-	hook.Add("ScavScreenDrawOverrideIdle","NoOverride", function(check)
+	hook.Add("ScavScreenDrawOverrideIdle","NoOverride", function(self,check)
 		local runcheck = check or false
 		if check then return nil end
 	end)
 
-	hook.Add("ScavScreenDrawOverridePost","NoOverride", function(check)
+	hook.Add("ScavScreenDrawOverridePost","NoOverride", function(self,check)
 		local runcheck = check or false
 		if check then return nil end
+	end)
+
+	hook.Add("ScavScreenDrawOverridePost","RadStatic",function(self)
+		radthink = radthink or CurTime()
+		geiger = geiger or SCAV_SHORT_MAX
+		--GetInternalVariable("m_iGeigerRange")
+		if radthink <= CurTime() then
+			--geiger decay (effect trails off nicely instead of just abruptly ending)
+			if geiger < 800 then
+				geiger = geiger + 50
+			end
+			for _,v in pairs(ents.FindInBox(self.Owner:GetPos()-Vector(800,800,800),self.Owner:GetPos()+Vector(800,800,800))) do
+				if v:GetStatusEffect("Radiation") then
+					geiger = math.min(geiger,self.Owner:GetPos():Distance(v:GetPos()))
+				end
+			end
+			radthink = CurTime() + 0.25
+		end
+		if geiger < 800 then
+		 	for i=1,(800-geiger) do
+				surface.SetDrawColor(255,255,255)
+				surface.DrawRect(math.Rand(0,255),math.Rand(0,127),math.Rand(1,math.ceil(i/100)),math.Rand(1,math.ceil(i/100)))
+			end
+		end
 	end)
 
 	function SWEP:DrawIdle()
@@ -746,7 +770,6 @@ if CLIENT then
 		--render.ClearRenderTarget(SCAV_RTSCREEN,col_renderclear)
 		render.SetViewPort(0,0,256,256)
 		cam.Start2D()
-			local drawing = false
 			local item = nil
 			if IsValid(self.inv.items[1]) then
 				item = ScavData.models[self.inv.items[1].ammo]
@@ -754,26 +777,21 @@ if CLIENT then
 			--Locked screen
 			if self:IsLocked() then
 				self:DrawLocked()
-				drawing = true
 			--Screen Draw Override Hook
-			elseif hook.Run("ScavScreenDrawOverride",true) then
-				hook.Run("ScavScreenDrawOverride")
+			elseif hook.Run("ScavScreenDrawOverride",self,true) then
+				hook.Run("ScavScreenDrawOverride",self)
 			--Auto-Targeting System screen
 			elseif item and item.Name == "#scav.scavcan.computer" then
 				self:DrawAutoTargetScreen(item.On)
-				drawing = true
 			--Cooldown screen
 			elseif ((self.nextfire - CurTime() > 0.25 and self.nextfireearly == 0) or self.nextfireearly - CurTime() > 0.25) and not self.ChargeAttack then
 				self:DrawCooldown()
-				drawing = true
 			--Nice screen
 			elseif IsValid(self.inv.items[1]) and self.inv.items[1].subammo == 69 then
 				self:DrawNice()
-				drawing = true
 			--Charge Attack Firing screen
 			elseif self.ChargeAttack then
 				self:DrawFiring()
-				drawing = true
 			--Seeking Rocket Screen
 			elseif item and item.Name == "#scav.scavcan.rocket" then
 				local seeking = false
@@ -790,18 +808,19 @@ if CLIENT then
 				else
 					self:DrawIdle()
 				end
-				drawing = true
 			--Screen Draw Override Idle Hook
-			elseif hook.Run("ScavScreenDrawOverrideIdle",true) then
-				hook.Run("ScavScreenDrawOverrideIdle")
+			elseif hook.Run("ScavScreenDrawOverrideIdle",self,true) and self.nextfire <= CurTime() then
+				hook.Run("ScavScreenDrawOverrideIdle",self)
 			--Idle Screen 
 			elseif self.nextfire <= CurTime() then
 				self:DrawIdle()
-				drawing = true
+			--Cooldown Screen ending catch
+			else
+				self:DrawCooldown()
 			end
 			--Screen Post Draw Hook
-			if drawing and hook.Run("ScavScreenDrawOverridePost",true) then
-				hook.Run("ScavScreenDrawOverridePost")
+			if hook.Run("ScavScreenDrawOverridePost",self,true) then
+				hook.Run("ScavScreenDrawOverridePost",self)
 			end
 		cam.End2D()
 		render.SetRenderTarget(rend)
