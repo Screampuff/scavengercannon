@@ -14,21 +14,21 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 			tab.tracep.mask = MASK_SHOT
 			tab.tracep.mins = Vector(-32,-32,-32)
 			tab.tracep.maxs = Vector(32,32,32)
-			if SERVER then
-				tab.FireFunc = function(self,item)
-						local tab = ScavData.models["models/combine_turrets/floor_turret.mdl"]
-						tab.tracep.start = self.Owner:GetShootPos()+self:GetAimVector()*48
-						tab.tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*20000
-						tab.tracep.filter = self.Owner
-						local tr = util.TraceHull(tab.tracep)
-						local dir
-						if tr.Entity:IsValid() then
-							dir = (tr.Entity:GetPos()+tr.Entity:OBBCenter()-self.Owner:GetShootPos()):GetNormalized()
-						else
-							dir = self:GetAimVector()
-						end
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local tab = ScavData.models["models/combine_turrets/floor_turret.mdl"]
+					tab.tracep.start = self.Owner:GetShootPos()+self:GetAimVector()*48
+					tab.tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*20000
+					tab.tracep.filter = self.Owner
+					local tr = util.TraceHull(tab.tracep)
+					local dir
+					if tr.Entity:IsValid() then
+						dir = (tr.Entity:GetPos()+tr.Entity:OBBCenter()-self.Owner:GetShootPos()):GetNormalized()
+					else
+						dir = self:GetAimVector()
+					end
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					local bullet = {}
 						bullet.Num = 1
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = dir
@@ -36,32 +36,47 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 4
-						if string.find(item.ammo,"models/buildables/sentry") then
+					if string.find(item.ammo,"models/buildables/sentry") then
+						if SERVER then
 							if item.ammo == "models/buildables/sentry1.mdl" then
-								self.Owner:EmitToAllButSelf("weapons/sentry_shoot.wav")
+								self.Owner:EmitSound("weapons/sentry_shoot.wav")
 							else
-								self.Owner:EmitToAllButSelf("weapons/sentry_shoot2.wav")
+								self.Owner:EmitSound("weapons/sentry_shoot2.wav")
 							end
-							bullet.TracerName = "ef_scav_tr_b"
-						elseif item.ammo == "models/sentry.mdl" then
-							self.Owner:EmitToAllButSelf("turret/tu_fire1.wav",75,160,1)
-							bullet.TracerName = "Tracer"
-						else
-							self.Owner:EmitToAllButSelf("npc/turret_floor/shoot"..math.random(1,3)..".wav")
-							bullet.TracerName = "AR2Tracer"
 						end
-						self.Owner:FireBullets(bullet)
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-
-
-						if item.ammo == "models/buildables/sentry1.mdl" then
-							tab.Cooldown = 0.25
-						else
-							tab.Cooldown = 0.1
-						end
-						if SERVER then return self:TakeSubammo(item,1) end
+						bullet.TracerName = "ef_scav_tr_b"
+					elseif item.ammo == "models/sentry.mdl" then
+						if SERVER then self.Owner:EmitSound("turret/tu_fire1.wav",75,160,1) end
+						bullet.TracerName = "Tracer"
+					else
+						if SERVER then self.Owner:EmitSound("npc/turret_floor/shoot"..math.random(1,3)..".wav") end
+						bullet.TracerName = "AR2Tracer"
 					end
-				tab.OnArmed = function(self,item,olditemname)
+					self.Owner:FireBullets(bullet)
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					if CLIENT then
+						self.Owner:ScavViewPunch(Angle(math.Rand(0,1),math.Rand(-1,1),0),0.5)
+					else
+						self:TakeSubammo(item,1)
+					end
+				end
+				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
+				if !continuefiring and SERVER then
+					self.ChargeAttack = nil
+				end
+				if item.ammo == "models/buildables/sentry1.mdl" then
+					return 0.25
+				else
+					return 0.1
+				end
+			end
+			tab.FireFunc = function(self,item)
+				self.ChargeAttack = ScavData.models["models/combine_turrets/floor_turret.mdl"].ChargeAttack
+				self.chargeitem = item							
+				return false
+			end
+			tab.OnArmed = function(self,item,olditemname)
+				if SERVER then
 					local newitem = item
 					if newitem.ammo != olditemname then
 						if newitem.ammo == "models/props/turret_01.mdl" then
@@ -75,6 +90,8 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						end
 					end
 				end
+			end
+			if SERVER then
 				ScavData.CollectFuncs["models/combine_turrets/floor_turret.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),100,ent:GetSkin(),1) end
 				--Portal
 				ScavData.CollectFuncs["models/props/turret_01.mdl"] = ScavData.CollectFuncs["models/combine_turrets/floor_turret.mdl"]
@@ -86,57 +103,8 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 				ScavData.CollectFuncs["models/buildables/sentry3_heavy.mdl"] = function(self,ent) self:AddItem("models/buildables/sentry2.mdl",100,ent:GetSkin(),1) end
 				--HLS
 				ScavData.CollectFuncs["models/sentry.mdl"] = ScavData.CollectFuncs["models/combine_turrets/floor_turret.mdl"]
-			else
-				tab.FireFunc = function(self,item)
-						if item.subammo <= 0 then
-							return
-						end
-						local tab = ScavData.models["models/combine_turrets/floor_turret.mdl"]
-						tab.tracep.start = self.Owner:GetShootPos()+self:GetAimVector()*48
-						tab.tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*20000
-						tab.tracep.filter = self.Owner
-						local tr = util.TraceHull(tab.tracep)
-						local dir
-						if tr.Entity:IsValid() then
-							dir = (tr.Entity:GetPos()+tr.Entity:OBBCenter()-self.Owner:GetShootPos()):GetNormalized()
-						else
-							dir = self:GetAimVector()
-						end
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						self.Owner:ScavViewPunch(Angle(math.Rand(0,1),math.Rand(-1,1),0),0.5)
-						local bullet = {}
-						bullet.Num = 1
-						bullet.Src = self.Owner:GetShootPos()
-						bullet.Dir = dir
-						bullet.Spread = Vector(0.02,0.02,0)
-						bullet.Tracer = 1
-						bullet.Force = 5
-						bullet.Damage = 4
-						if string.find(item.ammo,"models/buildables/sentry") then
-							if item.ammo == "models/buildables/sentry1.mdl" then
-								self.Owner:EmitSound("weapons/sentry_shoot.wav")
-							else
-								self.Owner:EmitSound("weapons/sentry_shoot2.wav")
-							end
-							bullet.TracerName = "ef_scav_tr_b"
-						elseif item.ammo == "models/sentry.mdl" then
-							self.Owner:EmitSound("turret/tu_fire1.wav",75,160,1)
-							bullet.TracerName = "Tracer"
-						else
-							self.Owner:EmitSound("npc/turret_floor/shoot"..math.random(1,3)..".wav")
-							bullet.TracerName = "AR2Tracer"
-						end
-						if item.ammo == "models/buildables/sentry1.mdl" then
-							tab.Cooldown = 0.25
-						else
-							tab.Cooldown = 0.1
-						end
-						
-						self.Owner:FireBullets(bullet)
-						--return self:TakeSubammo(item,1)
-					end
 			end
-			tab.Cooldown = 0.1
+			tab.Cooldown = 0
 		ScavData.models["models/combine_turrets/floor_turret.mdl"] = tab
 		--Portal
 		ScavData.models["models/props/turret_01.mdl"] = tab
@@ -761,82 +729,88 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 				bullet.TracerName = "ef_scav_tr_b"
 			function tab.OnArmed(self,item,olditemname)
 				if SERVER then
-					if item.ammo == "models/weapons/shells/shell_shotgun.mdl" then
-						self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
-						timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
-					elseif item.ammo == "models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" or
-						item.ammo == "models/workshop_partner/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" then
-					elseif item.ammo == "models/shotgunshell.mdl" then
-						self.Owner:EmitSound("weapons/scock1.wav")
-					else
-						self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
+					if olditemname == "" or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
+						if item.ammo == "models/weapons/shells/shell_shotgun.mdl" then
+							self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
+							timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
+						elseif item.ammo == "models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" or
+							item.ammo == "models/workshop_partner/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" then
+						elseif item.ammo == "models/shotgunshell.mdl" then
+							self.Owner:EmitSound("weapons/scock1.wav")
+						else
+							self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
+						end
 					end
 				end
 			end
 			tab.FireFunc = function(self,item)
-					self.Owner:ScavViewPunch(Angle(-10,math.Rand(-0.1,0.1),0),0.3)
-					bullet.Src = self.Owner:GetShootPos()
-					bullet.Dir = self:GetAimVector()
-					self.Owner:FireBullets(bullet)
-					self:MuzzleFlash2()
-					self.Owner:SetAnimation(PLAYER_ATTACK1)
+				self.Owner:ScavViewPunch(Angle(-10,math.Rand(-0.1,0.1),0),0.3)
+				bullet.Src = self.Owner:GetShootPos()
+				bullet.Dir = self:GetAimVector()
+				self.Owner:FireBullets(bullet)
+				self:MuzzleFlash2()
+				self.Owner:SetAnimation(PLAYER_ATTACK1)
+				if item.ammo == "models/weapons/shells/shell_shotgun.mdl" then --TF2
 					if SERVER then
-						if item.ammo == "models/weapons/shells/shell_shotgun.mdl" then --TF2
+						if self.Owner:GetStatusEffect("DamageX") then
+							self.Owner:EmitSound("weapons/shotgun_shoot_crit.wav") --crit sound
+						else
 							self.Owner:EmitSound("weapons/shotgun_shoot.wav")
-							if item.subammo > 1 then
-								timer.Simple(0.4,function()
-									self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
-									timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
-									--TODO: TF2 shell eject
-								end)
-							end
-						elseif item.ammo == "models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" or
-							item.ammo == "models/workshop_partner/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" then --Widowmaker
-							self.Owner:EmitSound("weapons/widow_maker_shot_02.wav")
-						elseif item.ammo == "models/shotgunshell.mdl" then --HL1
-							self.Owner:EmitSound("weapons/sbarrel1.wav")
-							if item.subammo > 1 then
-								timer.Simple(0.4,function()
-									self.Owner:EmitSound("weapons/scock1.wav")
-									local ef = EffectData()
-									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-									if attach then
-										ef:SetOrigin(attach.Pos)
-										ef:SetAngles(attach.Ang)
-										--lovingly borrowed from https://steamcommunity.com/sharedfiles/filedetails/?id=1360233031
-										local angShellAngles = self.Owner:EyeAngles()
-										local vecShellVelocity = self.Owner:GetAbsVelocity()
-										vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
-										vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
-										vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
-										ef:SetStart(vecShellVelocity)
-										ef:SetEntity(self.Owner)
-										ef:SetFlags(1) --shotgun shell
-										util.Effect("HL1ShellEject",ef)
-									end
-								end)
-							end
-						else --HL2
-							self.Owner:EmitSound("weapons/shotgun/shotgun_fire6.wav")
-							if item.subammo > 1 then
-								timer.Simple(0.4,function()
-									self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
-									local ef = EffectData()
-									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-									if attach then
-										ef:SetOrigin(attach.Pos)
-										ef:SetAngles(attach.Ang)
-										util.Effect("ShotgunShellEject",ef)
-									end
-								end)
-							end
 						end
 					end
-					if SERVER then return self:TakeSubammo(item,1) end
+					timer.Simple(0.4,function()
+						if SERVER then
+							self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
+							timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
+						else
+							tf2shelleject(self,"shotgun")
+						end
+					end)
+				elseif SERVER then
+					if item.ammo == "models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" or
+					item.ammo == "models/workshop_partner/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" then --Widowmaker
+						self.Owner:EmitSound("weapons/widow_maker_shot_02.wav")
+					elseif item.ammo == "models/shotgunshell.mdl" then --HL1
+						self.Owner:EmitSound("weapons/sbarrel1.wav")
+						timer.Simple(0.4,function()
+							self.Owner:EmitSound("weapons/scock1.wav")
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								--lovingly borrowed from https://steamcommunity.com/sharedfiles/filedetails/?id=1360233031
+								local angShellAngles = self.Owner:EyeAngles()
+								local vecShellVelocity = self.Owner:GetAbsVelocity()
+								vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
+								vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
+								vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
+								ef:SetStart(vecShellVelocity)
+								ef:SetEntity(self.Owner)
+								ef:SetFlags(1) --shotgun shell
+								util.Effect("HL1ShellEject",ef)
+							end
+						end)
+					else --HL2
+						self.Owner:EmitSound("weapons/shotgun/shotgun_fire6.wav")
+						timer.Simple(0.4,function()
+							self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								util.Effect("ShotgunShellEject",ef)
+							end
+						end)
+					end
 				end
+				if SERVER then return self:TakeSubammo(item,1) end
+			end
 			if SERVER then		
 				ScavData.CollectFuncs["models/items/boxbuckshot.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",20,0,1) end --20 shotgun shells from a box of shells
 				ScavData.CollectFuncs["models/weapons/w_shotgun.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",6,0,1) end --6 shotgun shells from a shotgun
+				ScavData.CollectFuncs["models/scav/shells/shell_shotgun_tf2.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",1,0,1) end --convert Scav TF2 shell
 				--Ep2
 				ScavData.CollectFuncs["models/items/ammocrate_buckshot.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",6,0,5) end --5 x 6 shotgun shells from a shotgun crate
 				--TF2
@@ -894,68 +868,80 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 3
 			tab.bullet = {}
-			tab.bullet.Num = 1
-			tab.bullet.Spread = Vector(0.03,0.03,0)
-			tab.bullet.Tracer = 1
-			tab.bullet.Force = 0
-			tab.bullet.Damage = 5
-			tab.bullet.TracerName = "ef_scav_tr_b"
+				tab.bullet.Num = 1
+				tab.bullet.Spread = Vector(0.03,0.03,0)
+				tab.bullet.Tracer = 1
+				tab.bullet.Force = 0
+				tab.bullet.Damage = 5
+				tab.bullet.TracerName = "ef_scav_tr_b"
 			tab.FireFunc = function(self,item)
-					local tab = ScavData.models[self.inv.items[1].ammo]
-					self.Owner:ScavViewPunch(Angle(math.Rand(-1,1),math.Rand(-1,1),0),0.5)
-					tab.bullet.Src = self.Owner:GetShootPos()
-					tab.bullet.Dir = self:GetAimVector()
+				local tab = ScavData.models[self.inv.items[1].ammo]
+				self.Owner:ScavViewPunch(Angle(math.Rand(-1,1),math.Rand(-1,1),0),0.5)
+				tab.bullet.Src = self.Owner:GetShootPos()
+				tab.bullet.Dir = self:GetAimVector()
 
-					self.Owner:FireBullets(tab.bullet)
-					if SERVER then self.Owner:SetAnimation(PLAYER_ATTACK1) end
-					self:MuzzleFlash2()
-					if item.ammo == "models/items/boxsrounds.mdl" or item.ammo == "models/weapons/w_pistol.mdl" then
-						self.Owner:EmitSound("Weapon_Pistol.Single")
-						timer.Simple(.025,function() 
-							local ef = EffectData()
-							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-							if attach and SERVER then
-								ef:SetOrigin(attach.Pos)
-								ef:SetAngles(attach.Ang)
-								util.Effect("ShellEject",ef)
-							end
-						end)
-					elseif item.ammo == "models/w_9mmhandgun.mdl" then
-						self.Owner:EmitSound("weapons/pl_gun3.wav")
-						timer.Simple(.025,function() 
-							local ef = EffectData()
-							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-							if attach and SERVER then
-								ef:SetOrigin(attach.Pos)
-								ef:SetAngles(attach.Ang)
-								--lovingly borrowed from https://steamcommunity.com/sharedfiles/filedetails/?id=1360233031
-								local angShellAngles = self.Owner:EyeAngles()
-								local vecShellVelocity = self.Owner:GetAbsVelocity()
-								vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
-								vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
-								vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
-								ef:SetStart(vecShellVelocity)
-								ef:SetEntity(self.Owner)
-								ef:SetFlags(0) --pistol shell
-								util.Effect("HL1ShellEject",ef)
-							end
-						end)
+				self.Owner:FireBullets(tab.bullet)
+				if SERVER then self.Owner:SetAnimation(PLAYER_ATTACK1) end
+				self:MuzzleFlash2()
+				if item.ammo == "models/items/boxsrounds.mdl" or item.ammo == "models/weapons/w_pistol.mdl" then
+					self.Owner:EmitSound("Weapon_Pistol.Single")
+					timer.Simple(.025,function() 
+						local ef = EffectData()
+						local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+						if attach and SERVER then
+							ef:SetOrigin(attach.Pos)
+							ef:SetAngles(attach.Ang)
+							util.Effect("ShellEject",ef)
+						end
+					end)
+				elseif item.ammo == "models/w_9mmhandgun.mdl" then --HL:S
+					self.Owner:EmitSound("weapons/pl_gun3.wav")
+					timer.Simple(.025,function() 
+						local ef = EffectData()
+						local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+						if attach and SERVER then
+							ef:SetOrigin(attach.Pos)
+							ef:SetAngles(attach.Ang)
+							--lovingly borrowed from https://steamcommunity.com/sharedfiles/filedetails/?id=1360233031
+							local angShellAngles = self.Owner:EyeAngles()
+							local vecShellVelocity = self.Owner:GetAbsVelocity()
+							vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
+							vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
+							vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
+							ef:SetStart(vecShellVelocity)
+							ef:SetEntity(self.Owner)
+							ef:SetFlags(0) --pistol shell
+							util.Effect("HL1ShellEject",ef)
+						end
+					end)
+				else --TF2
+					if self.Owner:GetStatusEffect("DamageX") then
+						self.Owner:EmitSound("weapons/pistol_shoot_crit.wav",75,100) --crit sound
 					else
-						self.Owner:EmitSound("weapons/pistol_shoot.wav")
-						timer.Simple(.025,function() 
-							local ef = EffectData()
-							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-							if attach and SERVER then
-								ef:SetOrigin(attach.Pos)
-								ef:SetAngles(attach.Ang)
-								--TODO: TF2 shell eject
-								--util.Effect("ShellEject",ef)
-							end
-						end)
+						self.Owner:EmitSound("weapons/pistol_shoot.wav",75,100)
 					end
-					self.nextfireearly = CurTime()+0.1
-					if SERVER then return self:TakeSubammo(item,1) end
+					timer.Simple(.025,function() 
+						local ef = EffectData()
+						local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+						if attach then
+							ef:SetOrigin(attach.Pos)
+							ef:SetAngles(attach.Ang)
+							if CLIENT then
+								tf2shelleject(self)
+							end
+						end
+					end)
 				end
+				self.nextfireearly = CurTime()+0.1
+				if SERVER then return self:TakeSubammo(item,1) end
+			end
+			function tab.OnArmed(self,item,olditemname)
+				if SERVER then
+					if olditemname == "" or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
+						self.Owner:EmitSound("physics/metal/weapon_impact_soft3.wav") --TODO: nice slide sound
+					end
+				end
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/items/boxsrounds.mdl"] = function(self,ent) self:AddItem("models/items/boxsrounds.mdl",20,0) end --20 pistol rounds from a box of bullets
 				ScavData.CollectFuncs["models/weapons/w_pistol.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),18,0) end --18 pistol rounds from a HL2 pistol
@@ -1007,47 +993,65 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 3
 			tab.Callback = function(attacker,tr,dmg)
-									local ef = EffectData()
-									ef:SetOrigin(tr.HitPos)
-									ef:SetNormal(tr.HitNormal)
-									util.Effect("AR2Impact",ef)
-								end
-			local bullet = {}
-				bullet.Num = 1
-				bullet.Tracer = 1
-				bullet.Force = 5
-				bullet.Damage = 8
-				bullet.TracerName = "AR2Tracer"
-				bullet.Callback = tab.Callback
-			tab.FireFunc = function(self,item)
-					if item.subammo <= 0 and CLIENT then
-						return
-					end
-					local scale1 = 1
-					if self.mousepressed then
-						scale1 = 1+math.Clamp((CurTime()-self.mousepressed),0,3)
-					end
-					if CLIENT then self.Owner:ScavViewPunch(Angle(math.Rand(0,-1*scale1),math.Rand(-1*scale1,1*scale1),0),0.5) end
-					bullet.Spread = Vector(0.02*scale1,0.02*scale1,0)
-					bullet.Src = self.Owner:GetShootPos()
-					bullet.Dir = self:GetAimVector()
+				local ef = EffectData()
+				ef:SetOrigin(tr.HitPos)
+				ef:SetNormal(tr.HitNormal)
+				util.Effect("AR2Impact",ef)
+			end
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
+						bullet.Num = 1
+						bullet.Tracer = 1
+						bullet.Force = 5
+						bullet.Damage = 8
+						bullet.TracerName = "AR2Tracer"
+						bullet.Callback = tab.Callback
+						local scale1 = 1
+						if self.mousepressed then
+							scale1 = 1+math.Clamp((CurTime()-self.mousepressed),0,3)
+						end
+						if CLIENT then self.Owner:ScavViewPunch(Angle(math.Rand(0,-1*scale1),math.Rand(-1*scale1,1*scale1),0),0.5) end
+						bullet.Spread = Vector(0.02*scale1,0.02*scale1,0)
+						bullet.Src = self.Owner:GetShootPos()
+						bullet.Dir = self:GetAimVector()
 					self.Owner:FireBullets(bullet)
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:MuzzleFlash2(2)
-					self.Owner:EmitSound("Weapon_AR2.Single")
 					if SERVER then
+						self.Owner:EmitSound("Weapon_AR2.Single")
 						self:AddBarrelSpin(500)
 						self:SetPanelPose(math.Min(.5,math.Max(0,scale1-1.5)),scale1/2)
 						timer.Simple(tab.Cooldown,function() self:SetPanelPose(0,scale1/4) end)
-						return self:TakeSubammo(item,1)
+						self:TakeSubammo(item,1)
 					end
 				end
+				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
+				if !continuefiring then
+					if SERVER then
+						self.ChargeAttack = nil
+					end
+				end
+				return 0.1
+			end
+			tab.FireFunc = function(self,item)
+				self.ChargeAttack = ScavData.models["models/weapons/w_irifle.mdl"].ChargeAttack
+				self.chargeitem = item							
+				return false
+			end
+			function tab.OnArmed(self,item,olditemname)
+				if SERVER then
+					--if item.ammo == "models/weapons/w_irifle.mdl" then
+						self.Owner:EmitSound("weapons/ar2/ar2_reload_push.wav")
+					--end
+				end
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/items/ammocrate_ar2.mdl"] = function(self,ent) self:AddItem("models/items/combine_rifle_cartridge01.mdl",30,0,3) end
 				ScavData.CollectFuncs["models/items/combine_rifle_cartridge01.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end				
 				ScavData.CollectFuncs["models/weapons/w_irifle.mdl"] = ScavData.CollectFuncs["models/items/combine_rifle_cartridge01.mdl"]
 			end
-			tab.Cooldown = 0.1
+			tab.Cooldown = 0
 		ScavData.models["models/items/combine_rifle_cartridge01.mdl"] = tab
 		ScavData.models["models/weapons/w_irifle.mdl"] = tab
 		
@@ -1059,14 +1063,14 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 7
 			tab.Callback = function(attacker,tr,dmg)
-									local ef = EffectData()
-									ef:SetOrigin(tr.HitPos)
-									ef:SetNormal(tr.HitNormal)
-									//ef:SetScale(1)
-									//ef:SetMagnitude(10)
-									//util.Effect("HelicopterImpact",ef)
-									util.Effect("AR2Impact",ef)
-								end
+				local ef = EffectData()
+				ef:SetOrigin(tr.HitPos)
+				ef:SetNormal(tr.HitNormal)
+				//ef:SetScale(1)
+				//ef:SetMagnitude(10)
+				//util.Effect("HelicopterImpact",ef)
+				util.Effect("AR2Impact",ef)
+			end
 			local bullet = {}
 				bullet.Num = 1
 				bullet.Tracer = 1
@@ -1075,15 +1079,13 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 				bullet.TracerName = "ef_scav_tr_strider"
 				bullet.Callback = tab.Callback
 			local ef = EffectData()
-			tab.FireFunc = function(self,item)
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
 					local scale1 = 1
 					if self.mousepressed then
 						scale1 = 4-math.Clamp((CurTime()-self.mousepressed),0,3)
 					end
 					if CLIENT then
-						if item.subammo <= 0 then
-							return
-						end
 						self.Owner:ScavViewPunch(Angle(math.Rand(0,-1*scale1),math.Rand(-1*scale1,1*scale1),0),0.5)
 					end
 					bullet.Spread = Vector(0.02*scale1,0.02*scale1,0)
@@ -1100,14 +1102,27 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 					ef:SetNormal(bullet.Dir)
 					ef:SetScale(0.25)
 					util.Effect("StriderMuzzleFlash",ef)
-					if SERVER then self.Owner:SetAnimation(PLAYER_ATTACK1) end
-					self.Owner:EmitSound("NPC_Strider.FireMinigun")
-					if SERVER then return self:TakeSubammo(item,1) end
+					if SERVER then
+						self.Owner:SetAnimation(PLAYER_ATTACK1)
+						self.Owner:EmitSound("NPC_Strider.FireMinigun")
+						self:TakeSubammo(item,1)
+					end
 				end
+				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
+				if !continuefiring and SERVER then
+					self.ChargeAttack = nil
+				end
+				return 0.2
+			end
+			tab.FireFunc = function(self,item)
+				self.ChargeAttack = ScavData.models["models/gibs/strider_head.mdl"].ChargeAttack
+				self.chargeitem = item							
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/gibs/strider_head.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),100,0,1) end
 			end
-			tab.Cooldown = 0.2
+			tab.Cooldown = 0
 		ScavData.models["models/gibs/strider_head.mdl"] = tab
 		
 /*==============================================================================================
@@ -1265,6 +1280,13 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									return true
 								end
 			end
+			function tab.OnArmed(self,item,olditemname)
+				if SERVER then
+					--if item.ammo == "models/items/combine_rifle_ammo01.mdl" then
+						self.Owner:EmitSound("weapons/ar2/ar2_reload_rotate.wav")
+					--end
+				end
+			end
 			tab.Cooldown = 0.5
 			
 		ScavData.models["models/items/combine_rifle_ammo01.mdl"] = tab
@@ -1420,7 +1442,7 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 										self.soundloops.healthCharger:Play()
 									end
 									target:SetHealth(math.min(target:GetMaxHealth(),target:Health()+1))
-									self:TakeSubammo(item,1)
+									if SERVER then self:TakeSubammo(item,1) end
 								elseif SERVER then --our target is full health, switch over to beep loop
 									self.StopBeep = false
 									fullBeep(self,item)
@@ -1525,8 +1547,10 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 										self.soundloops.suitCharger = CreateSound(self.Owner,"items/suitcharge1.wav")
 										self.soundloops.suitCharger:Play()
 									end
-									if SERVER then target:SetArmor(math.min(target:GetMaxArmor(),target:Armor()+1)) end
-									self:TakeSubammo(item,1)
+									if SERVER then
+										target:SetArmor(math.min(target:GetMaxArmor(),target:Armor()+1))
+										self:TakeSubammo(item,1)
+									end
 								elseif SERVER then --our target is full armor, switch over to beep loop
 									self.StopBeep = false
 									fullBeep(self,item)
@@ -1571,9 +1595,11 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 							end
 			if SERVER then
 				ScavData.CollectFuncs["models/props_combine/suit_charger001.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),math.Round(GetConVar("sk_suitcharger"):GetFloat()) or 75,ent:GetSkin()) end --(default 75) battery for chargers
+				ScavData.CollectFuncs["models/props_lab/hevplate.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),math.Round(GetConVar("sk_suitcharger"):GetFloat()) or 75,ent:GetSkin()) end --(default 75) battery for chargers
 			end
 		
 		ScavData.models["models/props_combine/suit_charger001.mdl"] = tab
+		ScavData.models["models/props_lab/hevplate.mdl"] = tab
 		
 /*==============================================================================================
 	-- .357 rounds
@@ -1584,28 +1610,23 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 			tab.anim = ACT_VM_RECOIL2
 			tab.Level = 4
 			tab.FireFunc = function(self,item)
-					if item.subammo <= 0 and CLIENT then
-						return
-					end
-					local bullet = {}
-					bullet.Num = 1
-					bullet.Src = self.Owner:GetShootPos()
-					bullet.Dir = self:GetAimVector()
-					bullet.Spread = vector_origin
-					bullet.Tracer = 1
-					bullet.Force = 5
-					bullet.Damage = 40
-					bullet.TracerName = "ef_scav_tr_b"
-					self.Owner:FireBullets(bullet)
-					self:MuzzleFlash2()
-					self.Owner:SetAnimation(PLAYER_ATTACK1)
-					self.Owner:EmitSound("Weapon_357.Single")
-					if SERVER then
-						self.Owner:ScavViewPunch(Angle(-15,math.Rand(-0.1,0.1),0),0.5)
-					else
-						self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle())
-						self.Owner:ScavViewPunch(Angle(-15,math.Rand(-0.1,0.1),0),0.5)
-					end
+				local bullet = {}
+				bullet.Num = 1
+				bullet.Src = self.Owner:GetShootPos()
+				bullet.Dir = self:GetAimVector()
+				bullet.Spread = vector_origin
+				bullet.Tracer = 1
+				bullet.Force = 5
+				bullet.Damage = 40
+				bullet.TracerName = "ef_scav_tr_b"
+				self.Owner:FireBullets(bullet)
+				self:MuzzleFlash2()
+				self.Owner:SetAnimation(PLAYER_ATTACK1)
+				self.Owner:EmitSound("Weapon_357.Single")
+				self.Owner:ScavViewPunch(Angle(-15,math.Rand(-0.1,0.1),0),0.5)
+				if CLIENT then
+					self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle())
+				else
 					if item.ammo == "models/weapons/w_357.mdl" then
 						if (item.subammo <= 1 and SERVER) or (item.subammo <= 0 and CLIENT) then --drop shells at end
 							timer.Simple(0.5,function()
@@ -1633,8 +1654,18 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 							end
 						end)
 					end
-					if SERVER then return self:TakeSubammo(item,1) end
+					return self:TakeSubammo(item,1)
 				end
+			end
+			function tab.OnArmed(self,item,olditemname)
+				if SERVER then
+					if item.ammo == "models/weapons/w_357.mdl"
+					or item.ammo == "models/items/357ammo.mdl"
+					or item.ammo == "models/items/357ammobox.mdl" then
+						self.Owner:EmitSound("weapons/357/357_spin1.wav")
+					end
+				end
+			end
 			if SERVER then
 				--TODO: give these their own models/sounds where appropriate
 				ScavData.CollectFuncs["models/weapons/w_357.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",6,0,1) end --6 .357 rounds from a box of bullets
@@ -1655,12 +1686,12 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_letranger/c_letranger.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_letranger/c_letranger.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_dex_revolver/c_dex_revolver.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",5,0,1) end --5 .357 rounds from the Diamondback
 				--FoF
-				ScavData.CollectFuncs["models/weapons/w_carbine.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",1,0,1) end --1 .357 round from the Carbine
+				ScavData.CollectFuncs["models/weapons/w_carbine.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",1,0,1) end --1 .357 round from the Carbine
 				ScavData.CollectFuncs["models/weapons/w_dualnavy.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",6,0,2) end --2 x 6 .357 round from the duals
-				ScavData.CollectFuncs["models/weapons/w_henryrifle.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",16,0,1) end --16 .357 rounds from the Henry Rifle
-				ScavData.CollectFuncs["models/weapons/w_maresleg.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",8,0,1) end --8 .357 rounds from the Mare's Leg
-				ScavData.CollectFuncs["models/weapons/w_spencer.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",7,0,1) end --7 .357 rounds from the Spencer
-				ScavData.CollectFuncs["models/weapons/w_volcanic.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",9,0,1) end --9 .357 rounds from the Volcanic
+				ScavData.CollectFuncs["models/weapons/w_henryrifle.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",16,0,1) end --16 .357 rounds from the Henry Rifle
+				ScavData.CollectFuncs["models/weapons/w_maresleg.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",8,0,1) end --8 .357 rounds from the Mare's Leg
+				ScavData.CollectFuncs["models/weapons/w_spencer.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",7,0,1) end --7 .357 rounds from the Spencer
+				ScavData.CollectFuncs["models/weapons/w_volcanic.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",9,0,1) end --9 .357 rounds from the Volcanic
 				ScavData.CollectFuncs["models/weapons/w_volcanic2.mdl"] = ScavData.CollectFuncs["models/weapons/w_volcanic.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_mauser.mdl"] = ScavData.CollectFuncs["models/weapons/w_volcanic.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_mauser2.mdl"] = ScavData.CollectFuncs["models/weapons/w_mauser.mdl"]
@@ -1692,11 +1723,10 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 			tab.Name = "#scav.scavcan.smg"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 3
-			if SERVER then
-					
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
-						local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
+					local bullet = {}
 						bullet.Num = 1
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
@@ -1705,10 +1735,40 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						bullet.Force = 5
 						bullet.Damage = 4
 						bullet.TracerName = "ef_scav_tr_b"
-						self.Owner:FireBullets(bullet)
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if item.ammo == "models/w_9mmar.mdl" then
-							self.Owner:EmitToAllButSelf("weapons/hks"..math.floor(math.Rand(1,4))..".wav")
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					if SERVER then
+						self:AddBarrelSpin(200)
+						self:TakeSubammo(item,1)
+					end
+					if item.ammo == "models/weapons/w_models/w_smg.mdl" or item.ammo == "models/weapons/c_models/c_smg/c_smg.mdl" then --TF2
+						if SERVER then
+							if self.Owner:GetStatusEffect("DamageX") then
+								self.Owner:EmitSound("weapons/smg_shoot_crit.wav",75,100) --crit sound
+							else
+								self.Owner:EmitSound("weapons/smg_shoot.wav",75,100)
+							end
+						else
+							timer.Simple(.025,function() 
+								tf2shelleject(self)
+							end)
+						end
+					elseif item.ammo == "models/weapons/c_models/c_pro_smg/c_pro_smg.mdl" or item.ammo == "models/workshop/weapons/c_models/c_pro_smg/c_pro_smg.mdl" then --Cleaner's Carbine
+						if SERVER then
+							if self.Owner:GetStatusEffect("DamageX") then
+								self.Owner:EmitSound("weapons/doom_sniper_smg_crit.wav",75,100) --crit sound
+							else
+								self.Owner:EmitSound("weapons/doom_sniper_smg.wav",75,100)
+							end
+						else
+							timer.Simple(.025,function() 
+								tf2shelleject(self)
+							end)
+						end
+					elseif SERVER then
+						if item.ammo == "models/w_9mmar.mdl" then --HLS
+							self.Owner:EmitSound("weapons/hks"..math.floor(math.Rand(1,4))..".wav")
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -1727,8 +1787,19 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("HL1ShellEject",ef)
 								end
 							end)
-						else
-							self.Owner:EmitToAllButSelf("Weapon_SMG1.Single")
+						elseif item.ammo == "models/weapons/w_alyx_gun.mdl" then
+							self.Owner:EmitSound("Weapon_Alyx_Gun.Single")
+							timer.Simple(.025,function() 
+								local ef = EffectData()
+								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+								if attach then
+									ef:SetOrigin(attach.Pos)
+									ef:SetAngles(attach.Ang)
+									util.Effect("ShellEject",ef)
+								end
+							end)
+						else--if item.ammo == "models/items/boxmrounds.mdl" or item.ammo == "models/weapons/w_smg1.mdl" then
+							self.Owner:EmitSound("Weapon_SMG1.Single")
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -1739,47 +1810,45 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								end
 							end)
 						end
-						self:MuzzleFlash2()
-						self:AddBarrelSpin(200)
-						if SERVER then return self:TakeSubammo(item,1) end
 					end
-				
+				end
+				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()	
+				if !continuefiring and SERVER then
+					self.ChargeAttack = nil
+				end
+				if item.ammo == "models/weapons/w_models/w_smg.mdl" or item.ammo == "models/weapons/c_models/c_smg/c_smg.mdl" then --TF2
+					return 0.105
+				elseif item.ammo == "models/weapons/c_models/c_pro_smg/c_pro_smg.mdl" or item.ammo == "models/workshop/weapons/c_models/c_pro_smg/c_pro_smg.mdl" then --Cleaner's Carbine
+					return 0.135
+				else
+					return 0.065
+				end
+			end
+			tab.FireFunc = function(self,item)
+				self.ChargeAttack = ScavData.models["models/weapons/w_smg1.mdl"].ChargeAttack
+				self.chargeitem = item							
+				return false
+			end
+			function tab.OnArmed(self,item,olditemname)
+				if SERVER then
+					--if item.ammo == "models/weapons/w_smg1.mdl" then
+						self.Owner:EmitSound("weapons/smg1/switch_burst.wav")
+					--end
+				end
+			end
+			if SERVER then
 				ScavData.CollectFuncs["models/items/ammocrate_smg1.mdl"] = function(self,ent) self:AddItem("models/weapons/w_smg1.mdl",45,0,3) end
 				--ScavData.CollectFuncs["models/items/ammocrate_smg2.mdl"] = ScavData.CollectFuncs["models/items/ammocrate_smg1.mdl"]
 				ScavData.CollectFuncs["models/items/boxmrounds.mdl"] = function(self,ent) self:AddItem("models/items/boxmrounds.mdl",20,0) end
 				ScavData.CollectFuncs["models/weapons/w_smg1.mdl"] = function(self,ent) self:AddItem("models/weapons/w_smg1.mdl",45,0) end
-				ScavData.CollectFuncs["models/weapons/w_alyx_gun.mdl"] = function(self,ent) self:AddItem("models/weapons/w_smg1.mdl",45,0) end
+				ScavData.CollectFuncs["models/weapons/w_alyx_gun.mdl"] = function(self,ent) self:AddItem("models/weapons/w_alyx_gun.mdl",30,0) end
 				--TF2
 				ScavData.CollectFuncs["models/weapons/w_models/w_smg.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),25,0) end
 				ScavData.CollectFuncs["models/weapons/c_models/c_smg/c_smg.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_smg.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_pro_smg/c_pro_smg.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),20,0) end
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_pro_smg/c_pro_smg.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_pro_smg/c_pro_smg.mdl"]
-			else
-				tab.FireFunc = function(self,item)
-						if item.subammo <= 0 then
-							return
-						end
-						local bullet = {}
-						bullet.Num = 1
-						bullet.Src = self.Owner:GetShootPos()
-						bullet.Dir = self:GetAimVector()
-						bullet.Spread = Vector(0.05,0.05,0)
-						bullet.Tracer = 2
-						bullet.Force = 5
-						bullet.Damage = 12
-						bullet.TracerName = "ef_scav_tr_b"
-						self.Owner:FireBullets(bullet)
-						if item.ammo == "models/w_9mmar.mdl" then
-							self.Owner:EmitSound("weapons/hks"..math.floor(math.Rand(1,4))..".wav")
-						else
-							self.Owner:EmitSound("Weapon_SMG1.Single")
-						end
-						self:MuzzleFlash2()
-						self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
-						--return self:TakeSubammo(item,1)
-					end
 			end
-			tab.Cooldown = 0.065
+			tab.Cooldown = 0
 		ScavData.models["models/items/boxmrounds.mdl"] = tab
 		ScavData.models["models/weapons/w_smg1.mdl"] = tab
 		ScavData.models["models/weapons/w_alyx_gun.mdl"] = tab
@@ -1923,43 +1992,43 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 				tracep.mins = Vector(-2,-2,-2)
 				tracep.maxs = Vector(2,2,2)
 				tab.ChargeAttack = function(self,item)
-						local shootpos = self.Owner:GetShootPos()
-						tracep.start = shootpos
-						tracep.endpos = shootpos+self:GetAimVector()*2000
-						tracep.filter = self.Owner
-						local tr = util.TraceHull(tracep)
-						util.ParticleTracerEx("vortigaunt_beam",self:GetAttachment(self:LookupAttachment("muzzle")).Pos,tr.HitPos,false,self:EntIndex(),1)
-						if tr.Entity:IsValid() then
-							dmg:SetAttacker(self.Owner)
-							dmg:SetInflictor(self)
-							dmg:SetDamagePosition(tr.HitPos)
-							dmg:SetDamageType(DMG_SHOCK)
-							dmg:SetDamage(50)
-							dmg:SetDamageForce(tr.Normal*12000)
-							tr.Entity:TakeDamageInfo(dmg)
-						end
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						self.Owner:EmitToAllButSelf("npc/vort/vort_explode1.wav")
-						self.Owner:EmitToAllButSelf("npc/vort/attack_shoot.wav",45)
-						sound.Play("npc/vort/vort_explode2.wav",tr.HitPos)
-						self.soundloops.scavvort:Stop()
-						self.ChargeAttack = nil
-						self:SetBlockPose(0,4)
-						return 0.5
+					local shootpos = self.Owner:GetShootPos()
+					tracep.start = shootpos
+					tracep.endpos = shootpos+self:GetAimVector()*2000
+					tracep.filter = self.Owner
+					local tr = util.TraceHull(tracep)
+					util.ParticleTracerEx("vortigaunt_beam",self:GetAttachment(self:LookupAttachment("muzzle")).Pos,tr.HitPos,false,self:EntIndex(),1)
+					if tr.Entity:IsValid() then
+						dmg:SetAttacker(self.Owner)
+						dmg:SetInflictor(self)
+						dmg:SetDamagePosition(tr.HitPos)
+						dmg:SetDamageType(DMG_SHOCK)
+						dmg:SetDamage(50)
+						dmg:SetDamageForce(tr.Normal*12000)
+						tr.Entity:TakeDamageInfo(dmg)
 					end
-					tab.FireFunc = function(self,item)
-						self.ChargeAttack = ScavData.models["models/vortigaunt.mdl"].ChargeAttack
-						if self.Owner.snd_scavvort then
-							self.Owner.snd_scavvort:Stop()
-						end
-						if !self.soundloops.scavvort then
-							self.soundloops.scavvort = CreateSound(self.Owner,"npc/vort/attack_charge.wav")
-						end
-						self.soundloops.scavvort:Play()
-						self.chargeitem = item
-						self:SetBlockPose(1,4)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self.Owner:EmitToAllButSelf("npc/vort/vort_explode1.wav")
+					self.Owner:EmitToAllButSelf("npc/vort/attack_shoot.wav",45)
+					sound.Play("npc/vort/vort_explode2.wav",tr.HitPos)
+					self.soundloops.scavvort:Stop()
+					self.ChargeAttack = nil
+					self:SetBlockPose(0,4)
+					return 0.5
+				end
+				tab.FireFunc = function(self,item)
+					self.ChargeAttack = ScavData.models["models/vortigaunt.mdl"].ChargeAttack
+					if self.Owner.snd_scavvort then
+						self.Owner.snd_scavvort:Stop()
 					end
+					if !self.soundloops.scavvort then
+						self.soundloops.scavvort = CreateSound(self.Owner,"npc/vort/attack_charge.wav")
+					end
+					self.soundloops.scavvort:Play()
+					self.chargeitem = item
+					self:SetBlockPose(1,4)
+					if SERVER then return self:TakeSubammo(item,1) end
+				end
 				ScavData.CollectFuncs["models/vortigaunt.mdl"] = function(self,ent) self:AddItem(ent:GetModel(),10,ent:GetSkin()) end
 				ScavData.CollectFuncs["models/vortigaunt_slave.mdl"] = ScavData.CollectFuncs["models/vortigaunt.mdl"]
 				--Ep1
@@ -1976,32 +2045,52 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 				tracep.maxs = Vector(2,2,2)
 				local ef = EffectData()
 				tab.ChargeAttack = function(self,item)
-						local shootpos = self.Owner:GetShootPos()
-						tracep.start = shootpos
-						tracep.endpos = shootpos+self:GetAimVector()*2000
-						tracep.filter = self.Owner
-						local tr = util.TraceHull(tracep)
-						if self.Owner == GetViewEntity() then
-							util.ParticleTracerEx("vortigaunt_beam",self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos,self.Owner:GetEyeTraceNoCursor().HitPos,false,0,-1)
-						else
-							util.ParticleTracerEx("vortigaunt_beam",self:GetAttachment(self:LookupAttachment("muzzle")).Pos,self.Owner:GetEyeTraceNoCursor().HitPos,false,self:EntIndex(),1)
-						end
-						self.Owner:EmitSound("npc/vort/vort_explode1.wav")
-						self.Owner:EmitSound("npc/vort/attack_shoot.wav",45)
-						ef:SetOrigin(tr.HitPos)
-						ef:SetNormal(tr.HitNormal)
-						util.Effect("StunstickImpact",ef)
-						self.ChargeAttack = nil
-						return 0.5
-						
+					local shootpos = self.Owner:GetShootPos()
+					tracep.start = shootpos
+					tracep.endpos = shootpos+self:GetAimVector()*2000
+					tracep.filter = self.Owner
+					local tr = util.TraceHull(tracep)
+					if self.Owner == GetViewEntity() then
+						util.ParticleTracerEx("vortigaunt_beam",self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos,self.Owner:GetEyeTraceNoCursor().HitPos,false,0,-1)
+					else
+						util.ParticleTracerEx("vortigaunt_beam",self:GetAttachment(self:LookupAttachment("muzzle")).Pos,self.Owner:GetEyeTraceNoCursor().HitPos,false,self:EntIndex(),1)
 					end
-					G_ATTACH = 1
-					tab.FireFunc = function(self,item)
-										self.ChargeAttack = ScavData.models["models/vortigaunt.mdl"].ChargeAttack
-										self.chargeitem = item
-										ParticleEffectAttach("scav_vm_vort",PATTACH_POINT_FOLLOW,self.Owner:GetViewModel(),G_ATTACH)
-										--return self:TakeSubammo(item,1)
-									end
+					self.Owner:EmitSound("npc/vort/vort_explode1.wav")
+					self.Owner:EmitSound("npc/vort/attack_shoot.wav",45)
+					ef:SetOrigin(tr.HitPos)
+					ef:SetNormal(tr.HitNormal)
+					if GetConVar("cl_scav_high"):GetBool() then
+						self.dlight = DynamicLight(0)
+							self.dlight.Pos = tr.HitPos
+							self.dlight.r = 110
+							self.dlight.g = 200
+							self.dlight.b = 75
+							self.dlight.Brightness = .5
+							self.dlight.Size = 512
+							self.dlight.Decay = 750
+							self.dlight.DieTime = CurTime() + .75
+					end
+					util.Effect("StunstickImpact",ef)
+					self.ChargeAttack = nil
+					return 0.5
+					
+				end
+				tab.FireFunc = function(self,item)
+					self.ChargeAttack = ScavData.models["models/vortigaunt.mdl"].ChargeAttack
+					self.chargeitem = item
+					ParticleEffectAttach("scav_vm_vort",PATTACH_POINT_FOLLOW,self.Owner:GetViewModel(),self:LookupAttachment("muzzle"))
+					if GetConVar("cl_scav_high"):GetBool() then
+						self.dlight = DynamicLight(0)
+							self.dlight.Pos = self.Owner:GetShootPos()
+							self.dlight.r = 110
+							self.dlight.g = 200
+							self.dlight.b = 75
+							self.dlight.Brightness = .625
+							self.dlight.Size = 512
+							self.dlight.Decay = 250
+							self.dlight.DieTime = CurTime() + 1.5
+					end
+				end
 			end
 			tab.Cooldown = 1
 		ScavData.models["models/vortigaunt.mdl"] = tab

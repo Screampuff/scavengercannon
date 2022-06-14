@@ -30,7 +30,7 @@ local dodsshelleject = function(self,shellsize)
 				phys:SetVelocity(vecShellVelocity)
 				phys:SetAngleVelocity(angShellAngles:Forward()*1000)
 			end
-			timer.Simple(10,function() brass:Remove() end)
+			timer.Simple(10,function() if IsValid(brass) then brass:Remove() end end)
 		end
 	end
 end
@@ -51,11 +51,14 @@ end
 						if self.Owner:GetVelocity():LengthSqr() < 20000 then
 							if self.Owner:Crouching() and self.Owner:GetVelocity():LengthSqr() < 800 then --900 would be crouching with walk key held
 								bullet.Spread = Vector(0.1,0.1,0) --"true" spread for bipod is .01 in DoD, but this player has a lot more freedom of movement
+								if CLIENT then self.Owner:SetEyeAngles((vector_up*0.01+self:GetAimVector()):Angle()) end
 							else
 								bullet.Spread = Vector(0.2,0.2,0)
+								if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 							end
 						else
 							bullet.Spread = Vector(0.3,0.3,0)
+							if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 						end
 						bullet.Tracer = 1
 						bullet.Force = 5
@@ -63,7 +66,6 @@ end
 						bullet.TracerName = "ef_scav_tr_b"
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-					--self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true) --TODO: DoD:S viewpunch
 					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
 					self.Owner:FireBullets(bullet)
 					self:MuzzleFlash2()
@@ -130,7 +132,8 @@ end
 						bullet.TracerName = "ef_scav_tr_b"
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-						self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true) --TODO: DoD:S viewpunch
+						self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
+						if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 					self.Owner:FireBullets(bullet)
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -189,7 +192,8 @@ end
 						bullet.TracerName = "ef_scav_tr_b"
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true) --TODO: DoD:S viewpunch
+					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
+					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 					self.Owner:FireBullets(bullet)
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -246,6 +250,7 @@ end
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
+				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 				self.Owner:FireBullets(bullet)
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -292,6 +297,7 @@ end
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
+				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 				self.Owner:FireBullets(bullet)
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -333,6 +339,7 @@ end
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
+					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 					self.Owner:FireBullets(bullet)
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -361,7 +368,7 @@ end
 										phys:SetVelocity(vecShellVelocity)
 										phys:SetAngleVelocity(angShellAngles:Forward()*1000)
 									end
-									timer.Simple(10,function() ping:Remove() end)
+									timer.Simple(10,function() if IsValid(ping) then ping:Remove() end end)
 								end
 							end
 						end)
@@ -397,6 +404,7 @@ end
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
+				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 				self.Owner:FireBullets(bullet)
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -439,6 +447,7 @@ end
 						bullet.Damage = 40
 						bullet.TracerName = "ef_scav_tr_b"
 				self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.2)
+				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 				bullet.Src = self.Owner:GetShootPos()
 				bullet.Dir = self:GetAimVector()
 				self.Owner:FireBullets(bullet)
@@ -478,6 +487,7 @@ end
 			--tab.Particle = nil
 			local function mgcooloff(self,item)
 				if item:IsValid() then
+					local tab = ScavData.models[item.ammo]
 					if not (self:ProcessLinking(item) && self:StopChargeOnRelease()) then
 						if tab.Heat > 0 then
 							if SERVER then
@@ -515,6 +525,7 @@ end
 			end
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
+					local tab = ScavData.models[item.ammo]
 					if SERVER then
 						tab.Heat = math.min(100,tab.Heat + 1)
 						if tab.Heat >= 100 then
@@ -549,11 +560,14 @@ end
 							if self.Owner:GetVelocity():LengthSqr() < 20000 then
 								if self.Owner:Crouching() and self.Owner:GetVelocity():LengthSqr() < 800 then --900 would be crouching with walk key held
 									bullet.Spread = Vector(0.1,0.1,0) --"true" spread for bipod is .025 in DoD, but this player has a lot more freedom of movement and can aim anywhere
+									if CLIENT then self.Owner:SetEyeAngles((vector_up*0.01+self:GetAimVector()):Angle()) end
 								else
 									bullet.Spread = Vector(0.2,0.2,0)
+									if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 								end
 							else
 								bullet.Spread = Vector(0.3,0.3,0)
+								if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 							end
 							bullet.Tracer = 1
 							bullet.Force = 5
@@ -646,7 +660,8 @@ end
 						bullet.TracerName = "ef_scav_tr_b"
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true) --TODO: DoD:S viewpunch
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 					self.Owner:FireBullets(bullet)
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -704,7 +719,8 @@ end
 						bullet.TracerName = "ef_scav_tr_b"
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true) --TODO: DoD:S viewpunch
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 					self.Owner:FireBullets(bullet)
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -761,6 +777,7 @@ end
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.2)
+				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 				self.Owner:FireBullets(bullet)
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -800,7 +817,8 @@ end
 						bullet.TracerName = "ef_scav_tr_b"
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true) --TODO: DoD:S viewpunch
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 					self.Owner:FireBullets(bullet)
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)

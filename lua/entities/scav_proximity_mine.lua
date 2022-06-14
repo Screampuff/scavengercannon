@@ -159,12 +159,10 @@ if SERVER then
 			if state == 1 then --friendly
 			
 				if self.dt.showrings then
-					if self.dt.showrings then
-						if not GetConVar("cl_scav_colorblindmode"):GetBool() then
-							ParticleEffectAttach("scav_proxmine_green",PATTACH_ABSORIGIN_FOLLOW,self,0)
-						else
-							ParticleEffectAttach("scav_proxmine_green_colorblind",PATTACH_ABSORIGIN_FOLLOW,self,0)
-						end
+					if not GetConVar("cl_scav_colorblindmode"):GetBool() then
+						ParticleEffectAttach("scav_proxmine_green",PATTACH_ABSORIGIN_FOLLOW,self,0)
+					else
+						ParticleEffectAttach("scav_proxmine_green_colorblind",PATTACH_ABSORIGIN_FOLLOW,self,0)
 					end
 				end
 				
@@ -173,12 +171,10 @@ if SERVER then
 			elseif state == 2 then --enemy
 			
 				if self.dt.showrings then
-					if self.dt.showrings then
-						if not GetConVar("cl_scav_colorblindmode"):GetBool() then
-							ParticleEffectAttach("scav_proxmine_red",PATTACH_ABSORIGIN_FOLLOW,self,0)
-						else
-							ParticleEffectAttach("scav_proxmine_red_colorblind",PATTACH_ABSORIGIN_FOLLOW,self,0)
-						end
+					if not GetConVar("cl_scav_colorblindmode"):GetBool() then
+						ParticleEffectAttach("scav_proxmine_red",PATTACH_ABSORIGIN_FOLLOW,self,0)
+					else
+						ParticleEffectAttach("scav_proxmine_red_colorblind",PATTACH_ABSORIGIN_FOLLOW,self,0)
 					end
 				end
 				
