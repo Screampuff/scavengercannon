@@ -16,15 +16,18 @@ DMG_CHEMICAL = 1048576
 local halloween = os.date("%m") == "10"
 local christmas = os.date("%m") == "12"
 
-local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachment
+local eject = "brass"
+
 util.PrecacheModel("models/scav/shells/shell_pistol_tf2.mdl")
 util.PrecacheModel("models/scav/shells/shell_shotgun_tf2.mdl")
 util.PrecacheModel("models/scav/shells/shell_sniperrifle_tf2.mdl")
 util.PrecacheModel("models/scav/shells/shell_minigun_tf2.mdl")
 tf2shelleject = function(self,shelltype)
 	local shell = shelltype or "pistol"
-	--TODO: only spawns on local client/spectators with viewmodel, need other backup
 	local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+	if attach == nil then
+		attach = self:GetAttachment(self:LookupAttachment(eject))
+	end
 	if attach then
 		local brass = ents.CreateClientProp("models/scav/shells/shell_" .. shell .."_tf2.mdl")
 		if IsValid(brass) then
@@ -1976,13 +1979,15 @@ end
 
 		function tab.OnArmed(self,item,olditemname)
 			if SERVER then
-				if item.ammo == "models/props_2fort/telephone001.mdl" or --TF2
-						item.ammo == "models/props_spytech/control_room_console01.mdl" or
-						item.ammo == "models/props_spytech/control_room_console03.mdl" then
-					self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
-					timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
-				else --HL2
-					self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
+				if olditemname == "" or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
+					if item.ammo == "models/props_2fort/telephone001.mdl" or --TF2
+							item.ammo == "models/props_spytech/control_room_console01.mdl" or
+							item.ammo == "models/props_spytech/control_room_console03.mdl" then
+						self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
+						timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
+					else --HL2
+						self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
+					end
 				end
 			end
 		end
@@ -2034,32 +2039,34 @@ end
 				self.Owner:FireBullets(bullet)
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
-				if SERVER then
-					if item.ammo == "models/props_2fort/telephone001.mdl" or --TF2
-						item.ammo == "models/props_spytech/control_room_console01.mdl" or
-						item.ammo == "models/props_spytech/control_room_console03.mdl" then
+				if item.ammo == "models/props_2fort/telephone001.mdl" or --TF2
+					item.ammo == "models/props_spytech/control_room_console01.mdl" or
+					item.ammo == "models/props_spytech/control_room_console03.mdl" then
+					if SERVER then
 						self.Owner:EmitSound("weapons/shotgun_shoot.wav")
-						if item.subammo > 1 then
-							timer.Simple(0.4,function()
-								self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
-								timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
-								--TODO: TF2 shell eject
-							end)
+					end
+					timer.Simple(0.4,function()
+						if SERVER then
+							self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
+							timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
+						else
+							tf2shelleject(self,"shotgun")
 						end
-					else --HL2
+					end)
+				else --HL2
+					if SERVER then
 						self.Owner:EmitSound("weapons/shotgun/shotgun_fire6.wav")
-						if item.subammo > 1 then
-							timer.Simple(0.4,function()
-								self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									util.Effect("ShotgunShellEject",ef)
-								end
-							end)
-						end
+					else
+						timer.Simple(0.4,function()
+							self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								util.Effect("ShotgunShellEject",ef)
+							end
+						end)
 					end
 				end
 				if SERVER then return self:TakeSubammo(item,1) end
@@ -2499,6 +2506,7 @@ end
 				--CSS
 				ScavData.CollectFuncs["models/props/de_train/biohazardtank.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),5,ent:GetSkin()) end
 				ScavData.CollectFuncs["models/props/cs_militia/toilet.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),1,ent:GetSkin()) end
+				ScavData.CollectFuncs["models/props/cs_militia/urine_trough.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),2,ent:GetSkin()) end
 				--TF2
 				ScavData.CollectFuncs["models/props_badlands/barrel01.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),2,ent:GetSkin()) end
 				ScavData.CollectFuncs["models/props_hydro/water_barrel_cluster2.mdl"] = function(self,ent) self:AddItem("models/props_badlands/barrel01.mdl",2,0,8) end --eight barrels from the clusters
@@ -2533,6 +2541,7 @@ end
 		--CSS
 		ScavData.models["models/props/de_train/biohazardtank.mdl"] = tab
 		ScavData.models["models/props/cs_militia/toilet.mdl"] = tab
+		ScavData.models["models/props/cs_militia/urine_trough.mdl"] = tab
 		--TF2
 		ScavData.models["models/props_badlands/barrel01.mdl"] = tab
 		ScavData.models["models/weapons/c_models/urinejar.mdl"] = tab
@@ -2598,15 +2607,19 @@ end
 							if attach then
 								ef:SetOrigin(attach.Pos)
 								ef:SetAngles(attach.Ang)
-								if SERVER and item.ammo == "models/weapons/rifleshell.mdl" then
-									util.Effect("RifleShellEject",ef)
-									self:EmitSound("weapons/smg1/switch_burst.wav",75,100,1)
-								else
-									if CLIENT then
-										tf2shelleject(self,"sniperrifle")
+								ef:SetEntity(self)
+								if item.ammo == "models/weapons/rifleshell.mdl" then
+									if SERVER then
+										self:EmitSound("weapons/smg1/switch_burst.wav",75,100,1)
 									else
+										util.Effect("RifleShellEject",ef)
+									end
+								else
+									if SERVER then
 										self:EmitSound("weapons/sniper_bolt_back.wav",75,100,1)
 										timer.Simple(.25,function() self.Owner:EmitSound("weapons/sniper_bolt_forward.wav") end)
+									else
+										tf2shelleject(self,"sniperrifle")
 									end
 								end
 							end
@@ -3491,37 +3504,61 @@ PrecacheParticleSystem("scav_exp_plasma")
 			tab.Level = 4
 			if SERVER then
 				tab.FireFunc = function(self,item)
-									for i=1,7,1 do
-											local projmod = "models/props_combine/breenbust_Chunk0"..i..".mdl"
-											local proj = self:CreateEnt("prop_physics")
-											local randvec = Vector(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
-											proj:SetModel(projmod)
-											proj:SetPos(self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec))
-											proj:SetAngles(self.Owner:GetAngles())
-											proj:SetPhysicsAttacker(self.Owner)
-											proj:SetCollisionGroup(13)
-											proj:Spawn()
-											proj:SetOwner(self.Owner)
-											proj:GetPhysicsObject():SetMass(10)
-											proj:GetPhysicsObject():AddGameFlag(FVPHYSICS_PENETRATING)
-											proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500+self.Owner:GetVelocity())
-											proj:GetPhysicsObject():SetBuoyancyRatio(0)
-											proj:Fire("kill",1,"3")
-											//gamemode.Call("ScavFired",self.Owner,proj)
-									end
-									self.Owner:GetPhysicsObject(wake)
-									self.Owner:SetVelocity(self.Owner:GetVelocity()-self:GetAimVector()*200)
-									self.Owner:SetAnimation(PLAYER_ATTACK1)
-									self.Owner:ViewPunch(Angle(math.Rand(-1,0)-8,math.Rand(-0.1,0.1),0))
-									self.Owner:EmitSound("weapons/shotgun/shotgun_dbl_fire.wav")
-									timer.Simple(0.5, function() self:SendWeaponAnim(ACT_VM_HOLSTER) end)
-									timer.Simple(0.75, function() self.Owner:EmitSound("weapons/shotgun/shotgun_reload3.wav",100,65) end)
-									timer.Simple(1.75, function() self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav",100,120) end)
-									return true
-								end
+					if item.ammo == "models/props_combine/breenbust.mdl" then
+						for i=1,7,1 do
+							local projmod = "models/props_combine/breenbust_Chunk0"..i..".mdl"
+							local proj = self:CreateEnt("prop_physics")
+							local randvec = Vector(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
+							proj:SetModel(projmod)
+							proj:SetPos(self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec))
+							proj:SetAngles(self.Owner:GetAngles())
+							proj:SetPhysicsAttacker(self.Owner)
+							proj:SetCollisionGroup(13)
+							proj:Spawn()
+							proj:SetOwner(self.Owner)
+							proj:GetPhysicsObject():SetMass(10)
+							proj:GetPhysicsObject():AddGameFlag(FVPHYSICS_PENETRATING)
+							proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500+self.Owner:GetVelocity())
+							proj:GetPhysicsObject():SetBuoyancyRatio(0)
+							proj:Fire("kill",1,"3")
+							//gamemode.Call("ScavFired",self.Owner,proj)
+						end
+					elseif item.ammo == "models/props/cs_office/plant01.mdl" then
+						for i=1,7,1 do
+							local projmod = "models/props/cs_office/plant01_p"..i..".mdl"
+							local proj = self:CreateEnt("prop_physics")
+							local randvec = Vector(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
+							proj:SetModel(projmod)
+							proj:SetPos(self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec))
+							proj:SetAngles(self.Owner:GetAngles())
+							proj:SetPhysicsAttacker(self.Owner)
+							proj:SetCollisionGroup(13)
+							proj:Spawn()
+							proj:SetOwner(self.Owner)
+							proj:GetPhysicsObject():SetMass(10)
+							proj:GetPhysicsObject():AddGameFlag(FVPHYSICS_PENETRATING)
+							proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500+self.Owner:GetVelocity())
+							proj:GetPhysicsObject():SetBuoyancyRatio(0)
+							proj:Fire("kill",1,"3")
+							//gamemode.Call("ScavFired",self.Owner,proj)
+						end
+					end
+					self.Owner:GetPhysicsObject(wake)
+					self.Owner:SetVelocity(self.Owner:GetVelocity()-self:GetAimVector()*200)
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self.Owner:ViewPunch(Angle(math.Rand(-1,0)-8,math.Rand(-0.1,0.1),0))
+					self.Owner:EmitSound("weapons/shotgun/shotgun_dbl_fire.wav")
+					timer.Simple(0.5, function() self:SendWeaponAnim(ACT_VM_HOLSTER) end)
+					timer.Simple(0.75, function() self.Owner:EmitSound("weapons/shotgun/shotgun_reload3.wav",100,65) end)
+					timer.Simple(1.75, function() self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav",100,120) end)
+					return true
+				end
 			end
 			tab.Cooldown = 2
 		ScavData.models["models/props_combine/breenbust.mdl"] = tab
+		--CSS
+		ScavData.models["models/props/cs_office/plant01.mdl"] = tab
+		--ScavData.models["models/props/de_inferno/flower_barrel.mdl"] = tab --TODO: maybe
 	
 	
 	
@@ -4397,6 +4434,11 @@ PrecacheParticleSystem("scav_exp_plasma")
 				tracep.mins = Vector(-12,-12,-12)
 				tracep.maxs = Vector(12,12,12)
 				function tab.ChargeAttack(self,item)
+					if IsValid(self.ef_pblade) then
+						if self.Owner:WaterLevel() > 1 then
+							self.ef_pblade:SetSkin(0) --Clear the bloodied skin from the model
+						end
+					end
 					tracep.start = self.Owner:GetShootPos()
 					tracep.endpos = tracep.start+self.Owner:GetAimVector()*60
 					tracep.filter = self.Owner
@@ -4477,9 +4519,6 @@ PrecacheParticleSystem("scav_exp_plasma")
 									if (tr.Entity:GetMaterialType() == MAT_FLESH or tr.Entity:GetMaterialType() == MAT_BLOODYFLESH) or --ragdolls, props
 										(tr.Entity:GetBloodColor() == BLOOD_COLOR_RED or tr.Entity:GetBloodColor() == BLOOD_COLOR_ZOMBIE or tr.Entity:GetBloodColor() == BLOOD_COLOR_GREEN) then --NPCs
 										self.ef_pblade:SetSkin(1) --Set the bloodied skin on the model
-									end
-									if self.Owner:WaterLevel() > 1 then
-										self.ef_pblade:SetSkin(0) --Clear
 									end
 								end
 							end
@@ -5353,6 +5392,19 @@ PrecacheParticleSystem("scav_exp_plasma")
 				ScavData.CollectFuncs["models/props/de_prodigy/tirestack3.mdl"] = function(self,ent)
 																			self:AddItem("models/props/de_prodigy/tire1.mdl",1,0,2)
 																			self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1) end
+				ScavData.CollectFuncs["models/props/cs_assault/box_stack1.mdl"] = function(self,ent)
+																			self:AddItem("models/props/cs_assault/dryer_box.mdl",1,0,5)
+																			self:AddItem("models/props/cs_assault/washer_box2.mdl",1,0,7) end
+				ScavData.CollectFuncs["models/props/cs_assault/box_stack2.mdl"] = function(self,ent)
+																			self:AddItem("models/props/cs_assault/dryer_box.mdl",1,0,3)
+																			self:AddItem("models/props/cs_assault/washer_box.mdl",1,0,1)
+																			self:AddItem("models/props/cs_assault/dryer_box2.mdl",1,0,1)
+																			self:AddItem("models/props/cs_assault/washer_box2.mdl",1,0,4) end
+				ScavData.CollectFuncs["models/props/cs_assault/moneypallet_washerdryer.mdl"] = function(self,ent)
+																			self:AddItem("models/props/cs_assault/dryer_box.mdl",1,0,1)
+																			self:AddItem("models/props/cs_assault/washer_box2.mdl",1,0,2)
+																			self:AddItem("models/props/cs_militia/dryer.mdl",25,0,2)
+																			self:AddItem("models/props/cs_assault/money.mdl",1,0,5) end
 				--TF2
 				ScavData.CollectFuncs["models/props_2fort/tire002.mdl"] = function(self,ent) self:AddItem("models/props_2fort/tire001.mdl",1,0,5) end
 				ScavData.CollectFuncs["models/props_2fort/tire003.mdl"] = function(self,ent) self:AddItem("models/props_2fort/tire001.mdl",1,0,3) end

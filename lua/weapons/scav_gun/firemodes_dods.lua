@@ -1,6 +1,6 @@
 --Firemodes largely related to the Day of Defeat series. Can have other games' props defined!
 
-local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachment
+local eject = "brass"
 util.PrecacheModel("models/scav/shells/shell_large.mdl")
 util.PrecacheModel("models/scav/shells/shell_medium.mdl")
 util.PrecacheModel("models/scav/shells/shell_small.mdl")
@@ -8,6 +8,9 @@ util.PrecacheModel("models/scav/shells/shell_small.mdl")
 local dodsshelleject = function(self,shellsize)
 	local size = shellsize or "large"
 	local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+	if attach == nil then
+		attach = self:GetAttachment(self:LookupAttachment(eject))
+	end
 	if attach then
 		local brass = ents.CreateClientProp("models/scav/shells/shell_".. size ..".mdl")
 		if IsValid(brass) then
@@ -485,41 +488,49 @@ end
 			tab.Heat = 0
 			tab.Overheated = false
 			--tab.Particle = nil
+			local heat = heat or tab.Heat
+			local overheated = overheat or tab.Overheated
 			local function mgcooloff(self,item)
 				if item:IsValid() then
-					local tab = ScavData.models[item.ammo]
+					--local tab = ScavData.models[item.ammo]
 					if not (self:ProcessLinking(item) && self:StopChargeOnRelease()) then
-						if tab.Heat > 0 then
+						if heat > 0 then
 							if SERVER then
-								tab.Heat = math.max(0,tab.Heat - 1)
+								heat = math.max(0,heat - 1)
 								net.Start("scv_setheat")
 									net.WriteEntity(self)
-									net.WriteInt(tab.Heat,8)
-									net.WriteBool(tab.Overheated)
+									net.WriteInt(heat,8)
+									net.WriteBool(overheated)
 								net.Send(self.Owner)
 							elseif IsFirstTimePredicted() then
 								net.Receive("scv_setheat", function() 
 									local self = net.ReadEntity()
-									local heat = net.ReadInt(8)
-									local overheated = net.ReadBool()
+									local c_heat = net.ReadInt(8)
+									local c_overheated = net.ReadBool()
 									if IsValid(self) then 
-										tab.Heat = heat
-										tab.Overheated = overheated
+										heat = c_heat
+										overheated = c_overheated
 									end 
 								end)
 							end
 							timer.Simple(0.05, function() mgcooloff(self,item) end)
 						else
-							tab.Overheated = false
+							overheated = false
 							if CLIENT then--and IsValid(tab.Particle) then
 								--tab.Particle:StopEmission(true,false)
 								hook.Remove("ScavScreenDrawOverridePost","Cooldown")
 							end
 						end
-						--print(tab.Heat .. " " .. tostring(tab.Overheated))
+						--print(heat .. " " .. tostring(overheated))
 					end
 					if SERVER then
-						self:SetBlockPoseInstant(tab.Heat/100)
+						self:SetBlockPoseInstant(heat/100)
+					end
+				else
+					heat = tab.heat
+					overheated = tab.overheated
+					if CLIENT then
+						hook.Remove("ScavScreenDrawOverridePost","Cooldown")
 					end
 				end
 			end
@@ -527,26 +538,26 @@ end
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local tab = ScavData.models[item.ammo]
 					if SERVER then
-						tab.Heat = math.min(100,tab.Heat + 1)
-						if tab.Heat >= 100 then
-							tab.Overheated = true
+						heat = math.min(100,heat + 1)
+						if heat >= 100 then
+							overheated = true
 						end
 						net.Start("scv_setheat")
 							net.WriteEntity(self)
-							net.WriteInt(tab.Heat,8)
-							net.WriteBool(tab.Overheated)
+							net.WriteInt(heat,8)
+							net.WriteBool(overheated)
 						net.Send(self.Owner)
 					else
 						net.Receive("scv_setheat", function() 
 							local self = net.ReadEntity()
-							local heat = net.ReadInt(8)
-							local overheated = net.ReadBool()
+							local c_heat = net.ReadInt(8)
+							local c_overheated = net.ReadBool()
 							if IsValid(self) then 
-								tab.Heat = heat
-								tab.Overheated = overheated
+								heat = c_heat
+								overheated = c_overheated
 							end
 						end)
-						--if tab.Overheated == true then
+						--if overheated == true then
 							--if IsValid(tab.Particle) then
 							--	tab.Particle:Restart()
 							--else
@@ -554,7 +565,7 @@ end
 							--end
 						--end
 					end
-					if tab.Overheated == false then
+					if overheated == false then
 						local bullet = {}
 							bullet.Num = 1
 							if self.Owner:GetVelocity():LengthSqr() < 20000 then
@@ -585,17 +596,17 @@ end
 							hook.Add("ScavScreenDrawOverridePost","Cooldown",function()
 								surface.SetDrawColor(0,0,0)
 								surface.DrawOutlinedRect(75,78,106,14,2)
-								surface.DrawRect(78,81,tab.Heat,8)
+								surface.DrawRect(78,81,heat,8)
 							end)
 						else
 							self.Owner:EmitSound("Weapon_Mg42.Shoot")
-							self:SetBlockPoseInstant(tab.Heat/100)
+							self:SetBlockPoseInstant(heat/100)
 							self:SetPanelPoseInstant(0.25,2)
 							self:TakeSubammo(item,1)
 						end
 					else
 						if SERVER then
-							self:SetBlockPoseInstant(tab.Heat/100)
+							self:SetBlockPoseInstant(heat/100)
 						--else
 						--	if not IsValid(tab.Particle) then
 						--		tab.Particle = CreateParticleSystem(self,"grenadetrail",PATTACH_POINT_FOLLOW,0,0)

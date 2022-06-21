@@ -167,8 +167,9 @@ if SERVER then
 		self.inv:AddAllToClient(self.Owner)
 	end
 	
+	--called when most (but not all, naturally) firemodes are removed by the cannon itself
 	function SWEP:RemoveItem(pos)
-
+		
 		if self.inv:GetItemCount() == 0 then
 			return false
 		end
@@ -206,6 +207,7 @@ if SERVER then
 		
 	end
 	
+	--Called in charge attacks to remove the item from the inventory, also for removing cloak when ammo is fully drained
 	function SWEP:RemoveItemValue(item)
 		for k,v in ipairs(self.inv.items) do
 			if v == item then
@@ -225,7 +227,8 @@ if SERVER then
 	function SWEP:GetNextItem()
 		return self.inv.items[2]
 	end
-	
+
+	--Player manually switches items in inventory
 	function SWEP.ShiftItems(pl,cmd,args)
 
 		local self = pl:GetActiveWeapon()
@@ -347,8 +350,6 @@ if SERVER then
 				self.dt.CanScav = false
 			end
 		end
-		
-		local delta = CurTime()-self.LastThink
 
 		if not self.Owner:KeyDown(IN_ATTACK) then
 			self.Inaccuracy = math.Max(1, self.Inaccuracy - 10 * FrameTime())
@@ -403,14 +404,13 @@ if SERVER then
 		
 		if not self:IsLocked() and self.ChargeAttack and self.nextfire < CurTime() then
 		
-			local shoottime = CurTime()
 			local item = self.chargeitem
 			local cooldown = self:ChargeAttack(item) * self.dt.CooldownScale
 			
 			self.nextfire = CurTime()+cooldown
 			
 			if item:GetFiremodeTable().chargeanim then
-				self:SetSeqEndTime(shoottime+cooldown)
+				self:SetSeqEndTime(self.nextfire)
 				self:SendWeaponAnim(item:GetFiremodeTable().chargeanim)
 			end
 			

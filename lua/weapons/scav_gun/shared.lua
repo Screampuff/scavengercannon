@@ -33,8 +33,8 @@ SWEP.AutoSwitchFrom			= false
 
 SWEP.HoldType 				= "pistol"
 
-SWEP.ViewModel 				= "models/weapons/scav/c_scavgun6.mdl"
-SWEP.WorldModel 			= "models/weapons/scav/c_scavgun6.mdl"
+SWEP.ViewModel 				= "models/weapons/scav/c_scavgun7.mdl"
+SWEP.WorldModel 			= "models/weapons/scav/c_scavgun7.mdl"
 SWEP.UseHands 				= true
 
 SWEP.Primary.Clipsize 		= 0
@@ -391,6 +391,16 @@ else
 		local vec = net.ReadVector() 
 		LocalPlayer():EmitSound(net.ReadString(),math.Clamp(100 - EyePos():Distance(vec) / 50,20,100)) 
 	end)	
+end
+
+--Localize a Scav string, replacing any instances of %#% with the second, etc. arguments
+ScavLocalize = function(...)
+	local arg = {...}
+	local strang = language.GetPhrase(tostring(table.remove(arg,1)))
+	for i,v in ipairs(arg) do
+		strang = string.Replace(strang,"%"..i.."%",language.GetPhrase(tostring(v)))
+	end
+	return strang
 end
 
 include("client.lua")

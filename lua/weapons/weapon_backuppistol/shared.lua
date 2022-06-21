@@ -58,7 +58,14 @@ function SWEP:TakeAmmo(amt)
 end
 
 function SWEP:CanFire(amt)
-	return self:GetAmmo() > 0
+	 --BIGASS TODO: this whole system is super archaic and weird, the client and server are never in sync if player energy is below max,
+	 --this is a very dirty fix for the gun sometimes firing on the server but not on the client. Both should be "return self:GetAmmo() > 0" in a just, sane world.
+	 --All I can tell is that client is behind server when firing, but ahead of it when recharging
+	if SERVER then
+		return self:GetAmmo() > 1
+	else
+		return self:GetAmmo() > 0
+	end
 end
 
 function SWEP:Initialize()

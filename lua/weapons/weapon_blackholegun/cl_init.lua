@@ -52,18 +52,18 @@ function SWEP:DrawScreenBoot(progress)
 	end
 	local message = startuplines[offset+1]
 	for i=offset+1,progress-1 do
-		message = message.."\n"..startuplines[i+1]
+		message = message.."\n"..ScavLocalize(startuplines[i+1],LocalPlayer():Nick())
 	end
 	draw.DrawText(message,"BHG7",5,5,col_textcol,0)
 end
 
 function SWEP:DrawCharging()
 	draw.DrawText(language.GetPhrase("scav.bhg.startup1")
-				.."\n"..language.GetPhrase("scav.bhg.user")..LocalPlayer():Nick()
+				.."\n"..ScavLocalize("scav.bhg.user",LocalPlayer():Nick())
 				.."\n-------------------------------\n"
-				..language.GetPhrase("scav.bhg.ammo")..self:GetAmmo().."/"..self:GetMaxAmmo()
-				.."\n"..language.GetPhrase("scav.bhg.charge")..math.floor(self.Charge)
-				.."\n"..language.GetPhrase("scav.bhg.waypoints")..self.dt.WaypointCount.."/"..self.dt.MaxWaypoints,
+				..ScavLocalize("scav.bhg.ammo",self:GetAmmo(),self:GetMaxAmmo())
+				.."\n"..ScavLocalize("scav.bhg.charge",math.floor(self.Charge))
+				.."\n"..ScavLocalize("scav.bhg.waypoints",self.dt.WaypointCount,self.dt.MaxWaypoints),
 				"BHG10",5,5,col_textcol,0)
 end
 

@@ -292,11 +292,11 @@ function PLAYER:ProcessEnergyChanges()
 	
 end
 
-local LastThink = CurTime()
+--local LastThink = CurTime()
 
 hook.Add("Think","G_EnergyManage",function()
 
-	local delta = CurTime()-LastThink
+	--local delta = CurTime()-LastThink
 	
 	for _,pl in ipairs(player.GetAll()) do
 		if pl.G_Energy then
@@ -304,7 +304,7 @@ hook.Add("Think","G_EnergyManage",function()
 		end
 	end
 	
-	LastThink = CurTime()
+	--LastThink = CurTime()
 	
 end)
 

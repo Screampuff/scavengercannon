@@ -1,6 +1,6 @@
 --Firemodes largely related to the Counter-Strike series. Can have other games' props defined!
 
-local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachment
+local eject = "brass"
 
 /*==============================================================================================
 	--C4
@@ -107,60 +107,41 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 			tab.Name = "#scav.scavcan.p90"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			if SERVER then
-				local bullet = {}
-						bullet.Num = 1
-						bullet.BaseSpread = Vector(0.045,0.045,0)
-						bullet.Tracer = 1
-						bullet.Force = 5
-						bullet.Damage = 26
-						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
-						bullet.Src = self.Owner:GetShootPos()
-						bullet.Dir = self:GetAimVector()
-						bullet.Spread = self:GetAccuracyModifiedCone(bullet.BaseSpread)
-						self.Owner:FireBullets(bullet)
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						self.Owner:EmitToAllButSelf("Weapon_P90.Single")
-						self:AddInaccuracy(1/175,0.1)
-						self:AddBarrelSpin(300)
-						self:MuzzleFlash2()
-						timer.Simple(.025,function() 
-							local ef = EffectData()
-							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-							if attach then
-								ef:SetOrigin(attach.Pos)
-								ef:SetAngles(attach.Ang)
-								ef:SetFlags(75) --velocity
-								util.Effect("EjectBrass_57",ef)
-							end
-						end)
-						if SERVER then return self:TakeSubammo(item,1) end
-					end
-				ScavData.CollectFuncs["models/weapons/w_smg_p90.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
-			else
-				local bullet = {}
-						bullet.Num = 1
-						bullet.BaseSpread = Vector(0.045,0.045,0)
-						bullet.Tracer = 1
-						bullet.Force = 5
-						bullet.Damage = 26
-						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						if item.subammo <= 0 then
-							return
+			local bullet = {}
+				bullet.Num = 1
+				bullet.BaseSpread = Vector(0.045,0.045,0)
+				bullet.Tracer = 1
+				bullet.Force = 5
+				bullet.Damage = 26
+				bullet.TracerName = "ef_scav_tr_b"
+			tab.FireFunc = function(self,item)
+				self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
+				bullet.Src = self.Owner:GetShootPos()
+				bullet.Dir = self:GetAimVector()
+				bullet.Spread = self:GetAccuracyModifiedCone(bullet.BaseSpread)
+				self.Owner:FireBullets(bullet)
+				self.Owner:SetAnimation(PLAYER_ATTACK1)
+				if SERVER then
+					self.Owner:EmitSound("Weapon_P90.Single")
+					self:AddBarrelSpin(300)
+				else
+					timer.Simple(.025,function() 
+						local ef = EffectData()
+						local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+						if attach then
+							ef:SetOrigin(attach.Pos)
+							ef:SetAngles(attach.Ang)
+							ef:SetFlags(75) --velocity
+							util.Effect("EjectBrass_57",ef)
 						end
-						bullet.Src = self.Owner:GetShootPos()
-						bullet.Dir = self:GetAimVector()
-						bullet.Spread = self:GetAccuracyModifiedCone(bullet.BaseSpread)
-						self.Owner:FireBullets(bullet)
-						self.Owner:EmitSound("Weapon_P90.Single")
-						self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
-						self:AddInaccuracy(1/175,0.1)
-						self:MuzzleFlash2()
-						--return self:TakeSubammo(item,1)
-					end
+					end)
+				end
+				self:AddInaccuracy(1/175,0.1)
+				self:MuzzleFlash2()
+				if SERVER then return self:TakeSubammo(item,1) end
+			end
+			if SERVER then
+				ScavData.CollectFuncs["models/weapons/w_smg_p90.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
 			end
 			tab.Cooldown = 0.07
 		ScavData.models["models/weapons/w_smg_p90.mdl"] = tab
@@ -190,7 +171,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_AK47.Single")
+							self.Owner:EmitSound("Weapon_AK47.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -201,9 +184,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_762Nato",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_AK47.Single")
 						end
 						self:AddInaccuracy(1/200,0.125)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -243,7 +223,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_AUG.Single")
+							self.Owner:EmitSound("Weapon_AUG.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -254,9 +236,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_556",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_AUG.Single")
 						end
 						self:AddInaccuracy(1/215,0.125)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -291,7 +270,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_AWP.Single")
+							self.Owner:EmitSound("Weapon_AWP.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.4,function() 
 								self.Owner:EmitSound("weapons/awp/awp_bolt.wav",75,100,1)
 								local ef = EffectData()
@@ -303,9 +284,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_338Mag",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_AWP.Single")
 						end
 						if SERVER then return self:TakeSubammo(item,1) end
 					end
@@ -347,7 +325,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
-						self.Owner:EmitToAllButSelf("Weapon_Deagle.Single")
+						self.Owner:EmitSound("Weapon_Deagle.Single")
+						self:AddBarrelSpin(300)
+					else
 						timer.Simple(.025,function() 
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -357,9 +337,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								util.Effect("ShellEject",ef)
 							end
 						end)
-						self:AddBarrelSpin(300)
-					else
-						self.Owner:EmitSound("Weapon_Deagle.Single")
 					end
 					self.nextfireearly = CurTime()+0.225
 					self:AddInaccuracy(0.1,0.2)
@@ -396,8 +373,10 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 					self.Owner:FireBullets(bullet)
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
-					self.Owner:EmitSound("Weapon_Elite.Single")
 					if SERVER then
+						self.Owner:EmitSound("Weapon_Elite.Single")
+						self:AddBarrelSpin(300)
+					else
 						timer.Simple(.025,function() 
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -408,7 +387,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								util.Effect("EjectBrass_9mm",ef)
 							end
 						end)
-						self:AddBarrelSpin(300)
 					end
 					self.nextfireearly = CurTime()+0.075
 					self:AddInaccuracy(0.1,0.2)
@@ -463,7 +441,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_FAMAS.Single")
+							self.Owner:EmitSound("Weapon_FAMAS.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -474,9 +454,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_556",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_FAMAS.Single")
 						end
 						self:AddInaccuracy(1/215,0.125)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -511,7 +488,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
-						self.Owner:EmitToAllButSelf("Weapon_FiveSeven.Single")
+						self.Owner:EmitSound("Weapon_FiveSeven.Single")
+						self:AddBarrelSpin(300)
+					else
 						timer.Simple(.025,function() 
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -522,9 +501,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								util.Effect("EjectBrass_57",ef)
 							end
 						end)
-						self:AddBarrelSpin(300)
-					else
-						self.Owner:EmitSound("Weapon_FiveSeven.Single")
 					end
 					self.nextfireearly = CurTime()+0.15
 					self:AddInaccuracy(0.1,0.2)
@@ -561,7 +537,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_Galil.Single")
+							self.Owner:EmitSound("Weapon_Galil.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -572,9 +550,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_556",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_Galil.Single")
 						end
 						self:AddInaccuracy(1/200,0.125)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -613,7 +588,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
-						self.Owner:EmitToAllButSelf("Weapon_Glock.Single")
+						self.Owner:EmitSound("Weapon_Glock.Single")
+						self:AddBarrelSpin(300)
+					else
 						timer.Simple(.025,function() 
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -624,9 +601,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								util.Effect("EjectBrass_9mm",ef)
 							end
 						end)
-						self:AddBarrelSpin(300)
-					else
-						self.Owner:EmitSound("Weapon_Glock.Single")
 					end
 					self.nextfireearly = CurTime()+0.15
 					self:AddInaccuracy(0.1,0.2)
@@ -665,7 +639,8 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
-						self.Owner:EmitToAllButSelf("Weapon_M3.Single")
+						self.Owner:EmitSound("Weapon_M3.Single")
+					else
 						timer.Simple(.5,function() 
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -676,8 +651,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								util.Effect("EjectBrass_12Gauge",ef)
 							end
 						end)
-					else
-						self.Owner:EmitSound("Weapon_M3.Single")
 					end
 					if SERVER then return self:TakeSubammo(item,1) end
 				end
@@ -712,7 +685,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_M4A1.Single")
+							self.Owner:EmitSound("Weapon_M4A1.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -723,9 +698,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_556",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_M4A1.Single")
 						end
 						self:AddInaccuracy(1/220,0.1)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -765,7 +737,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						--self:MuzzleFlash2() --no flash on silenced weapon!
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_M4A1.Silenced")
+							self.Owner:EmitSound("Weapon_M4A1.Silenced")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -776,9 +750,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_556",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_M4A1.Silenced")
 						end
 						self:AddInaccuracy(1/220,0.1)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -814,7 +785,11 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_M249.Single")
+							self.Owner:EmitSound("Weapon_M249.Single")
+							self:AddBarrelSpin(300)
+							self:SetBlockPoseInstant(1,4)
+							self:SetPanelPoseInstant(0.25,2)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -825,11 +800,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_556",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-							self:SetBlockPoseInstant(1,4)
-							self:SetPanelPoseInstant(0.25,2)
-						else
-							self.Owner:EmitSound("Weapon_M249.Single")
 						end
 						self:AddInaccuracy(1/175,0.09)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -869,7 +839,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_MAC10.Single")
+							self.Owner:EmitSound("Weapon_MAC10.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -880,9 +852,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_9mm",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_MAC10.Single")
 						end
 						self:AddInaccuracy(1/200,0.165)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -924,7 +893,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_MP5Navy.Single")
+							self.Owner:EmitSound("Weapon_MP5Navy.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -935,9 +906,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_9mm",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_MP5Navy.Single")
 						end
 						self:AddInaccuracy(1/220,0.075)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -976,7 +944,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
-						self.Owner:EmitToAllButSelf("Weapon_P228.Single")
+						self.Owner:EmitSound("Weapon_P228.Single")
+						self:AddBarrelSpin(300)
+					else
 						timer.Simple(.025,function() 
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -987,9 +957,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								util.Effect("EjectBrass_9mm",ef)
 							end
 						end)
-						self:AddBarrelSpin(300)
-					else
-						self.Owner:EmitSound("Weapon_P228.Single")
 					end
 					self.nextfireearly = CurTime()+0.15
 					self:AddInaccuracy(0.1,0.2)
@@ -1029,7 +996,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_Scout.Single")
+							self.Owner:EmitSound("Weapon_Scout.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.5,function()
 								self.Owner:EmitSound("weapons/scout/scout_bolt.wav",75,100,1)
 								local ef = EffectData()
@@ -1041,9 +1010,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_762Nato",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_Scout.Single")
 						end
 						if SERVER then return self:TakeSubammo(item,1) end
 					end
@@ -1083,7 +1049,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_SG550.Single")
+							self.Owner:EmitSound("Weapon_SG550.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -1094,9 +1062,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_556",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_SG550.Single")
 						end
 						if SERVER then return self:TakeSubammo(item,1) end
 					end
@@ -1135,7 +1100,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_SG552.Single")
+							self.Owner:EmitSound("Weapon_SG552.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -1146,9 +1113,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_556",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_SG552.Single")
 						end
 						self:AddInaccuracy(1/220,0.1)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -1188,7 +1152,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						--self:MuzzleFlash2() --no flash on silenced weapon!
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_TMP.Single")
+							self.Owner:EmitSound("Weapon_TMP.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -1199,9 +1165,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_9mm",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_TMP.Single")
 						end
 						self:AddInaccuracy(1/200,0.14)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -1237,7 +1200,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
-							self.Owner:EmitToAllButSelf("Weapon_UMP45.Single")
+							self.Owner:EmitSound("Weapon_UMP45.Single")
+							self:AddBarrelSpin(300)
+						else
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -1248,9 +1213,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_9mm",ef)
 								end
 							end)
-							self:AddBarrelSpin(300)
-						else
-							self.Owner:EmitSound("Weapon_UMP45.Single")
 						end
 						self:AddInaccuracy(1/210,0.1)
 						if SERVER then return self:TakeSubammo(item,1) end
@@ -1285,7 +1247,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
-						self.Owner:EmitToAllButSelf("Weapon_USP.Single")
+						self.Owner:EmitSound("Weapon_USP.Single")
+						self:AddBarrelSpin(300)
+					else
 						timer.Simple(.025,function() 
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -1296,9 +1260,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								util.Effect("EjectBrass_9mm",ef)
 							end
 						end)
-						self:AddBarrelSpin(300)
-					else
-						self.Owner:EmitSound("Weapon_USP.Single")
 					end
 					self.nextfireearly = CurTime()+0.15
 					self:AddInaccuracy(0.1,0.2)
@@ -1334,8 +1295,14 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 					--self:MuzzleFlash2() --no flash on silenced weapon!
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
-						if item.ammo == "models/w_silencer.mdl" then
-							self.Owner:EmitToAllButSelf("weapons/pl_gun2.wav")
+						if item.ammo == "models/w_silencer.mdl" then --HL:S
+							self.Owner:EmitSound("weapons/pl_gun2.wav")
+						else
+							self.Owner:EmitSound("Weapon_USP.SilencedShot")
+						end
+						self:AddBarrelSpin(300)
+					else
+						if item.ammo == "models/w_silencer.mdl" then --HL:S
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -1355,7 +1322,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								end
 							end)
 						else
-							self.Owner:EmitToAllButSelf("Weapon_USP.SilencedShot")
 							timer.Simple(.025,function() 
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -1366,13 +1332,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 									util.Effect("EjectBrass_9mm",ef)
 								end
 							end)
-						end
-						self:AddBarrelSpin(300)
-					else
-						if item.ammo == "models/w_silencer.mdl" then
-							self.Owner:EmitSound("weapons/pl_gun2.wav")
-						else
-							self.Owner:EmitSound("Weapon_USP.SilencedShot")
 						end
 					end
 					self.nextfireearly = CurTime()+0.15
@@ -1412,7 +1371,8 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
-						self.Owner:EmitToAllButSelf("Weapon_XM1014.Single")
+						self.Owner:EmitSound("Weapon_XM1014.Single")
+					else
 						timer.Simple(.025,function() 
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -1423,8 +1383,6 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								util.Effect("EjectBrass_12Gauge",ef)
 							end
 						end)
-					else
-						self.Owner:EmitSound("Weapon_XM1014.Single")
 					end
 					self.nextfireearly = CurTime()+0.25
 					if SERVER then return self:TakeSubammo(item,1) end
