@@ -1,6 +1,6 @@
 --Firemodes largely related to the Half-Life series. Can have other games' props defined!
 
-local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachment
+local eject = "brass"
 
 /*==============================================================================================
 	--Turret Gun
@@ -766,41 +766,54 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 							tf2shelleject(self,"shotgun")
 						end
 					end)
-				elseif SERVER then
+				else
 					if item.ammo == "models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" or
 					item.ammo == "models/workshop_partner/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" then --Widowmaker
-						self.Owner:EmitSound("weapons/widow_maker_shot_02.wav")
+						if SERVER then self.Owner:EmitSound("weapons/widow_maker_shot_02.wav") end
 					elseif item.ammo == "models/shotgunshell.mdl" then --HL1
-						self.Owner:EmitSound("weapons/sbarrel1.wav")
+						if SERVER then
+							self.Owner:EmitSound("weapons/sbarrel1.wav")
+						end
 						timer.Simple(0.4,function()
-							self.Owner:EmitSound("weapons/scock1.wav")
-							local ef = EffectData()
-							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-							if attach then
-								ef:SetOrigin(attach.Pos)
-								ef:SetAngles(attach.Ang)
-								--lovingly borrowed from https://steamcommunity.com/sharedfiles/filedetails/?id=1360233031
-								local angShellAngles = self.Owner:EyeAngles()
-								local vecShellVelocity = self.Owner:GetAbsVelocity()
-								vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
-								vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
-								vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
-								ef:SetStart(vecShellVelocity)
-								ef:SetEntity(self.Owner)
-								ef:SetFlags(1) --shotgun shell
-								util.Effect("HL1ShellEject",ef)
+							if SERVER then
+								self.Owner:EmitSound("weapons/scock1.wav")
+							else
+								local ef = EffectData()
+								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+								if attach == nil then
+									attach = self:GetAttachment(self:LookupAttachment(eject))
+								end
+								if attach then
+									ef:SetOrigin(attach.Pos)
+									ef:SetAngles(attach.Ang)
+									--lovingly borrowed from https://steamcommunity.com/sharedfiles/filedetails/?id=1360233031
+									local angShellAngles = self.Owner:EyeAngles()
+									local vecShellVelocity = self.Owner:GetAbsVelocity()
+									vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
+									vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
+									vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
+									ef:SetStart(vecShellVelocity)
+									ef:SetEntity(self.Owner)
+									ef:SetFlags(1) --shotgun shell
+									util.Effect("HL1ShellEject",ef)
+								end
 							end
 						end)
 					else --HL2
-						self.Owner:EmitSound("weapons/shotgun/shotgun_fire6.wav")
+						if SERVER then
+							self.Owner:EmitSound("weapons/shotgun/shotgun_fire6.wav")
+						end
 						timer.Simple(0.4,function()
-							self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
-							local ef = EffectData()
-							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-							if attach then
-								ef:SetOrigin(attach.Pos)
-								ef:SetAngles(attach.Ang)
-								util.Effect("ShotgunShellEject",ef)
+							if SERVER then
+								self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
+							else
+								local ef = EffectData()
+								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+								if attach then
+									ef:SetOrigin(attach.Pos)
+									ef:SetAngles(attach.Ang)
+									util.Effect("ShotgunShellEject",ef)
+								end
 							end
 						end)
 					end
@@ -884,53 +897,57 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 				if SERVER then self.Owner:SetAnimation(PLAYER_ATTACK1) end
 				self:MuzzleFlash2()
 				if item.ammo == "models/items/boxsrounds.mdl" or item.ammo == "models/weapons/w_pistol.mdl" then
-					self.Owner:EmitSound("Weapon_Pistol.Single")
-					timer.Simple(.025,function() 
-						local ef = EffectData()
-						local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-						if attach and SERVER then
-							ef:SetOrigin(attach.Pos)
-							ef:SetAngles(attach.Ang)
-							util.Effect("ShellEject",ef)
-						end
-					end)
-				elseif item.ammo == "models/w_9mmhandgun.mdl" then --HL:S
-					self.Owner:EmitSound("weapons/pl_gun3.wav")
-					timer.Simple(.025,function() 
-						local ef = EffectData()
-						local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-						if attach and SERVER then
-							ef:SetOrigin(attach.Pos)
-							ef:SetAngles(attach.Ang)
-							--lovingly borrowed from https://steamcommunity.com/sharedfiles/filedetails/?id=1360233031
-							local angShellAngles = self.Owner:EyeAngles()
-							local vecShellVelocity = self.Owner:GetAbsVelocity()
-							vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
-							vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
-							vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
-							ef:SetStart(vecShellVelocity)
-							ef:SetEntity(self.Owner)
-							ef:SetFlags(0) --pistol shell
-							util.Effect("HL1ShellEject",ef)
-						end
-					end)
-				else --TF2
-					if self.Owner:GetStatusEffect("DamageX") then
-						self.Owner:EmitSound("weapons/pistol_shoot_crit.wav",75,100) --crit sound
+					if SERVER then
+						self.Owner:EmitSound("Weapon_Pistol.Single")
 					else
-						self.Owner:EmitSound("weapons/pistol_shoot.wav",75,100)
-					end
-					timer.Simple(.025,function() 
-						local ef = EffectData()
-						local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-						if attach then
-							ef:SetOrigin(attach.Pos)
-							ef:SetAngles(attach.Ang)
-							if CLIENT then
-								tf2shelleject(self)
+						timer.Simple(.025,function() 
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								util.Effect("ShellEject",ef)
 							end
+						end)
+					end
+				elseif item.ammo == "models/w_9mmhandgun.mdl" then --HL:S
+					if SERVER then
+						self.Owner:EmitSound("weapons/pl_gun3.wav")
+					else
+						timer.Simple(.025,function() 
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach == nil then
+								attach = self:GetAttachment(self:LookupAttachment(eject))
+							end
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								--lovingly borrowed from https://steamcommunity.com/sharedfiles/filedetails/?id=1360233031
+								local angShellAngles = self.Owner:EyeAngles()
+								local vecShellVelocity = self.Owner:GetAbsVelocity()
+								vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
+								vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
+								vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
+								ef:SetStart(vecShellVelocity)
+								ef:SetEntity(self.Owner)
+								ef:SetFlags(0) --pistol shell
+								util.Effect("HL1ShellEject",ef)
+							end
+						end)
+					end
+				else --TF2
+					if SERVER then
+						if self.Owner:GetStatusEffect("DamageX") then
+							self.Owner:EmitSound("weapons/pistol_shoot_crit.wav",75,100) --crit sound
+						else
+							self.Owner:EmitSound("weapons/pistol_shoot.wav",75,100)
 						end
-					end)
+					else
+						timer.Simple(.025,function() 
+							tf2shelleject(self)
+						end)
+					end
 				end
 				self.nextfireearly = CurTime()+0.1
 				if SERVER then return self:TakeSubammo(item,1) end
@@ -1626,11 +1643,13 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 				self.Owner:ScavViewPunch(Angle(-15,math.Rand(-0.1,0.1),0),0.5)
 				if CLIENT then
 					self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle())
-				else
-					if item.ammo == "models/weapons/w_357.mdl" then
-						if (item.subammo <= 1 and SERVER) or (item.subammo <= 0 and CLIENT) then --drop shells at end
-							timer.Simple(0.5,function()
+				end
+				if item.ammo == "models/weapons/w_357.mdl" then
+					if (item.subammo <= 1 and SERVER) or (item.subammo <= 0 and CLIENT) then --drop shells at end
+						timer.Simple(0.5,function()
+							if SERVER then
 								self.Owner:EmitSound("weapons/357/357_reload1.wav",75,100,1,CHAN_WEAPON)
+							else
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 								if attach then
@@ -1640,11 +1659,14 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 										util.Effect("ShellEject",ef)
 									end
 								end
-							end)
-						end
-					else
-						timer.Simple(0.4,function() --lever action
+							end
+						end)
+					end
+				else
+					timer.Simple(0.4,function() --lever action
+						if SERVER then
 							self.Owner:EmitSound("weapons/smg1/switch_burst.wav",75,85,1,CHAN_WEAPON)
+						else
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -1652,8 +1674,10 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								ef:SetAngles(attach.Ang)
 								util.Effect("ShellEject",ef)
 							end
-						end)
-					end
+						end
+					end)
+				end
+				if SERVER then
 					return self:TakeSubammo(item,1)
 				end
 			end
@@ -1685,6 +1709,8 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 				ScavData.CollectFuncs["models/weapons/c_models/c_letranger/c_letranger.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_revolver.mdl"]
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_letranger/c_letranger.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_letranger/c_letranger.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_dex_revolver/c_dex_revolver.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",5,0,1) end --5 .357 rounds from the Diamondback
+				--CSS
+				ScavData.CollectFuncs["models/props/cs_militia/gun_cabinet.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",2,0,2) end --2 x 2 .357 rounds from the gun cabinet
 				--FoF
 				ScavData.CollectFuncs["models/weapons/w_carbine.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",1,0,1) end --1 .357 round from the Carbine
 				ScavData.CollectFuncs["models/weapons/w_dualnavy.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",6,0,2) end --2 x 6 .357 round from the duals
@@ -1724,6 +1750,8 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 3
 			tab.ChargeAttack = function(self,item)
+				local tf2 = item.ammo == "models/weapons/w_models/w_smg.mdl" or item.ammo == "models/weapons/c_models/c_smg/c_smg.mdl"
+				local cleanerscarbine = item.ammo == "models/weapons/c_models/c_pro_smg/c_pro_smg.mdl" or item.ammo == "models/workshop/weapons/c_models/c_pro_smg/c_pro_smg.mdl"
 				if self.Owner:KeyDown(IN_ATTACK) then
 					self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
 					local bullet = {}
@@ -1742,7 +1770,7 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 						self:AddBarrelSpin(200)
 						self:TakeSubammo(item,1)
 					end
-					if item.ammo == "models/weapons/w_models/w_smg.mdl" or item.ammo == "models/weapons/c_models/c_smg/c_smg.mdl" then --TF2
+					if tf2 then --TF2
 						if SERVER then
 							if self.Owner:GetStatusEffect("DamageX") then
 								self.Owner:EmitSound("weapons/smg_shoot_crit.wav",75,100) --crit sound
@@ -1754,7 +1782,7 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								tf2shelleject(self)
 							end)
 						end
-					elseif item.ammo == "models/weapons/c_models/c_pro_smg/c_pro_smg.mdl" or item.ammo == "models/workshop/weapons/c_models/c_pro_smg/c_pro_smg.mdl" then --Cleaner's Carbine
+					elseif cleanerscarbine then --Cleaner's Carbine
 						if SERVER then
 							if self.Owner:GetStatusEffect("DamageX") then
 								self.Owner:EmitSound("weapons/doom_sniper_smg_crit.wav",75,100) --crit sound
@@ -1766,49 +1794,58 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 								tf2shelleject(self)
 							end)
 						end
-					elseif SERVER then
-						if item.ammo == "models/w_9mmar.mdl" then --HLS
-							self.Owner:EmitSound("weapons/hks"..math.floor(math.Rand(1,4))..".wav")
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									--lovingly borrowed from https://steamcommunity.com/sharedfiles/filedetails/?id=1360233031
-									local angShellAngles = self.Owner:EyeAngles()
-									local vecShellVelocity = self.Owner:GetAbsVelocity()
-									vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
-									vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
-									vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
-									ef:SetStart(vecShellVelocity)
-									ef:SetEntity(self.Owner)
-									ef:SetFlags(0) --pistol shell
-									util.Effect("HL1ShellEject",ef)
-								end
-							end)
+					else
+						if item.ammo == "models/w_9mmar.mdl" then --HL:S
+							if SERVER then
+								self.Owner:EmitSound("weapons/hks"..math.floor(math.Rand(1,4))..".wav")
+							else
+								timer.Simple(.025,function() 
+									local ef = EffectData()
+									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+									if attach then
+										ef:SetOrigin(attach.Pos)
+										ef:SetAngles(attach.Ang)
+										--lovingly borrowed from https://steamcommunity.com/sharedfiles/filedetails/?id=1360233031
+										local angShellAngles = self.Owner:EyeAngles()
+										local vecShellVelocity = self.Owner:GetAbsVelocity()
+										vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
+										vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
+										vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
+										ef:SetStart(vecShellVelocity)
+										ef:SetEntity(self.Owner)
+										ef:SetFlags(0) --pistol shell
+										util.Effect("HL1ShellEject",ef)
+									end
+								end)
+							end
 						elseif item.ammo == "models/weapons/w_alyx_gun.mdl" then
-							self.Owner:EmitSound("Weapon_Alyx_Gun.Single")
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									util.Effect("ShellEject",ef)
-								end
-							end)
+							if SERVER then
+								self.Owner:EmitSound("Weapon_Alyx_Gun.Single")
+							else
+								timer.Simple(.025,function() 
+									local ef = EffectData()
+									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+									if attach then
+										ef:SetOrigin(attach.Pos)
+										ef:SetAngles(attach.Ang)
+										util.Effect("ShellEject",ef)
+									end
+								end)
+							end
 						else--if item.ammo == "models/items/boxmrounds.mdl" or item.ammo == "models/weapons/w_smg1.mdl" then
-							self.Owner:EmitSound("Weapon_SMG1.Single")
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									util.Effect("ShellEject",ef)
-								end
-							end)
+							if SERVER then
+								self.Owner:EmitSound("Weapon_SMG1.Single")
+							else
+								timer.Simple(.025,function() 
+									local ef = EffectData()
+									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+									if attach then
+										ef:SetOrigin(attach.Pos)
+										ef:SetAngles(attach.Ang)
+										util.Effect("ShellEject",ef)
+									end
+								end)
+							end
 						end
 					end
 				end
@@ -1816,9 +1853,9 @@ local eject = "rfinger1" --TODO: give scav cannon its own proper eject attachmen
 				if !continuefiring and SERVER then
 					self.ChargeAttack = nil
 				end
-				if item.ammo == "models/weapons/w_models/w_smg.mdl" or item.ammo == "models/weapons/c_models/c_smg/c_smg.mdl" then --TF2
+				if tf2 then
 					return 0.105
-				elseif item.ammo == "models/weapons/c_models/c_pro_smg/c_pro_smg.mdl" or item.ammo == "models/workshop/weapons/c_models/c_pro_smg/c_pro_smg.mdl" then --Cleaner's Carbine
+				elseif cleanerscarbine then
 					return 0.135
 				else
 					return 0.065

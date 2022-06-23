@@ -1,0 +1,26 @@
+VertexlitGeneric
+{
+	$basetexture		"models/weapons/scavenger/scav"
+	
+	$detail				"models/weapons/scavenger/scav_detail"
+	$detailscale		1.0
+	$detailblendfactor	1.0
+	$detailblendmode	5
+	
+	$envmap				"env_cubemap"
+	$envmapmask			"models/weapons/scavenger/scav_spec"
+	$envmapsaturation	0.2
+	
+	$selfillum			1
+	$selfillummask		"models/weapons/scavenger/scav_selfillum"
+	$selfillumtint		"[0.84 1 0.47]"
+	
+	Proxies
+	{
+		PlayerWeaponColor
+		{
+			resultVar	$selfillumtint
+			default		0.84 1 0.47
+		}
+	}
+}

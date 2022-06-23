@@ -280,3 +280,13 @@ function SWEP:Holster()
 	end
 	return true
 end
+
+--Localize a Scav string, replacing any instances of %#% with the second, etc. arguments
+ScavLocalize = function(...)
+	local arg = {...}
+	local strang = language.GetPhrase(tostring(table.remove(arg,1)))
+	for i,v in ipairs(arg) do
+		strang = string.Replace(strang,"%"..i.."%",language.GetPhrase(tostring(v)))
+	end
+	return strang
+end

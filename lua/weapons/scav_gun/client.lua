@@ -429,19 +429,19 @@ if CLIENT then
 			surface.DrawText(firemodename)
 			surface.SetTextPos(96,16)	
 
-			surface.DrawText(language.GetPhrase("scav.scavcan.ammo").. wep.inv:GetItemCount() .. "/" .. wep.dt.Capacity)
+			surface.DrawText(ScavLocalize("scav.scavcan.ammo",wep.inv:GetItemCount(),wep.dt.Capacity))
 			surface.SetTextPos(104,64)
 			surface.SetDrawColor(255, 255, 255, 200)
 			surface.DrawRect(16, 80, (wep.nextfire-UnPredictedCurTime()) * 256 / (wep.nextfire - wep.receivednextfire) - 32, 8)
 			
 			if item then 
 				if self.item.subammo == SCAV_SHORT_MAX then
-					surface.DrawText(language.GetPhrase("scav.scavcan.subammo")..language.GetPhrase("scav.scavcan.inf"))
+					surface.DrawText(ScavLocalize("scav.scavcan.subammo","scav.scavcan.inf"))
 				else
-					surface.DrawText(language.GetPhrase("scav.scavcan.subammo").. self.item.subammo)
+					surface.DrawText(ScavLocalize("scav.scavcan.subammo",self.item.subammo))
 				end
 			else
-				surface.DrawText(language.GetPhrase("scav.scavcan.subammo").."0")
+				surface.DrawText(ScavLocalize("scav.scavcan.subammo","0"))
 			end
 		end
 	end
@@ -641,7 +641,7 @@ if CLIENT then
 			fontsize = "ScavScreenFontSm"
 			vpos = vpos + 8
 		end
-		draw.DrawText(language.GetPhrase("scav.scavcan.status")..language.GetPhrase("scav.scavcan.ok"),fontsize,128,vpos,color_black,TEXT_ALIGN_CENTER)
+		draw.DrawText(ScavLocalize("scav.scavcan.status","scav.scavcan.ok"),fontsize,128,vpos,color_black,TEXT_ALIGN_CENTER)
 	end
 
 	function SWEP:DrawNice()
@@ -659,7 +659,7 @@ if CLIENT then
 			fontsize = "ScavScreenFontSm"
 			vpos = vpos + 8
 		end
-		draw.DrawText(language.GetPhrase("scav.scavcan.status")..language.GetPhrase("scav.scavcan.nice"),fontsize,128,vpos,color_black,TEXT_ALIGN_CENTER)
+		draw.DrawText(ScavLocalize("scav.scavcan.status","scav.scavcan.nice"),fontsize,128,vpos,color_black,TEXT_ALIGN_CENTER)
 	end
 
 	function SWEP:DrawLocked()
@@ -679,9 +679,9 @@ if CLIENT then
 		end
 		local _, use = math.modf(CurTime())
 		if use < .5 then
-			draw.DrawText(language.GetPhrase("scav.scavcan.status")..language.GetPhrase("scav.scavcan.locked"),fontsize,128,vpos,color_white,TEXT_ALIGN_CENTER)
+			draw.DrawText(ScavLocalize("scav.scavcan.status","scav.scavcan.locked"),fontsize,128,vpos,color_white,TEXT_ALIGN_CENTER)
 		else
-			draw.DrawText(language.GetPhrase("scav.scavcan.status")..language.GetPhrase("scav.scavcan.locked"),fontsize,128,vpos,color_black,TEXT_ALIGN_CENTER)
+			draw.DrawText(ScavLocalize("scav.scavcan.status","scav.scavcan.locked"),fontsize,128,vpos,color_black,TEXT_ALIGN_CENTER)
 		end
 	end
 
@@ -691,7 +691,7 @@ if CLIENT then
 		else
 			DrawScreenBKG(yellowscr_colorblind)
 		end
-		draw.DrawText(language.GetPhrase("scav.scavcan.status"),"ScavScreenFont",128,12,color_black,TEXT_ALIGN_CENTER)
+		draw.DrawText(ScavLocalize("scav.scavcan.status","\0"),"ScavScreenFont",128,12,color_black,TEXT_ALIGN_CENTER)
 		local _, use = math.modf(math.abs(CurTime()-self.nextfire))
 		if use < .25 then
 			draw.DrawText(language.GetPhrase("scav.scavcan.recharge")..language.GetPhrase("scav.scavcan.progress0"),"ScavScreenFontSm",128,20,color_black,TEXT_ALIGN_CENTER)
@@ -716,7 +716,7 @@ if CLIENT then
 			fontsize = "ScavScreenFontSm"
 			vpos = vpos + 8
 		end
-		draw.DrawText(language.GetPhrase("scav.scavcan.status"),"ScavScreenFont",128,12,color_black,TEXT_ALIGN_CENTER)
+		draw.DrawText(ScavLocalize("scav.scavcan.status","\0"),"ScavScreenFont",128,12,color_black,TEXT_ALIGN_CENTER)
 		local _, use = math.modf(CurTime())
 		if use < .25 then
 			draw.DrawText(language.GetPhrase("scav.scavcan.attack")..language.GetPhrase("scav.scavcan.progress0"),fontsize,128,vpos,color_black,TEXT_ALIGN_CENTER)
@@ -762,6 +762,8 @@ if CLIENT then
 		end
 	end
 
+	local idle = idle or true
+
 	function SWEP:DrawScreen()
 		local swide = ScrW()
 		local shigh = ScrH()
@@ -786,6 +788,7 @@ if CLIENT then
 			--Cooldown screen
 			elseif ((self.nextfire - CurTime() > 0.25 and self.nextfireearly == 0) or self.nextfireearly - CurTime() > 0.25) and not self.ChargeAttack then
 				self:DrawCooldown()
+				idle = false
 			--Nice screen
 			elseif IsValid(self.inv.items[1]) and self.inv.items[1].subammo == 69 then
 				self:DrawNice()
@@ -807,13 +810,15 @@ if CLIENT then
 					hook.Run("ScavScreenDrawOverrideIdle")
 				else
 					self:DrawIdle()
+					idle = true
 				end
 			--Screen Draw Override Idle Hook
 			elseif hook.Run("ScavScreenDrawOverrideIdle",self,true) and self.nextfire <= CurTime() then
 				hook.Run("ScavScreenDrawOverrideIdle",self)
 			--Idle Screen 
-			elseif self.nextfire <= CurTime() then
+			elseif self.nextfire <= CurTime() or idle then
 				self:DrawIdle()
+				idle = true
 			--Cooldown Screen ending catch
 			else
 				self:DrawCooldown()
