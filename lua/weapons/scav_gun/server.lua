@@ -292,7 +292,7 @@ if SERVER then
 		local itemid = tonumber(args[1])
 		
 		if self.inv.itemids[itemid] then
-			self.inv.itemids[itemid]:Remove()
+			self.inv.itemids[itemid]:Remove(false,nil,true)
 		end
 		
 	end

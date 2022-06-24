@@ -5,7 +5,7 @@
 if CLIENT then
 
 	CreateClientConVar("cl_scav_iconalpha","200",true,false)
-	CreateClientConVar("cl_scav_autoswitchdelay",".2",true,true,"Delay firing by this many seconds when automatically switching to another firemode.",0,1)
+	CreateClientConVar("cl_scav_autoswitchdelay",".375",true,true,"Delay firing by this many seconds when automatically switching to another firemode.",0,1)
 
 	CL_SCAVGUN = NULL
 

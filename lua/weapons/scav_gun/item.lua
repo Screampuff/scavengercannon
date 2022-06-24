@@ -456,10 +456,12 @@ end
 
 if SERVER then
 	util.AddNetworkString("scv_itmrem")
+	util.AddNetworkString("scv_s_time")
 end
 
-function ITEM:Remove(silent,pl) --Calling this on the server will send a net message that calls this same function on the client. If the first argument is true, the server will not inform the client
+function ITEM:Remove(silent,pl,ignoredelay) --Calling this on the server will send a net message that calls this same function on the client. If the first argument is true, the server will not inform the client
 
+	local delay = not ignoredelay
 	if SERVER then
 		if not silent then
 			net.Start("scv_itmrem")
@@ -484,6 +486,67 @@ function ITEM:Remove(silent,pl) --Calling this on the server will send a net mes
 				postremoved(self.parent.Owner,olditem)
 			end
 			
+			--add a slight, client-defined delay between different firemodes
+			if SERVER and delay then
+				if k == 1 and olditem then
+					local newitem = self.parent.items[2]
+					if newitem then
+						local newfiremode = "???"
+						local oldfiremode = "???"
+						local oldfiremodedelay = 0
+
+						if olditem:GetFiremodeTable() then
+							oldfiremode = olditem:GetFiremodeTable().Name
+							oldfiremodedelay = olditem:GetFiremodeTable().Cooldown
+						else --gotta figure out its mass
+							local prop = nil
+					
+							if util.IsValidRagdoll(olditem.ammo) then
+								prop = ents.Create("prop_ragdoll")
+							elseif util.IsValidProp(olditem.ammo) then
+								prop = ents.Create("prop_physics")
+							elseif string.find(olditem.ammo,"*%d",0,false) then
+								prop = ents.Create("func_physbox")
+							end
+
+							if prop then
+								prop:SetModel(olditem.ammo)
+								prop:SetPos(self.parent.Owner.Owner:GetShootPos())
+								prop:Spawn()
+								local phys = prop:GetPhysicsObject()
+								local mass = 0
+						
+								for i=0,prop:GetPhysicsObjectCount()-1 do --setup bone positions
+									local phys = prop:GetPhysicsObjectNum(i)
+									if IsValid(phys) then
+										mass = mass + phys:GetMass()
+									end
+								end
+								prop:Remove()
+								oldfiremodedelay = (math.sqrt(mass) * 0.05) * self.parent.Owner.dt.CooldownScale
+							end
+						end
+
+						if newitem:GetFiremodeTable() then
+							newfiremode = newitem:GetFiremodeTable().Name
+						end
+
+						local delaybuffer = self.parent.Owner.Owner:GetInfoNum("cl_scav_autoswitchdelay",.375)
+						if oldfiremode ~= newfiremode and oldfiremodedelay < delaybuffer then
+							net.Start("scv_s_time")
+								net.WriteEntity(self.parent.Owner)
+								net.WriteInt(math.floor(delaybuffer),32)
+								net.WriteFloat(delaybuffer - math.floor(delaybuffer))
+							net.Send(self.parent.Owner.Owner)
+							self.parent.Owner.nextfire = self.parent.Owner.nextfire - oldfiremodedelay + delaybuffer
+							if self.parent.Owner:IsValid() and self.parent.Owner.Owner:Alive() then
+								self.parent.Owner.Owner:EmitSound("npc/dog/dog_pneumatic1.wav",75,80,1)
+							end
+						end
+					end
+				end
+			end
+
 			table.remove(self.parent.items,k)
 			self.valid = false
 			break
@@ -504,6 +567,18 @@ if CLIENT then
 			local id = net.ReadInt(9)
 				timer.Simple(0.05, function()if inv.itemids[id] then inv.itemids[id]:Remove() end end)
 		end
+	end)
+	net.Receive("scv_s_time", function()
+
+		local ent = net.ReadEntity()
+		local stime = net.ReadInt(32) + net.ReadFloat()
+		
+		if not IsValid(ent) then return end
+		
+		ent:SetNextPrimaryFire(stime)
+		ent.nextfire = stime
+		ent.receivednextfire = UnPredictedCurTime()
+		
 	end)
 end
 
