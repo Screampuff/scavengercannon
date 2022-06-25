@@ -989,6 +989,8 @@ if CLIENT then
 	local sh = ScrH()
 	local sw = ScrW()
 
+	local iconradius = 120
+
 	local ITEMICON = {}
 	ITEMICON.currentangle = 0
 	ITEMICON.desiredangle = 0
@@ -1032,9 +1034,9 @@ if CLIENT then
 
 	function ITEMICON:PaintOver()
 		if self.item.subammo == SCAV_SHORT_MAX then
-			draw.DrawText("#scav.scavcan.inf", "Scav_DefaultSmallDropShadow", 60, 48, color_white, TEXT_ALIGN_RIGHT) --∞
+			draw.DrawText("#scav.scavcan.inf", "Scav_DefaultSmallDropShadow", 60, 52, color_white, TEXT_ALIGN_RIGHT) --∞
 		else
-			draw.DrawText(self.item.subammo, "Scav_DefaultSmallDropShadow", 60, 48, color_white, TEXT_ALIGN_RIGHT)
+			draw.DrawText(self.item.subammo, "Scav_DefaultSmallDropShadow", 60, 52, color_white, TEXT_ALIGN_RIGHT)
 		end
 	end
 			
@@ -1042,7 +1044,7 @@ if CLIENT then
 
 	local PANEL = {}
 	PANEL.Weapon = NULL
-	PANEL.iconradius = 120
+	PANEL.iconradius = iconradius
 	PANEL.angupdatesuppress = false
 
 	function PANEL:Init()
@@ -1066,6 +1068,7 @@ if CLIENT then
 					v:Remove()
 				end
 			end
+			hook.Remove("HUDPaintBackground","Scav_Menu")
 			self:Remove()
 		end
 		
@@ -1076,10 +1079,9 @@ if CLIENT then
 		for _,icon in pairs(self.icons) do
 			if icon.desiredangle then
 				icon.currentangle = math.ApproachAngle(icon.currentangle,icon.desiredangle,delta * 720)
-				icon:SetPos(w + math.cos(math.rad(icon.currentangle)) * self.iconradius - 32, h - math.sin(math.rad(icon.currentangle)) * self.iconradius - 32)
+				icon:SetPos(w + math.cos(math.rad(icon.currentangle)) * self.iconradius - 32, h - math.sin(math.rad(icon.currentangle)) * self.iconradius - 48)
 			end
 		end
-		
 	end
 		
 	function PANEL:SetWeapon(wep)
@@ -1136,6 +1138,8 @@ if CLIENT then
 		return icon
 	end
 		
+	--local bkgcol = Color(50,50,50)
+
 	function PANEL:Rebuild()
 
 		for k,v in pairs(self.icons) do
@@ -1170,6 +1174,12 @@ if CLIENT then
 
 	vgui.Register("scav_menu",PANEL,"DPanel")
 
+	-- local triangle = {
+	-- 	{ x = sw*.51+(iconradius-32), y = (sh+iconradius/2-32)*.5 },
+	-- 	{ x = sw*.4975+(iconradius-32), y = (sh+iconradius/2-32)*.5125 },
+	-- 	{ x = sw*.4975+(iconradius-32), y = (sh+iconradius/2-32)*.4875 }
+	-- }
+
 	function SWEP:OpenMenu()
 		if not IsValid(self.Menu) then
 			self.Menu = vgui.Create("scav_menu")
@@ -1180,6 +1190,13 @@ if CLIENT then
 			self.Menu:SetVisible(true)
 			self.Menu:MakePopup()
 			self.Menu:SetKeyboardInputEnabled(false)
+			--hook.Add("HUDPaintBackground","Scav_Menu",function() 
+				--better show our active item
+				--surface.SetDrawColor( 50,50,50 )
+				--draw.NoTexture()
+				--draw.RoundedBoxEx(8,sw/2+iconradius-32,sh/2-32,64,64,bkgcol,true,true,true,false)
+				--surface.DrawPoly(triangle)
+			--end)
 		end
 	end
 	
