@@ -257,6 +257,7 @@ ScavData.OKClasses = {
 	scav_c4 = 1,
 	scav_tripmine = 1,
 	scav_proximity_mine = 1,
+	npc_rollermine = 1, --can't leave corpses, so, gotta let them get taken here
 	weapon_physgun = 2,
 	weapon_physcannon = 2,
 	weapon_crowbar = 2,
@@ -312,8 +313,7 @@ ScavData.OKClasses = {
 	npc_grenade_bugbait = 2,
 	grenade_helicopter = 2,
 	weapon_striderbuster = 2,
-	npc_rollermine = 2, --can't leave corpses, so, gotta let them get taken here
-	npc_barnacle = 2, --ditto
+	npc_barnacle = 2, --can't leave corpses, so, gotta let them get taken here
 	combine_mine = 2, --ditto
 	scav_bounding_mine = 2, --ditto
 	npc_turret_ceiling = 2, --ditto
@@ -531,7 +531,13 @@ if SERVER then
 			return false
 		end
 		--print(ent:GetClass())
-		if ent.CanScav or ((ScavData.OKClasses[ent:GetClass()] ~= nil and GetConVar("scav_override_pickups"):GetInt() >= ScavData.OKClasses[ent:GetClass()] and (ent:GetMoveType() == MOVETYPE_VPHYSICS)) and not ent.NoScav) then return true end
+		if ent.CanScav or
+		(((ScavData.OKClasses[ent:GetClass()] ~= nil and GetConVar("scav_override_pickups"):GetInt() >= ScavData.OKClasses[ent:GetClass()]) or 
+		(GetConVar("scav_override_pickups"):GetInt() >= 3 and (ent:IsWeapon() /*or TODO: test for items*/))) and
+		ent:GetMoveType() == MOVETYPE_VPHYSICS and not ent.NoScav) then
+			if ent:GetClass() == "npc_rollermine" and not ent:GetInternalVariable("m_bHackedByAlyx") then return false end
+			return true
+		end
 	end
 	
 	local function NewViewPunch(angles,duration)

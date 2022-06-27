@@ -85,7 +85,7 @@ end
 						proj:SetOwner(self.Owner)
 						--Look for seeking items
 						for _,v in pairs(self.inv.items) do
-							if ScavData.models[v.ammo].Name == "Auto-Targeting System" then
+							if ScavData.models[v.ammo] and ScavData.models[v.ammo].Name == "#scav.scavcan.computer" then
 								tab.Seeking = ScavData.models[v.ammo].On
 								break
 							end
@@ -184,21 +184,19 @@ end
 ==============================================================================================*/
 	
 		local tab = {}
-		if SERVER then
-			tab.Name = "Auto-Targeting System"
-		else
-			tab.Name = "#scav.scavcan.computer" --missle gets errors if we try to use this name on the server.
-		end
+			tab.Name = "#scav.scavcan.computer"
 			tab.anim = ACT_VM_IDLE
 			tab.Level = 5
 			tab.On = true
 			tab.FireFunc = function(self,item)
 				tab.On = !tab.On
-				if tab.On then
-					self.Owner:EmitSound("buttons/button5.wav",75)
-					--self:Lock(CurTime(),CurTime()+5) --testing
-				else
-					self.Owner:EmitSound("buttons/button8.wav",75)
+				if SERVER then
+					if tab.On then
+						self.Owner:EmitSound("buttons/button5.wav",75)
+						--self:Lock(CurTime(),CurTime()+5) --testing
+					else
+						self.Owner:EmitSound("buttons/button8.wav",75)
+					end
 				end
 				return false
 			end
@@ -1125,9 +1123,10 @@ end
 				end
 				}
 			interactions["npc_rollermine"] = {
-				["HackTime"]=2,
+				["HackTime"]=.5,
 				["Action"]= function(self,ent)
-					ent:Fire("PowerDown",nil,0)
+					ent:SetSaveValue("m_bHackedByAlyx",not ent:GetInternalVariable("m_bHackedByAlyx"))
+					ent:Fire("InteractivePowerDown",nil,15,self.Owner,self)
 				end
 				}
 			interactions["npc_turret_floor"] = {
