@@ -37,7 +37,9 @@ end
 
 function ENT:Detach()
 	self.attachedent = NULL
-	self.constraint:Remove()
+	if self.constraint:IsValid() then
+		self.constraint:Remove()
+	end
 end
 
 function ENT:PhysicsCollide(data,physobj)
