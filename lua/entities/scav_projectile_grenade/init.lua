@@ -8,7 +8,7 @@ function ENT:CreateDangerSound()
 	local DangerSound = ents.Create("ai_sound")
 	DangerSound:SetParent(self)
 	DangerSound:SetLocalPos(vector_origin)
-	DangerSound:SetKeyValue("soundtype", bit.bor(8,33554432) ) //danger, explosion
+	DangerSound:SetKeyValue("soundtype", bit.bor(8,33554432) ) --danger, explosion
 	DangerSound:SetKeyValue("duration",0.5)
 	DangerSound:SetKeyValue("volume",130)
 	return DangerSound
@@ -18,10 +18,10 @@ function ENT:Think()
 	if self.NextSound < CurTime() then --staggering the sound emission to give the appearance of reaction times in the NPCs
 		self.DangerPoint:Fire("EmitAISound",nil,0)
 		self.NextSound = CurTime()+0.5
-		//debugoverlay.Sphere(self.DangerSound:GetPos(),100,0.5,color_red,false)
+		--debugoverlay.Sphere(self.DangerSound:GetPos(),100,0.5,color_red,false)
 	end
-	if (self.dettime < CurTime()) || self.shouldexplode then
-		if !self.expl then
+	if (self.dettime < CurTime()) or self.shouldexplode then
+		if not self.expl then
 			self.expl = true
 			local edata = EffectData()
 			edata:SetOrigin(self:GetPos())
@@ -32,7 +32,7 @@ function ENT:Think()
 			self:Remove()
 		end	
 	end
-	if !self.bounce then
+	if not self.bounce then
 		self:NextThink(CurTime()+0.05)
 		return true
 	end
@@ -42,7 +42,7 @@ end
 function ENT:PhysicsCollide(data,physobj)
 	self.drag = self.drag+1
 	self:GetPhysicsObject():SetDragCoefficient(self.drag)
-	if !self.bounce && data.HitEntity && data.HitEntity:IsValid() && (data.HitEntity:IsPlayer() || data.HitEntity:IsNPC()) then
+	if not self.bounce and data.HitEntity and data.HitEntity:IsValid() and (data.HitEntity:IsPlayer() or data.HitEntity:IsNPC()) then
 		self:SetMoveType(MOVETYPE_NONE)
 		self.shouldexplode = data.HitEntity
 	end

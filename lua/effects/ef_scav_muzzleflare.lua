@@ -15,12 +15,12 @@ function EFFECT:Init(data)
 	else
 		self.Owner = self.Weapon
 	end
-	if !self.Weapon || !self.Weapon:IsValid() then
+	if not self.Weapon or not self.Weapon:IsValid() then
 		return false
 	end
 	self:SetPos(self:GetTracerShootPos(self.Owner:GetShootPos(),self.Weapon,1))
 	self:SetParent(self.Weapon)
-	if (self.Owner == GetViewEntity()) && self.Owner:IsPlayer() then
+	if (self.Owner == GetViewEntity()) and self.Owner:IsPlayer() then
 		local vm = self.Owner:GetViewModel()
 		ParticleEffectAttach(typetranslate[effecttype].."_vm",PATTACH_POINT_FOLLOW,vm,vm:LookupAttachment("muzzle"))
 	else
@@ -37,7 +37,7 @@ function EFFECT:Init(data)
 		self.dlight.Size = 200
 		self.dlight.Decay = 500
 		self.dlight.DieTime = CurTime() + 1
-		//self.shootpos = self:GetTracerShootPos(self.Owner:GetShootPos(),self.Weapon,1)	
+		--self.shootpos = self:GetTracerShootPos(self.Owner:GetShootPos(),self.Weapon,1)
 end
 
 function EFFECT:Think()

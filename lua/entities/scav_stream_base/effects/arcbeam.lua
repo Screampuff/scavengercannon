@@ -16,7 +16,7 @@ function ENT:OnInit()
 		self.WaveLerp = 0
 		self.LastBeamAdvance = CurTime()
 		for i=1,self.BeamRes do
-			self.DisplacementTable[i] = LerpVector(0.4,self.DisplacementTable[i-1]||VectorRand(),VectorRand()*math.Rand(4,16))
+			self.DisplacementTable[i] = LerpVector(0.4,self.DisplacementTable[i-1] or VectorRand(),VectorRand()*math.Rand(4,16))
 		end
 	else
 		self:EmitSound("weapons/stunstick/stunstick_impact1.wav",75,100)
@@ -27,7 +27,7 @@ function ENT:OnInit()
 end
 
 function ENT:OnSetupDataTables()
-	self:DTVar("Entity",0,"endent")
+	self:NetworkVar("Entity",0,"endent")
 end
 
 function ENT:OnKill()
@@ -42,12 +42,12 @@ if SERVER then
 		local currentdist = self.Range
 		local currentang = self.Cone
 		for k,v in pairs(ents.FindInSphere(pos,self.Range)) do
-			if v:IsNPC() || (v:IsPlayer() && v != self:GetPlayer() && v:Alive()) then
+			if v:IsNPC() or (v:IsPlayer() and v ~= self:GetPlayer() and v:Alive()) then
 				local entpos = v:GetPos()+v:OBBCenter()
 				local dist = entpos:Distance(pos)
 				if (dist < currentdist) then
 					local ang = math.abs(self:EntAng(v,pos,dir))
-					if (ang <= self.Cone) && (ang <= currentang) then
+					if (ang <= self.Cone) and (ang <= currentang) then
 						currentang = ang
 						currentdist = dist
 						ent = v
@@ -80,15 +80,15 @@ if SERVER then
 	
 	function ENT:OnThink()
 		local tr = self:GetTrace(self.Range)
-		local ent = self.dt.endent
+		local ent = self:Getendent()
 		local pos = self:GetShootPos()
 		local ang = self:GetAimVector():Angle()
 		if IsValid(ent) then
 			local entpos = ent:GetPos()+ent:OBBCenter()
 			local dist = entpos:Distance(pos)
 			local entconeang = math.abs(self:EntAng(ent,pos,ang:Forward()))
-			if (dist > self.Range) || (entconeang > self.Cone) || (ent:IsPlayer() && !ent:Alive()) || (ent:IsNPC() && (ent:Health() <= 0)) then
-				self.dt.endent = NULL
+			if (dist > self.Range) or (entconeang > self.Cone) or (ent:IsPlayer() and not ent:Alive()) or (ent:IsNPC() and (ent:Health() <= 0)) then
+				self:Setendent(NULL)
 				ent = NULL
 			else
 				if self.LastDamage+0.1 < CurTime() then
@@ -105,10 +105,10 @@ if SERVER then
 				ent:EmitSound(table.Random(shocksounds))
 			end
 		end
-		if !IsValid(ent) then
+		if not IsValid(ent) then
 			local newent = self:SeekTarget(pos,ang:Forward())
-			if newent != self then
-				self.dt.endent = newent
+			if newent ~= self then
+				self:Setendent(newent)
 				self.LastDamage = CurTime()
 			elseif IsValid(tr.Entity) then
 				if self.LastDamage+0.1 < CurTime() then
@@ -196,8 +196,8 @@ if CLIENT then
 			local ang = angpos.Ang
 			local pos1 = angpos.Pos
 			local pos2
-			if IsValid(self.dt.endent) then
-				pos2 = self.dt.endent:GetPos()+self.dt.endent:OBBCenter()
+			if IsValid(self:Getendent()) then
+				pos2 = self:Getendent():GetPos()+self:Getendent():OBBCenter()
 			else
 				local tr = self:GetTrace(self.Range)
 				pos2 = tr.HitPos
@@ -234,7 +234,7 @@ if CLIENT then
 			render.SetMaterial(beammat)
 			render.StartBeam(self.BeamRes)
 			local mult = 1
-			if IsValid(self.dt.endent) then
+			if IsValid(self:Getendent()) then
 				mult = 1+math.abs(math.sin(CurTime()*4))*3
 			end
 			for i=1,self.BeamRes do

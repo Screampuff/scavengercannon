@@ -22,7 +22,7 @@ local PANEL = {}
 		self:GetParent().MapInfo:SetMap(self:GetLine(line):GetValue(1),self:GetLine(line):GetValue(2))
 		self:GetParent().MapInfo:SetVisible(true)
 		local filename = self:GetLine(line):GetValue(1).."/"..self:GetLine(line):GetValue(2)
-		if !ScavData.AllSettingsFiles[filename] then
+		if not ScavData.AllSettingsFiles[filename] then
 			RunConsoleCommand("sdm_vote_requestmap",filename)
 		end
 		surface.PlaySound("buttons/button9.wav")
@@ -30,18 +30,18 @@ local PANEL = {}
 	
 	
 	local function RebuildVotedSettings(panel)
-		panel.settings = panel.settings || {}
+		panel.settings = panel.settings or {}
 		local settingswithvotes = {}
 		local players = player.GetHumans()
 		for _,pl in ipairs(players) do
 			local filename = pl:GetNWString("sdm_vote")
-			if filename != "" then
+			if filename ~= "" then
 				settingswithvotes[pl:GetNWString("sdm_vote")] = true
 			end
 		end
 		for k,v in pairs(panel.settings) do
 			if v:IsValid() then
-				if !settingswithvotes[k] then
+				if not settingswithvotes[k] then
 					panel:RemoveLine(v:GetID())
 					panel.settings[k] = nil
 				else
@@ -51,8 +51,8 @@ local PANEL = {}
 		end
 		for _,pl in ipairs(players) do
 			local filename = pl:GetNWString("sdm_vote")
-			if filename != "" then
-				if !panel.settings[filename] || !panel.settings[filename]:IsValid() then
+			if filename ~= "" then
+				if not panel.settings[filename] or not panel.settings[filename]:IsValid() then
 					local mapandsetting = string.Explode("/",filename)
 					local map = mapandsetting[1]
 					local setting = mapandsetting[2]
@@ -67,13 +67,13 @@ local PANEL = {}
 	net.Receive("UpdateSDMVotes", function() if SDM_VOTEMENU:IsValid() then SDM_VOTEMENU.VotedSettings:Rebuild() end end)
 	
 	function PANEL:Refresh()
-		if self.MapInfo && self.MapInfo:IsValid() then
+		if self.MapInfo and self.MapInfo:IsValid() then
 			self.MapInfo:Remove()
 		end
-		if self.VotedSettings && self.VotedSettings:IsValid() then
+		if self.VotedSettings and self.VotedSettings:IsValid() then
 			self.VotedSettings:Remove()
 		end
-		if self.Files && self.Files:IsValid() then
+		if self.Files and self.Files:IsValid() then
 			self.Files:Remove()
 		end
 		self.MapInfo = vgui.Create("SDM_VoteMenuSettingInfo",self)
@@ -111,7 +111,7 @@ local PANEL = {}
 			self.VotedSettings:Rebuild()
 			self.LastRefreshTime = CurTime()
 		end
-		if GetGlobalFloat("sdm_votedeadline") != 0 then
+		if GetGlobalFloat("sdm_votedeadline") ~= 0 then
 			self:SetTitle("Map Vote - "..tostring(math.max(math.floor(CurTime()-GetGlobalFloat("sdm_votedeadline")),0)).." seconds remaining to vote for the next map!")
 		end
 	end
@@ -136,7 +136,7 @@ local PANEL = {}
 		self:GetParent().MapInfo:SetMap(self:GetLine(line):GetValue(1),self:GetLine(line):GetValue(2))
 		self:GetParent().MapInfo:SetVisible(true)
 		local filename = self:GetLine(line):GetValue(1).."/"..self:GetLine(line):GetValue(2)
-		if !ScavData.AllSettingsFiles[filename] then
+		if not ScavData.AllSettingsFiles[filename] then
 			RunConsoleCommand("sdm_vote_requestmap",filename)
 		end
 		surface.PlaySound("buttons/button9.wav")
@@ -156,7 +156,7 @@ local PANEL = {}
 	end
 	
 	function PANEL:GetDesc()
-		return self.text||""
+		return self.textor""
 	end
 	
 	vgui.Register("SDM_VoteMenuDescLabel",PANEL,"DLabel")
@@ -180,8 +180,8 @@ local PANEL = {}
 	
 	local function votebuttonpress(panel)
 		surface.PlaySound("buttons/button4.wav")
-		RunConsoleCommand("sdm_vote_submit",panel:GetParent().FileName||"..")
-		//print(panel:GetParent().FileName)
+		RunConsoleCommand("sdm_vote_submit",panel:GetParent().FileNameor"..")
+		--print(panel:GetParent().FileName)
 	end
 	
 	function PANEL:Init() --before I'M visible there should be some sort of label instructing the player to select a map
@@ -207,14 +207,14 @@ local PANEL = {}
 			self.ModifierLabel:SetFont("Scav_MenuLarge")
 			self.ModifierLabel.ForcedY = 48
 			self.ModifierLabel:SetWrap(true)
-		//self.MapLabelBar = vgui.Create("DVerticalDivider",self)
-		//	self.MapLabelBar:SetPos(0,self.MapLabel.y+self.MapLabel:GetTall())
+		--self.MapLabelBar = vgui.Create("DVerticalDivider",self)
+		--	self.MapLabelBar:SetPos(0,self.MapLabel.y+self.MapLabel:GetTall())
 		self.VoteButton = vgui.Create("DButton",self)
 		self.VoteButton:SetFont("Scav_HUDNumber5")
 		self.VoteButton:SetText("VOTE!")
 		self.VoteButton.DoClick = votebuttonpress
 			--buttons/button5.wav
-		//self.initialized = true
+		--self.initialized = true
 	end
 	
 	function PANEL:AddDescriptionLabel()
@@ -237,9 +237,9 @@ local PANEL = {}
 		self.MapBG:SetSize(self:GetWide()-32,self:GetTall()-32)
 		local accumulatedy = 0
 		for k,v in ipairs(self.DescriptionLabels) do
-			if v:GetDesc() != "" then
+			if v:GetDesc() ~= "" then
 				v:SetPos(self.MapIcon.x,self.MapIcon.y+self.MapIcon:GetTall()+16+accumulatedy)
-				if !v.ForcedY then
+				if not v.ForcedY then
 					v:SizeToContents()
 				else
 					v:SetSize(self:GetWide()-64,v.ForcedY)
@@ -255,7 +255,7 @@ local PANEL = {}
 	
 	function PANEL:InvalidateLayout()
 
-		//self.MapLabelBar:SetSize(self:GetWide(),4)
+		--self.MapLabelBar:SetSize(self:GetWide(),4)
 	end
 
 	local modetranslate = {
@@ -268,8 +268,8 @@ local PANEL = {}
 	}
 	
 	function PANEL:SetMap(mapname,settingsfile)
-	//CHECKTHIS 10/17/2011:
-		//if file.Exists("../materials/maps/"..mapname..".vmt") then
+	--CHECKTHIS 10/17/2011:
+		--if file.Exists("../materials/maps/"..mapname..".vmt") then
 		if file.Exists("materials/maps/"..mapname..".vmt", true) then
 			self.MapIcon:SetImage("maps/"..mapname)
 		else
@@ -279,28 +279,28 @@ local PANEL = {}
 		self.MapLabel:SetText(mapname..": "..string.gsub(settingsfile,".txt",""))
 		self.MapLabel:SizeToContents()
 		self.FileName = mapname.."/"..settingsfile
-		//print(self.FileName)
+		--print(self.FileName)
 		local mapinfo = ScavData.AllSettingsFiles[mapname.."/"..settingsfile]
 		if mapinfo then
 			self.infovalid = true
-			//Setting Name
-			if (!mapinfo:GetName() || mapinfo:GetName() == "") then
+			--Setting Name
+			if (not mapinfo:GetName() or mapinfo:GetName() == "") then
 				self.SettingNameLabel:SetDesc("?")
 			else
 				self.SettingNameLabel:SetDesc(mapinfo:GetName())
 			end
 			
-			//Author Name
-			if (!mapinfo:GetAuthor() || mapinfo:GetAuthor() == "") then
+			--Author Name
+			if (not mapinfo:GetAuthor() or mapinfo:GetAuthor() == "") then
 				self.AuthorNameLabel:SetDesc("Author: Anonymous")
 			else
 				self.AuthorNameLabel:SetDesc("Author: "..mapinfo:GetAuthor())
 			end
 			
-			//mode
+			--mode
 			self.ModeLabel:SetDesc("Mode: "..modetranslate[mapinfo:GetMode()])
 			
-			//teams
+			--teams
 			if mapinfo:GetMaxTeams() == 0 then
 				self.TeamsLabel:SetDesc("")
 				self.FriendlyFireLabel:SetDesc("")
@@ -315,14 +315,14 @@ local PANEL = {}
 			
 			
 			
-			//point limit
+			--point limit
 			if mapinfo:GetPointLimit() == 0 then
 				self.PointLimitLabel:SetDesc("Point Limit: None")
 			else
 				self.PointLimitLabel:SetDesc("Point Limit: "..mapinfo:GetPointLimit())
 			end
 			
-			//time limit
+			--time limit
 			if mapinfo:GetTimeLimit() == 0 then
 				self.TimeLimitLabel:SetDesc("Time Limit: None")
 			else
@@ -333,14 +333,14 @@ local PANEL = {}
 				self.TimeLimitLabel:SetDesc("Time Limit: "..math.floor(mapinfo:GetTimeLimit()/60)..":"..fillzero..math.floor(mapinfo:GetTimeLimit()-math.floor(mapinfo:GetTimeLimit()/60)*60))
 			end
 			
-			//Damage Scale
+			--Damage Scale
 				if mapinfo:GetDamageScale() == 1 then
 					self.DamageScaleLabel:SetDesc("")
 				else
 					self.DamageScaleLabel:SetDesc("Damage Scale: "..mapinfo:GetDamageScale())
 				end
 				
-			//Mods
+			--Mods
 				if mapinfo:GetModString() == "" then
 					self.ModifierLabel:SetDesc("")
 				else
@@ -358,7 +358,7 @@ local PANEL = {}
 	end
 	
 	function PANEL:Think()
-		if !self.infovalid then
+		if not self.infovalid then
 			self:SetMap(self.waitingmapname,self.waitingsettingsname)
 		end
 	end

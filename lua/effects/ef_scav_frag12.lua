@@ -27,7 +27,7 @@ function EFFECT:Think()
 		tr = util.TraceLine(tracep)
 		if tr.Hit then
 			util.Decal("fadingscorch",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
-			//sound.Play("DOOM/DSFIRXPL.wav",tr.HitPos,150,100)
+			--sound.Play("DOOM/DSFIRXPL.wav",tr.HitPos,150,100)
 			local edata = EffectData()
 			edata:SetOrigin(self:GetPos())
 			util.Effect("ef_scav_expsmall",edata)

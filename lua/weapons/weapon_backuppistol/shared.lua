@@ -31,7 +31,7 @@ SWEP.SoundCharged = "buttons/button3.wav"
 PrecacheParticleSystem("scav_exp_bp")
 
 function SWEP:SetupDataTables()
-	self:DTVar("Int",0,"Charges")
+	self:NetworkVar("Int",0,"Charges")
 end
 
 function SWEP:ViewmodelAnimation(anim)
@@ -72,28 +72,28 @@ function SWEP:Initialize()
 end
 
 function SWEP:Think()
-	if (self.BeginIdle != 0) && (self.BeginIdle < CurTime()) then
+	if (self.BeginIdle ~= 0) and (self.BeginIdle < CurTime()) then
 		self:SendWeaponAnim(ACT_VM_IDLE)
 		self.BeginIdle = 0
 	end
 	if CLIENT then
 		self.HUD:SetVisible(true)
 		self.HUD:SetWeapon(self)
-		if !IsFirstTimePredicted() then
+		if not IsFirstTimePredicted() then
 			return
 		end
 	end
-	if (self.ChargeTime != 0) then
-		if (self.ForcedShots < self.MaxCharge) && (self.NextChargeUp < CurTime()) && self:CanFire(self.ShotCost) then
+	if (self.ChargeTime ~= 0) then
+		if (self.ForcedShots < self.MaxCharge) and (self.NextChargeUp < CurTime()) and self:CanFire(self.ShotCost) then
 			self:TakeAmmo(self.ShotCost)
 			self.NextChargeUp = CurTime() + 1/self.ChargeRate
 			self.ForcedShots = self.ForcedShots+1
-			self.dt.Charges = self.ForcedShots
+			self:SetCharges(self.ForcedShots)
 			if IsValid(self.BPChargeEffect) then
-				self.BPChargeEffect.dt.level = self.ForcedShots
+				self.BPChargeEffect:Setlevel(self.ForcedShots)
 			end
 		end
-		if !self.Owner:KeyDown(IN_ATTACK2) then
+		if not self.Owner:KeyDown(IN_ATTACK2) then
 			self:ReleaseCharge()
 		end
 	end
@@ -109,19 +109,19 @@ local bullet = {}
 	local callbackreturnstruct = {["damage"]=CLIENT,["effects"]=true}
 	function bullet.Callback(attacker,tr,dmginfo)
 		bullet.Damage = math.Clamp((120-tr.Entity:Health())/2,8,25)
-		//print("bulletdamage: "..bullet.Damage)
+		--print("bulletdamage: "..bullet.Damage)
 		dmginfo:SetDamage(math.Clamp((116-tr.Entity:Health())/2,8,25))
 		dmginfo:SetDamageType(bit.bor(DMG_BULLET,DMG_ENERGYBEAM))
 		local dodamage = gamemode.Call("PlayerTraceAttack",attacker,dmginfo,tr.Normal,tr)
 		if SERVER then
 			local class = tr.Entity:GetClass()
-			if (class == "prop_physics") || (class == "prop_physics_respawnable") || (class == "prop_physics_multiplayer") then
+			if (class == "prop_physics") or (class == "prop_physics_respawnable") or (class == "prop_physics_multiplayer") then
 				tr.Entity:SetHealth(1)
-				//print("setting ent health to 1: "..tostring(tr.Entity:Health()))
+				--print("setting ent health to 1: "..tostring(tr.Entity:Health()))
 			end
-			//print(dodamage)
-			//if dodamage then
-			local mp = !game.SinglePlayer()
+			--print(dodamage)
+			--if dodamage then
+			local mp = not game.SinglePlayer()
 			if (mp) then
 				SuppressHostEvents(NULL)
 			end
@@ -129,24 +129,24 @@ local bullet = {}
 			if (mp) then
 				SuppressHostEvents(attacker)
 			end
-			//end
+			--end
 		elseif GetConVar("cl_scav_high"):GetBool() then
-			//makedlight(tr.HitPos)
+			--makedlight(tr.HitPos)
 		end
-		//tr.Entity:TakeDamageInfo(dmginfo)
-		//return true,true
+		--tr.Entity:TakeDamageInfo(dmginfo)
+		--return true,true
 		return callbackreturnstruct
 	end
 	
 	function SWEP:Shoot(shots)
 		self:ViewmodelAnimation(ACT_VM_PRIMARYATTACK)
-		if !IsFirstTimePredicted() then
+		if not IsFirstTimePredicted() then
 			return
 		end
 		if CLIENT then
-			//print(CurTime(),"|",UnPredictedCurTime(),"[]",self.Owner:GetEnergy(),"|",self.Owner:GetPredictedEnergy())
+			--print(CurTime(),"|",UnPredictedCurTime(),"[]",self.Owner:GetEnergy(),"|",self.Owner:GetPredictedEnergy())
 		end
-		shots = shots || 1
+		shots = shots or 1
 		if shots == 1 then
 			if CurTime()-self.LastFired > 0.5 then 
 				bullet.Spread = vector_origin
@@ -162,7 +162,7 @@ local bullet = {}
 		self.Owner:FireBullets(bullet)
 		self:EmitSound(self.SoundShoot,100,200)
 		self.LastFired = CurTime()
-		//self:SetNextFire(UnPredictedCurTime()+self.Owner:GetUnPredictedEnergy())
+		--self:SetNextFire(UnPredictedCurTime()+self.Owner:GetUnPredictedEnergy())
 	end
 	
 	function SWEP:PrimaryAttack()
@@ -177,7 +177,7 @@ local bullet = {}
 	end
 	
 	function SWEP:SecondaryAttack()
-		if !IsFirstTimePredicted() then
+		if not IsFirstTimePredicted() then
 			return
 		end
 		if self.ChargeTime == 0 then
@@ -199,7 +199,7 @@ local bullet = {}
 		self.ChargeTime = 0
 		self:Shoot(self.ForcedShots)
 		self.ForcedShots = 0
-		self.dt.Charges = self.ForcedShots
+		self:SetCharges(self.ForcedShots)
 		if IsValid(self.BPChargeEffect) then
 			self.BPChargeEffect:Kill()
 		end

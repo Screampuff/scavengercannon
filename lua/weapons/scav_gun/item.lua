@@ -313,10 +313,10 @@ function ScavItem(parent,pos,id)
 	return item
 end
 	
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:Initialize( parent )
    Desc: Called when the item is created
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 
 function ITEM:Initialize(parent,pos,id)
 
@@ -353,10 +353,10 @@ function ITEM:FinishSetup() --this will need to be called after you've finished 
 	end
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:AddOnClient( pl )
    Desc: Makes the item known to the client
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 
 if SERVER then
 	util.AddNetworkString("scv_itmadd")
@@ -449,10 +449,10 @@ if CLIENT then
 	
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:Remove( )
    Desc: Remove this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 
 if SERVER then
 	util.AddNetworkString("scv_itmrem")
@@ -523,7 +523,7 @@ function ITEM:Remove(silent,pl,ignoredelay) --Calling this on the server will se
 									end
 								end
 								prop:Remove()
-								oldfiremodedelay = (math.sqrt(mass) * 0.05) * self.parent.Owner.dt.CooldownScale
+								oldfiremodedelay = (math.sqrt(mass) * 0.05) * self.parent.Owner:GetCooldownScale()
 							end
 						end
 
@@ -582,19 +582,19 @@ if CLIENT then
 	end)
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:IsValid( )
    Desc: Returns whether or not this item is valid
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 	
 function ITEM:IsValid()
 	return self.valid
 end		
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:SetID( id )
    Desc: Sets the ammo type of this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 
 function ITEM:SetID(id) --not networked, also don't use this
 	if type(id) ~= "number" then
@@ -604,10 +604,10 @@ function ITEM:SetID(id) --not networked, also don't use this
 	self.parent.itemids[id] = self
 end
 		
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:SetAmmoType( name )
    Desc: Sets the ammo type of this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 
 function ITEM:SetAmmoType(name) --not networked
 	if type(name) ~= "string" then
@@ -616,10 +616,10 @@ function ITEM:SetAmmoType(name) --not networked
 	self.ammo = name
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:SetSubammo( amount )
    Desc: Sets the subammo of this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 
 if SERVER then
 	util.AddNetworkString("scv_setsub")
@@ -645,10 +645,10 @@ function ITEM:SetSubammo(amount) --not networked
 	
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:SetData( data )
    Desc: Sets the ammo type of this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 
 function ITEM:SetData(data) --not networked
 	if type(data) ~= "number" then
@@ -657,10 +657,10 @@ function ITEM:SetData(data) --not networked
 	self.data = data
 end
 	
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:SetMass( mass )
    Desc: Sets the mass of this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 
 function ITEM:SetMass(mass) --not networked
 	if type(mass) ~= "number" then
@@ -669,91 +669,91 @@ function ITEM:SetMass(mass) --not networked
 	self.mass = mass
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:GetAmmoType( )
    Desc: Returns the ammo type of this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 	
 function ITEM:GetAmmoType()
 	return self.ammo
 end
 	
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:GetData( )
    Desc: Returns the extra data of this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 	
 function ITEM:GetData()
 	return self.data
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:GetMass( )
    Desc: Returns the mass of this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 	
 function ITEM:GetMass()
 	return self.mass
 end
 	
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:GetID( )
    Desc: Returns the ID of this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 	
 function ITEM:GetID()
 	return self.ID
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:GetFiremodeTable( )
    Desc: Returns the firemode table associated with this item's ammo type
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 	
 function ITEM:GetFiremodeTable()
 	return ScavData.models[self.ammo]
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:GetInvPosition( )
    Desc: Returns our position in our parent inventory
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 	
 function ITEM:GetFiremodeInfo()
 	return ScavData.models[self.ammo]
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:GetParent( )
    Desc: Returns the inventory to which this item belongs
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 
 function ITEM:GetParent()
 	return self.parent
 end
 	
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:GetParentID( )
    Desc: Returns the ID of the inventory to which this item belongs
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 	
 function ITEM:GetParentID()
 	return self.parent.ID
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:GetSubammo( )
    Desc: Returns the subammo of this item
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 	
 function ITEM:GetSubammo()
 	return self.subammo
 end
 
-/*---------------------------------------------------------
+--[[---------------------------------------------------------
    Name: ITEM:TakeSubammo( )
    Desc: Deducts a given amount of subammo from this item, returns true if the remaining amount is greater than zero
----------------------------------------------------------*/
+---------------------------------------------------------]]--
 
 function ITEM:TakeSubammo(amount)
 

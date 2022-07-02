@@ -6,7 +6,7 @@ function EFFECT:Init(data)
 	self.Created = CurTime()
 	local dlight = DynamicLight(0)
 	if (dlight) then
-		//local r, g, b, a = self:GetColor()
+		--local r, g, b, a = self:GetColor()
 		dlight.Pos = self:GetPos()
 		dlight.r = 255
 		dlight.g = 230

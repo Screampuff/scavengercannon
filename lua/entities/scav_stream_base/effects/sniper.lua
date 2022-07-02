@@ -42,10 +42,10 @@ if CLIENT then
 	local lasercol = Color(0,100,255,255)
 	
 	function ENT:Draw2()
-		//cam.Start3D(EyePos(),EyeAngles())
+		--cam.Start3D(EyePos(),EyeAngles())
 		local angpos = self:GetMuzzlePosAng()
 		local trace
-		if self.Killed && self.ViewMode then
+		if self.Killed and self.ViewMode then
 			trace = self:GetModelTrace(10000)
 		else
 			trace = self:GetTrace(10000)
@@ -69,7 +69,7 @@ else
 	function ENT:CreateDangerSound()
 		local DangerSound = ents.Create("ai_sound")
 		DangerSound:SetParent(self)
-		DangerSound:SetKeyValue("soundtype",bit.bor(1048576,8)) //sniper, turn to face, and danger
+		DangerSound:SetKeyValue("soundtype",bit.bor(1048576,8)) --sniper, turn to face, and danger
 		DangerSound:SetKeyValue("duration",0.5)
 		DangerSound:SetKeyValue("volume",200)
 		return DangerSound
@@ -85,7 +85,7 @@ else
 			self.DangerHull:SetPos(self:GetTrace(10000,nil,hullmins,hullmaxs,MASK_SHOT-CONTENTS_SOLID).HitPos)
 			self.DangerHull:Fire("EmitAISound",nil,0)
 			self.NextSound = CurTime()+0.5
-			//debugoverlay.Sphere(self.DangerSound:GetPos(),100,0.5,color_red,false)
+			--debugoverlay.Sphere(self.DangerSound:GetPos(),100,0.5,color_red,false)
 		end
 	end
 end

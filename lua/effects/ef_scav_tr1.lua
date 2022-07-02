@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
 local mat_beam = Material("sprites/bpist_tr1")
-//EFFECT.mat2 = Material("effects/scav_shine_HR")
+--EFFECT.mat2 = Material("effects/scav_shine_HR")
 local mat_flare = Material("effects/scav_shine_HR")
 local col = Color(255,128,0,255)
 local col_almostopaque = Color(255,255,255,254)
@@ -49,7 +49,7 @@ function EFFECT:Think()
 end
 
 function EFFECT:Render()
-	if !self.startpos then
+	if not self.startpos then
 		self.startpos = self:GetTracerShootPos(self:GetPos(),self.Weapon,1)
 		self.dir = self.endpos-self.startpos
 		self.lifetime = self.endpos:Distance(self.startpos)/10000

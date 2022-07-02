@@ -16,16 +16,16 @@ function EFFECT:Init(data)
 end
 
 function EFFECT:Think()
-	if (CurTime()-self.Created > 0.2) || !self.Weapon:IsValid() then
+	if (CurTime()-self.Created > 0.2) or not self.Weapon:IsValid() then
 		return false
 	end
 	return true
 end
 
 function EFFECT:Render()
-	if !self.Owner then return false end
+	if not self.Owner then return false end
 	local pos = self:GetTracerShootPos(self.Owner:GetShootPos(),self.Weapon,1)
-	if !self.SetupBeam then
+	if not self.SetupBeam then
 		local norm = self.norm
 		self.points = {}
 		self.points[1] = Vector(0,0,0)

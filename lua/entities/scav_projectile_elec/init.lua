@@ -16,12 +16,12 @@ function ENT:OnImpact(hitent)
 	local nextent
 	local dist
 	for k,v in ipairs(ent) do
-		if ((v:IsPlayer() && v:Alive()) || v:IsNPC()) && (v != self.Owner) && (v != hitent) && (!nextent || (dist > v:GetPos():Distance(pos))) && !table.HasValue(self.filter,v) then
+		if ((v:IsPlayer() and v:Alive()) or v:IsNPC()) and (v ~= self.Owner) and (v ~= hitent) and (not nextent or (dist > v:GetPos():Distance(pos))) and not table.HasValue(self.filter,v) then
 			nextent = v
 			dist = v:GetPos():Distance(self:GetPos())
 		end
 	end
-	if nextent && (nextent:IsNPC() || nextent:IsPlayer()) then
+	if nextent and (nextent:IsNPC() or nextent:IsPlayer()) then
 		local entpos = nextent:GetPos()+nextent:OBBCenter()
 		self:GetPhysicsObject():SetVelocity((entpos-pos):GetNormalized()*1500)
 	end
@@ -36,7 +36,7 @@ function ENT:OnImpact(hitent)
 		hitent:InflictStatusEffect("Shock",20,20)
 	end
 	hitent:TakeDamageInfo(dmg)
-	//self:SetNetworkedVector("vel",self.vel)
+	--self:SetNetworkedVector("vel",self.vel)
 	return true
 end
 

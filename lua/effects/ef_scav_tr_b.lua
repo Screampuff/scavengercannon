@@ -4,23 +4,23 @@ local speed = 8000
 local length = 160
 local width = 3
 
-//EFFECT.mat = Material("effects/energysplash")
+--EFFECT.mat = Material("effects/energysplash")
 local mat = Material("effects/laser_tracer")
 local mat2 = Material("effects/yellowflare")
 EFFECT.lifetime = 0.2
 local col = Color(255,255,180,255)
 
 function EFFECT:Init(data)
-	//if 1 then
-	//	util.Effect("Tracer",data)
-	//	self:Remove()
-	//	return
-	//end
+	--if 1 then
+	--	util.Effect("Tracer",data)
+	--	self:Remove()
+	--	return
+	--end
 	self.Weapon = data:GetEntity()
 	self.Owner = self.Weapon.Owner
 	self.startpos = self:GetTracerShootPos2(data:GetStart(),self.Weapon,1)
-	//print(self.startpos)
-	//print(data:GetStart(),self.startpos,self.Owner == GetViewEntity())
+	--print(self.startpos)
+	--print(data:GetStart(),self.startpos,self.Owner == GetViewEntity())
 	self.endpos = data:GetOrigin()
 	ScavData.SetRenderBoundsFromStartEnd(self,self.startpos,self.endpos)
 	self.Created = UnPredictedCurTime()
@@ -35,21 +35,21 @@ function EFFECT:Init(data)
 end
 
 function EFFECT:GetTracerShootPos2(start)
-	if !self.Weapon:IsValid() then
+	if not self.Weapon:IsValid() then
 		return start
 	end
 	if (self.Owner == GetViewEntity()) then
 		return (self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos)
-	elseif self.Owner != GetViewEntity() then
-		return self.Weapon:GetTracerOrigin()||(self.Weapon:GetAttachment(self.Weapon:LookupAttachment("muzzle")).Pos)
+	elseif self.Owner ~= GetViewEntity() then
+		return self.Weapon:GetTracerOrigin()or(self.Weapon:GetAttachment(self.Weapon:LookupAttachment("muzzle")).Pos)
 	else
 		return (self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos+self.Owner:GetAimVector():Angle():Right()*36-self.Owner:GetAimVector():Angle():Up()*36)
 	end
 end
 
 function EFFECT:Think()
-	//do return false end
-	if (self.Created+self.LifeTime < UnPredictedCurTime()) && (UnPredictedCurTime()-self.Created > 0.1) then
+	--do return false end
+	if (self.Created+self.LifeTime < UnPredictedCurTime()) and (UnPredictedCurTime()-self.Created > 0.1) then
 		return false
 	end
 	return true

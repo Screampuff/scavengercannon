@@ -4,21 +4,21 @@ ENT.Type = "anim"
 ENT.Base = "base_anim"
 
 function ENT:SetupDataTables()
-	self:DTVar("Float",0,"ArmTime")
-	self:DTVar("Float",1,"DetonateTime")
-	self:DTVar("Bool",0,"Armed")
+	self:NetworkVar("Float",0,"ArmTime")
+	self:NetworkVar("Float",1,"DetonateTime")
+	self:NetworkVar("Bool",0,"Armed")
 end
 
 function ENT:Arm(seconds)
-	self.dt.ArmTime = CurTime()
-	self.dt.DetonateTime = self.dt.ArmTime+seconds
-	self.dt.Armed = true
-	self.NoScav = true
+	self:SetArmTime(CurTime())
+	self:SetDetonateTime(self:GetArmTime()+seconds)
+	self:SetArmed(true)
+	self:SetNoScav(true)
 end
 
 function ENT:Disarm()
-	self.dt.Armed = false
-	self.NoScav = false
+	self:SetArmed(false)
+	self:SetNoScav(false)
 end
 
 if SERVER then
@@ -41,21 +41,21 @@ if SERVER then
 	
 	function ENT:Think()
 	
-		if not self.dt.Armed then return false end
+		if not self:GetArmed() then return false end
 
 		if self:GetStatusEffect("Frozen") then
-			self.dt.DetonateTime = self.dt.DetonateTime + 0.1 --slow down timer if frozen
+			self:SetDetonateTime(self:GetDetonateTime() + 0.1) --slow down timer if frozen
 		end
 		
 		if self.nextbeep < CurTime() then
-			local time = self.dt.DetonateTime - CurTime()
+			local time = self:GetDetonateTime() - CurTime()
 			if time < 30 then
 				self:EmitSound("weapons/c4/c4_beep1.wav")
 				self.nextbeep = self.nextbeep + math.Clamp(math.pow(time / 10,2),0.1,5)
 			end
 		end
 		
-		if self.dt.DetonateTime < CurTime() and not self.Exploded then
+		if self:GetDetonateTime() < CurTime() and not self.Exploded then
 		
 			self.Exploded = true
 			
@@ -91,13 +91,13 @@ else
 	function ENT:Draw()
 		local time = nil
 		
-		if self.dt.Armed then
-			time = self.dt.DetonateTime - CurTime()
+		if self:GetArmed() then
+			time = self:GetDetonateTime() - CurTime()
 			self.lasttimeremaining = nil
 		else
 		
 			if not self.lasttimeremaining then
-				self.lasttimeremaining = self.dt.DetonateTime - CurTime()
+				self.lasttimeremaining = self:GetDetonateTime() - CurTime()
 			end
 			
 			time = self.lasttimeremaining
@@ -113,7 +113,7 @@ else
 		
 		surface.SetFont("Scav_ConsoleText")
 		
-		if self.dt.Armed then
+		if self:GetArmed() then
 			surface.SetTextColor(color_red)
 			if (time%3 < 1) then
 				surface.SetTextPos(13,0)

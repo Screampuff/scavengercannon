@@ -1,6 +1,6 @@
-/////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////Client Code///////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
+----------------------------------------------------------------------------------------/
+--------------------------------------/Client Code--------------------------------------/
+----------------------------------------------------------------------------------------/
 
 if CLIENT then
 
@@ -161,9 +161,9 @@ if CLIENT then
 			return current_fov
 		end
 		
-		if not self:GetCurrentItem() or not ScavData.models[self:GetCurrentItem().ammo] or not ScavData.models[self:GetCurrentItem().ammo].fov or not self.dt.Zoomed then
-			self.dt.Zoomed = false
-		elseif self.dt.Zoomed then
+		if not self:GetCurrentItem() or not ScavData.models[self:GetCurrentItem().ammo] or not ScavData.models[self:GetCurrentItem().ammo].fov or not self:GetZoomed() then
+			self:SetZoomed(false)
+		elseif self:GetZoomed() then
 			current_fov = ScavData.models[self:GetCurrentItem().ammo].fov
 		end
 		
@@ -181,7 +181,7 @@ if CLIENT then
 	end
 
 	function SWEP:AdjustMouseSensitivity()
-		if self.dt.zoomed and self:GetCurrentItem() and ScavData.models[self:GetCurrentItem().ammo].fov then
+		if self:GetZoomed() and self:GetCurrentItem() and ScavData.models[self:GetCurrentItem().ammo].fov then
 			return ScavData.models[self:GetCurrentItem().ammo].fov / GetConVar("fov_desired"):GetFloat()
 		else
 			return
@@ -192,7 +192,7 @@ if CLIENT then
 
 		local delta = CurTime() - self.LastThink
 		
-		self.BarrelRotation = (self.BarrelRotation + self.dt.BarrelSpinSpeed * delta) % 360
+		self.BarrelRotation = (self.BarrelRotation + self:GetBarrelSpinSpeed() * delta) % 360
 		
 		if not self.Owner:KeyDown(IN_ATTACK) then
 			self.Inaccuracy = math.Max(1, self.Inaccuracy - 10 * FrameTime())
@@ -202,7 +202,7 @@ if CLIENT then
 		
 			local shoottime = CurTime()
 			local item = self.chargeitem or self.inv.items[self.predicteditem]
-			local cooldown = self:ChargeAttack(item) * self.dt.CooldownScale
+			local cooldown = self:ChargeAttack(item) * self:GetCooldownScale()
 			self.nextfire = CurTime() + cooldown
 			self.receivednextfire = UnPredictedCurTime()
 			
@@ -251,7 +251,7 @@ if CLIENT then
 		
 		local item = self:GetCurrentItem() --the item we're going to use to fire
 		
-		if item and ScavData.models[item.ammo] and ScavData.models[item.ammo].Level > self.dt.Level then
+		if item and ScavData.models[item.ammo] and ScavData.models[item.ammo].Level > self:GetLevel() then
 			self:SendWeaponAnim(ACT_VM_FIDGET)
 			self:SetNextPrimaryFire(shoottime + 2)
 			self:SetSeqEndTime(shoottime + 1)
@@ -288,7 +288,7 @@ if CLIENT then
 			
 			if item and ScavData.models[item.ammo] and ScavData.models[item.ammo].FireFunc then --check to make sure that this item is valid and has a firemode
 			
-				local cooldown = ScavData.models[self.currentmodel].Cooldown * self.dt.CooldownScale
+				local cooldown = ScavData.models[self.currentmodel].Cooldown * self:GetCooldownScale()
 				
 				ScavData.models[item.ammo].FireFunc(self,item)
 				
@@ -310,12 +310,12 @@ if CLIENT then
 			elseif item and ScavData.models[item.ammo] and ScavData.models[item.ammo].anim then --just play an animation if there is an empty firemode
 				self:SendWeaponAnim(ScavData.models[self:GetCurrentItem().ammo].anim)
 				self.LastAnim = ScavData.models[self:GetCurrentItem().ammo].anim
-				self.nextfire = shoottime + ScavData.models[self:GetCurrentItem().ammo].Cooldown * self.dt.CooldownScale
+				self.nextfire = shoottime + ScavData.models[self:GetCurrentItem().ammo].Cooldown * self:GetCooldownScale()
 				self.receivednextfire = UnPredictedCurTime()
 				self:SetSeqEndTime(self.nextfire)
 			elseif item then --just play a generic animation if we have no idea what this item is
 				local mass = item:GetMass()
-				self.nextfire = shoottime + (math.sqrt(mass) * 0.05) * self.dt.CooldownScale
+				self.nextfire = shoottime + (math.sqrt(mass) * 0.05) * self:GetCooldownScale()
 				self:SendWeaponAnim(ACT_VM_SECONDARYATTACK)
 				self.LastAnim = ACT_VM_SECONDARYATTACK
 				self.receivednextfire = UnPredictedCurTime()
@@ -429,7 +429,7 @@ if CLIENT then
 			surface.DrawText(firemodename)
 			surface.SetTextPos(96,16)	
 
-			surface.DrawText(ScavLocalize("scav.scavcan.ammo",wep.inv:GetItemCount(),wep.dt.Capacity))
+			surface.DrawText(ScavLocalize("scav.scavcan.ammo",wep.inv:GetItemCount(),wep:GetCapacity()))
 			surface.SetTextPos(104,64)
 			surface.SetDrawColor(255, 255, 255, 200)
 			surface.DrawRect(16, 80, (wep.nextfire-UnPredictedCurTime()) * 256 / (wep.nextfire - wep.receivednextfire) - 32, 8)
@@ -528,9 +528,9 @@ if CLIENT then
 		end
 	end)
 	
-	/////////////////////////////////////
-	/////////////Drawing/////////////////
-	/////////////////////////////////////
+	------------------------------------/
+	------------/Drawing----------------/
+	------------------------------------/
 	
 	local vec_white 		= Vector(1,1,1)
 
@@ -861,7 +861,7 @@ if CLIENT then
 		local size = frac * 16
 		local angoffset = -1 * math.deg(c_hairrotation * 5)
 		
-		if self.dt.CanScav and IsValid(tr.Entity) then
+		if self:GetCanScav() and IsValid(tr.Entity) then
 			if not GetConVar("cl_scav_colorblindmode"):GetBool() then
 				surface.SetDrawColor(color_green)
 			else
@@ -953,9 +953,9 @@ if CLIENT then
 		self:DrawScreen()
 	end
 	
-	/////////////////////////////////////
-	////////////////Menu/////////////////
-	/////////////////////////////////////
+	------------------------------------/
+	----------------Menu----------------/
+	------------------------------------/
 	
 	SWEP.Menu = NULL
 
@@ -1100,9 +1100,9 @@ if CLIENT then
 			local icon = self.iconids[v.ID]
 			
 			if icon then
-				icon.desiredangle = (itemnum) * 360 / self.Weapon.dt.Capacity
+				icon.desiredangle = (itemnum) * 360 / self.Weapon:GetCapacity()
 				icon.pos = itemnum
-				icon:SetZPos(self.Weapon.dt.Capacity - itemnum)
+				icon:SetZPos(self.Weapon:GetCapacity() - itemnum)
 				itemnum = itemnum + 1
 			end
 			
@@ -1156,9 +1156,9 @@ if CLIENT then
 		
 		for k,v in pairs(self.Weapon.inv.items) do
 			local icon = self:AddIcon(v, v.ID)
-			icon:SetZPos(self.Weapon.dt.Capacity - itemnum)
+			icon:SetZPos(self.Weapon:GetCapacity() - itemnum)
 			icon.pos = itemnum
-			icon.desiredangle = (itemnum) * 360 / self.Weapon.dt.Capacity
+			icon.desiredangle = (itemnum) * 360 / self.Weapon:GetCapacity()
 			icon.currentangle = icon.desiredangle
 			itemnum = itemnum + 1
 		end
@@ -1200,9 +1200,9 @@ if CLIENT then
 		end
 	end
 	
-	/////////////////////////////////////
-	/////////////View Punch//////////////
-	/////////////////////////////////////
+	------------------------------------/
+	------------/View Punch--------------
+	------------------------------------/
 	
 	local PLAYER = FindMetaTable("Player")
 
@@ -1287,7 +1287,7 @@ if CLIENT then
 	end
 		
 	function PLAYER:ScavViewPunch(angles,duration,freeze)
-		if !self.ScavViewPunches then
+		if not self.ScavViewPunches then
 			self.ScavViewPunches = {}
 		end
 		local vp = NewViewPunch(angles,duration)

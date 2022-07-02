@@ -10,11 +10,11 @@ EFFECT.WarpSize = 48
 function EFFECT:Init(data)
 	self.Created = CurTime()
 	self.Weapon = data:GetEntity()
-	if !self.Weapon:IsValid() then
+	if not self.Weapon:IsValid() then
 		return false
 	end
 	self.Owner = self.Weapon:GetOwner()
-	if !self.Owner:GetActiveWeapon() || !self.Owner:GetActiveWeapon():IsValid() || (self.Owner:GetActiveWeapon():GetClass() != "scav_gun") then
+	if not self.Owner:GetActiveWeapon() or not self.Owner:GetActiveWeapon():IsValid() or (self.Owner:GetActiveWeapon():GetClass() ~= "scav_gun") then
 		return false
 	end
 	local tracep = {}
@@ -23,7 +23,7 @@ function EFFECT:Init(data)
 	tracep.filter = self.Owner
 	local trace = {}
 	trace = util.TraceLine(tracep)
-	//util.Decal("fadingscorch",trace.HitPos+trace.HitNormal,trace.HitPos-trace.HitNormal)
+	--util.Decal("fadingscorch",trace.HitPos+trace.HitNormal,trace.HitPos-trace.HitNormal)
 	self.endpos = trace.HitPos
 	self:SetRenderBoundsWS(self:GetPos(),self.endpos)
 	if self.Owner == GetViewEntity() then
@@ -33,7 +33,7 @@ function EFFECT:Init(data)
 end
 
 function EFFECT:Think()
-	if !self.Owner:GetActiveWeapon() || !self.Owner:GetActiveWeapon():IsValid() || (self.Owner:GetActiveWeapon():GetClass() != "scav_gun") then
+	if not self.Owner:GetActiveWeapon() or not self.Owner:GetActiveWeapon():IsValid() or (self.Owner:GetActiveWeapon():GetClass() ~= "scav_gun") then
 		return false
 	end
 	if self.Created+4.5 < CurTime() then
@@ -138,7 +138,7 @@ function EFFECT:Render()
 	end
 	
 
-	if (age > DURATION_WARP) && (age < DURATION_WARP+DURATION_BEAMTRAVEL) then --shockwave, beam
+	if (age > DURATION_WARP) and (age < DURATION_WARP+DURATION_BEAMTRAVEL) then --shockwave, beam
 		render.SetMaterial(self.mat_prebeam)
 		self.mat_prebeam:SetFloat("$alpha",beamalpha)
 		render.DrawBeam(beampos,self.endpos,1+(1-beamfraction)*63,0,1,color_white)
@@ -149,7 +149,7 @@ function EFFECT:Render()
 		render.DrawSprite(beampos,32+48*(1-beamfraction),32+48*(1-beamfraction),color_white)
 	end
 	
-	if (age > DURATION_WARP+DURATION_BEAMTRAVEL) && (age < DURATION_WARP+DURATION_BEAMTRAVEL+DURATION_IMPACTFADE) then --shockwave impact
+	if (age > DURATION_WARP+DURATION_BEAMTRAVEL) and (age < DURATION_WARP+DURATION_BEAMTRAVEL+DURATION_IMPACTFADE) then --shockwave impact
 		render.UpdateRefractTexture()
 		self.mat_shockwave:SetFloat("$refractamount",math.pow((DURATION_IMPACTFADE+DURATION_WARP+DURATION_BEAMTRAVEL-age)/(DURATION_IMPACTFADE),2))
 		render.SetMaterial(self.mat_shockwave)

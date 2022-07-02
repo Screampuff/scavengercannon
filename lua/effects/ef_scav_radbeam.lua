@@ -8,18 +8,18 @@ EFFECT.em = ParticleEmitter(vector_origin)
 function EFFECT:Init(data)
 	self.Created = CurTime()
 	self.Weapon = data:GetEntity()
-	if !self.Weapon || !self.Weapon:IsValid() then
+	if not self.Weapon or not self.Weapon:IsValid() then
 		return false
 	end
 	self.Owner = self.Weapon:GetOwner()
 	
 	local tracep = {}
-	//if self.Owner == GetViewEntity() then
-	//	self:SetPos(self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos)
-	//else
-	//	self:SetPos(self.Owner:GetActiveWeapon():GetAttachment(self.Owner:GetActiveWeapon():LookupAttachment("muzzle")).Pos)
-	//end
-	//self:SetPos(self:GetTracerShootPos2(data:GetOrigin()))
+	--if self.Owner == GetViewEntity() then
+	--	self:SetPos(self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos)
+	--else
+	--	self:SetPos(self.Owner:GetActiveWeapon():GetAttachment(self.Owner:GetActiveWeapon():LookupAttachment("muzzle")).Pos)
+	--end
+	--self:SetPos(self:GetTracerShootPos2(data:GetOrigin()))
 	self.endpos = data:GetStart()
 	self:SetPos(self:GetTracerShootPos2(self:GetPos()))
 	ScavData.SetRenderBoundsFromStartEnd(self,self:GetPos(),self.endpos)
@@ -43,7 +43,7 @@ function EFFECT:Init(data)
 end
 
 function EFFECT:Think()
-	if !self.Weapon || !self.Weapon:IsValid() then
+	if not self.Weapon or not self.Weapon:IsValid() then
 		return false
 	end
 	if self.Created+0.5 < CurTime() then
@@ -53,12 +53,12 @@ function EFFECT:Think()
 end
 
 function EFFECT:GetTracerShootPos2(start)
-	if !self.Weapon:IsValid() then
+	if not self.Weapon:IsValid() then
 		return start
 	end
 	if (self.Owner == GetViewEntity()) then
 		return (self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos)
-	elseif self.Owner != GetViewEntity() then
+	elseif self.Owner ~= GetViewEntity() then
 		return (self.Weapon:GetAttachment(self.Weapon:LookupAttachment("muzzle")).Pos)
 	else
 		return (self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos+self.Owner:GetAimVector():Angle():Right()*36-self.Owner:GetAimVector():Angle():Up()*36)
@@ -66,10 +66,10 @@ function EFFECT:GetTracerShootPos2(start)
 end
 
 function EFFECT:Render()
-	if !self.hassetpos then
+	if not self.hassetpos then
 		self.startpos = (self:GetTracerShootPos2(self:GetPos()))
 		self.hassetpos = true
 	end
 	render.SetMaterial(self.mat)
-	render.DrawBeam(self.startpos,self.endpos || self:GetPos(),Lerp((CurTime()-self.Created)/0.5,32,0),0,1,self.col)
+	render.DrawBeam(self.startpos,self.endpos or self:GetPos(),Lerp((CurTime()-self.Created)/0.5,32,0),0,1,self.col)
 end

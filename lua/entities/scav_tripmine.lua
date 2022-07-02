@@ -13,7 +13,7 @@ ENT.LastStartPos 	= Vector()
 ENT.LastHitPos 		= Vector()
 
 function ENT:SetupDataTables()
-	self:DTVar("Bool",0,"Armed")
+	self:NetworkVar("Bool",0,"IsArmed")
 end
 
 function ENT:Initialize()
@@ -46,11 +46,11 @@ function ENT:Think()
 			
 		end
 	
-		if not self.dt.Armed and CurTime() - self.Created > self.ArmDelay and self.AutomaticArm then
+		if not self:GetIsArmed() and CurTime() - self.Created > self.ArmDelay and self.AutomaticArm then
 			self:SetArmed(true)
 		end
 		
-		if self.dt.Armed then
+		if self:GetIsArmed() then
 			local tr = self:GetBeamTrace()
 			if IsValid(tr.Entity) and (tr.Entity:IsNPC() or tr.Entity:IsPlayer()) and not tr.Entity:IsFriendlyToPlayer(self.Owner) then
 				self:OnBeamCrossedByEnemy(tr)
@@ -72,7 +72,7 @@ end
 
 function ENT:SetArmed(state)
 
-	if self.dt.Armed ~= state then
+	if self:GetIsArmed() ~= state then
 		if state then
 			self:OnArmed()
 		else
@@ -81,7 +81,7 @@ function ENT:SetArmed(state)
 	end
 	
 	if SERVER then --we are sending a net message to inform the client of the change in arming, and using a dtvar so clients that learn about the mine later still know its state
-		self.dt.Armed = state
+		self:SetIsArmed(state)
 		net.Start("scv_mine_arm")
 			local rf = RecipientFilter()
 			rf:AddAllPlayers()
@@ -95,7 +95,7 @@ function ENT:SetArmed(state)
 end
 
 function ENT:IsArmed()
-	return self.dt.Armed
+	return self:GetIsArmed()
 end
 
 function ENT:OnArmed()

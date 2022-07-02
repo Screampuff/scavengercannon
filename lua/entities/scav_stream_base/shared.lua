@@ -24,7 +24,7 @@ function ENT:Initialize()
 end
 
 function ENT:SetupDataTables()
-	self:DTVar("Float",3,"DeathTime")
+	self:NetworkVar("Float",3,"DeathTime")
 	self:OnSetupDataTables()
 end
 
@@ -37,12 +37,12 @@ end
 
 function ENT:GetMuzzlePosAng()
 	local pl = self.Player
-	if !IsValid(pl) || !IsValid(pl:GetActiveWeapon()) then
+	if not IsValid(pl) or not IsValid(pl:GetActiveWeapon()) then
 		return self:AngPos()
 	end
-	if CLIENT && (pl == GetViewEntity()) then
+	if CLIENT and (pl == GetViewEntity()) then
 		local vm = pl:GetViewModel()
-		local angpos = vm:GetAttachment(vm:LookupAttachment("muzzle"))||self:AngPos()
+		local angpos = vm:GetAttachment(vm:LookupAttachment("muzzle")) or self:AngPos()
 		if self.PosOffset then
 			local right = angpos.Ang:Right()
 			local up = angpos.Ang:Up()
@@ -61,7 +61,7 @@ function ENT:GetMuzzlePosAng()
 		return angpos
 	else
 		local wep = pl:GetActiveWeapon()
-		local angpos = wep:GetAttachment(wep:LookupAttachment("muzzle"))||self:AngPos()
+		local angpos = wep:GetAttachment(wep:LookupAttachment("muzzle")) or self:AngPos()
 		if self.PosOffset then
 			local right = angpos.Ang:Right()
 			local up = angpos.Ang:Up()
@@ -118,10 +118,10 @@ tracep.mask = MASK_SHOT
 function ENT:GetTrace(length,filter,mins,maxs,mask)
 	tracep.start = self.Player:GetShootPos()
 	tracep.endpos = tracep.start+self.Player:GetAimVector()*length
-	tracep.filter = filter||self.Player
+	tracep.filter = filter or self.Player
 	tracep.mins = mins
 	tracep.maxs = maxs
-	tracep.mask = mask||MASK_SHOT
+	tracep.mask = mask or MASK_SHOT
 	if mins then
 		return util.TraceHull(tracep)
 	else
@@ -132,10 +132,10 @@ end
 function ENT:GetModelTrace(length,filter,mins,maxs,mask)
 	tracep.start = self.Player:GetShootPos()
 	tracep.endpos = tracep.start+self:GetAngles():Forward()*length
-	tracep.filter = filter||self.Player
+	tracep.filter = filter or self.Player
 	tracep.mins = mins
 	tracep.maxs = maxs
-	tracep.mask = mask||MASK_SHOT
+	tracep.mask = mask or MASK_SHOT
 	if mins then
 		return util.TraceHull(tracep)
 	else
@@ -145,20 +145,20 @@ end
 
 function ENT:Think()
 	local pl = self:GetPlayer()
-	if !pl:IsValid() then
+	if not pl:IsValid() then
 		return
 	end
 	if SERVER then
-		if !IsValid(self.Player) || (self.Weapon != self.Player:GetActiveWeapon()) then
+		if not IsValid(self.Player) or (self.Weapon ~= self.Player:GetActiveWeapon()) then
 			self:OnKill()
 			self:Remove()
 			return
 		end
 	else
-		if (pl == GetViewEntity()) && !self.ViewMode then
+		if (pl == GetViewEntity()) and not self.ViewMode then
 			self:OnViewMode()
 			self.ViewMode = true
-		elseif (pl != GetViewEntity()) && self.ViewMode then
+		elseif (pl ~= GetViewEntity()) and self.ViewMode then
 			self:OnWorldMode()
 			self.ViewMode = false
 		end
@@ -168,7 +168,7 @@ end
 
 
 for k,v in pairs(file.Find("entities/scav_stream_base/effects/*.lua","LUA")) do
-	if (v != ".") && (v != "..") then
+	if (v ~= ".") and (v ~= "..") then
 		include("effects/"..v)
 		AddCSLuaFile("effects/"..v)
 	end

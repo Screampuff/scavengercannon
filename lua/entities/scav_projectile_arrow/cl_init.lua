@@ -5,8 +5,8 @@ ENT.blue = Color(0,0,255,255)
 
 function ENT:Draw()
 	self:DrawModel()
-	//render.SetMaterial(self.mat)
-	//render.DrawSprite(self:GetPos(),48,48,self.col)
+	--render.SetMaterial(self.mat)
+	--render.DrawSprite(self:GetPos(),48,48,self.col)
 end
 
 function ENT:Initialize()

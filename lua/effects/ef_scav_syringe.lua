@@ -13,7 +13,7 @@ function EFFECT:Init(data)
 end
 
 function EFFECT:Think()
-		if !self.didhit then
+		if not self.didhit then
 			self.vel = self.vel+self.Gravity*math.max(UnPredictedCurTime()-self.lasttrace,0)
 			self:SetAngles(self.vel:Angle())
 			local vel = self.vel*math.max(UnPredictedCurTime()-self.lasttrace,0)
@@ -24,11 +24,11 @@ function EFFECT:Think()
 			tracep.mask = MASK_SHOT
 			tr = util.TraceLine(tracep)
 			if tr.Hit then
-				if tr.Entity && tr.Entity:IsValid() then
+				if tr.Entity and tr.Entity:IsValid() then
 					local ef = EffectData()
 					ef:SetStart(self.vel:GetNormalized()*-1)
 					ef:SetOrigin(tr.HitPos)
-					if (tr.MatType == MAT_BLOODYFLESH)||(tr.MatType == MAT_FLESH) then
+					if (tr.MatType == MAT_BLOODYFLESH) or (tr.MatType == MAT_FLESH) then
 						util.Effect("BloodImpact",ef)
 						sound.Play("physics/flesh/flesh_impact_bullet"..math.random(1,5)..".wav",self:GetPos(),50)
 					elseif (tr.MatType == MAT_CONCRETE) then
@@ -37,18 +37,18 @@ function EFFECT:Think()
 					elseif (tr.MatType == MAT_PLASTIC) then
 						util.Decal("impact.concrete",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 						sound.Play("physics/plastic/plastic_box_impact_hard"..math.random(1,4)..".wav",self:GetPos(),50)
-					elseif (tr.MatType == MAT_GLASS)||(tr.MatType == MAT_TILE) then
+					elseif (tr.MatType == MAT_GLASS) or (tr.MatType == MAT_TILE) then
 						util.Effect("GlassImpact",ef)
 						util.Decal("impact.glass",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 						sound.Play("physics/concrete/concrete_impact_bullet"..math.random(1,4)..".wav",self:GetPos(),50)
-					elseif (tr.MatType == MAT_METAL)||(tr.MatType == MAT_GRATE) then
+					elseif (tr.MatType == MAT_METAL) or (tr.MatType == MAT_GRATE) then
 						util.Effect("MetalSpark",ef)
 						util.Decal("impact.metal",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 						sound.Play("physics/metal/metal_solid_impact_bullet"..math.random(1,4)..".wav",self:GetPos(),50)
 					elseif (tr.MatType == MAT_WOOD) then
 						util.Decal("impact.wood",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 						sound.Play("physics/wood/wood_solid_impact_bullet"..math.random(1,5)..".wav",self:GetPos(),50)
-					elseif (tr.MatType == MAT_DIRT)||(tr.MatType == MAT_SAND) then
+					elseif (tr.MatType == MAT_DIRT) or (tr.MatType == MAT_SAND) then
 						util.Decal("impact.sand",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 						sound.Play("physics/surfaces/sand_impact_bullet"..math.random(1,4)..".wav",self:GetPos(),50)
 					end
@@ -60,12 +60,12 @@ function EFFECT:Think()
 					self.didhit = true
 					self:SetPos(tr.HitPos - self.vel:GetNormalized()*4)
 				end
-				//util.Decal("fadingscorch",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
-				//sound.Play("DOOM/DSFIRXPL.wav",tr.HitPos,150,100)
-				//local edata = EffectData()
-				//edata:SetOrigin(self:GetPos())
-				//util.Effect("sprite_pl_imp",edata)
-				//return false
+				--util.Decal("fadingscorch",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
+				--sound.Play("DOOM/DSFIRXPL.wav",tr.HitPos,150,100)
+				--local edata = EffectData()
+				--edata:SetOrigin(self:GetPos())
+				--util.Effect("sprite_pl_imp",edata)
+				--return false
 			else
 				self:SetPos(self:GetPos()+vel)
 			end

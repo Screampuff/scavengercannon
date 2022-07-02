@@ -1,13 +1,13 @@
 ----------------------------------------------------------
-//Status Effects System //
+--Status Effects System --
 ---------------------------------------------------------
 
-/*======================================================================================================================================================================================
+--[[======================================================================================================================================================================================
 	AUTHOR: Ghor
 	--This was originally created for personal use, but as I started working on this system more and more I realized how many people might be able to make use of my work..
 	--I've provided a wide range of status effects with this script, and new ones can be added very easily.
 	--Don't forget to include an icon for your custom status effects!  It should go in materials/hud/status/, and have the same name as your status effect. It will automatically resource.AddFile() itself and appear for the client when they get the status.
-======================================================================================================================================================================================*/
+======================================================================================================================================================================================]]--
 
 --damage fix
 DMG_FREEZE = 16
@@ -144,7 +144,7 @@ function Status2.Inflict(ent,statustype,duration,value,inflictor,infinite) --ent
 		end
 	end
 	--if this is a new effect being inflicted..
-	if duration > 0 then //if you want to end a status effect early, just throw a negative value into the duration argument and it'll subtract from an existing effect
+	if duration > 0 then --if you want to end a status effect early, just throw a negative value into the duration argument and it'll subtract from an existing effect
 		local newstat = Status2.New(statustype)
 		newstat.Owner = ent
 		newstat.StartTime = CurTime()
@@ -250,7 +250,7 @@ if CLIENT then
 				surface.SetTexture(surface.GetTextureID("hud/status/"..string.lower(v.Name)))
 				local x = xbase + k * 64 - 64
 				surface.DrawTexturedRect(x,y,32,32)
-				if !v.Infinite then
+				if not v.Infinite then
 					draw.DrawText(math.max(math.floor(v.EndTime - CurTime()),0),"Trebuchet18",x + 48,y + 8,color_white,TEXT_ALIGN_RIGHT)
 				else
 					draw.DrawText("∞","Trebuchet18",x + 48,y + 16,color_white,TEXT_ALIGN_RIGHT)
@@ -276,9 +276,9 @@ end
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
 	
-//Speed
+--Speed
 
-if !STATUS_PLY.SetWalkSpeedOld then
+if not STATUS_PLY.SetWalkSpeedOld then
 	STATUS_PLY.SetWalkSpeedOld = STATUS_PLY.SetWalkSpeed
 		function STATUS_PLY:SetWalkSpeed(speed)
 			if speed then
@@ -304,8 +304,8 @@ if !STATUS_PLY.SetWalkSpeedOld then
 	if not vFireInstalled then --vFire breaks this so let's make sure it doesnt init if vFire exists
 		STATUS_ENT.IgniteOld = STATUS_ENT.Ignite
 		function STATUS_ENT:Ignite(duration,radius,inflictor)
-			if !radius then radius = 0 end
-			if !inflictor then inflictor = self end
+			if not radius then radius = 0 end
+			if not inflictor then inflictor = self end
 			self:InflictStatusEffect("Burning",duration,radius,inflictor)
 		end
 		
@@ -345,7 +345,7 @@ local STATUS = {}
 	
 	Status2.Register("Speed",STATUS)
 
-//Slow
+--Slow
 
 local STATUS = {}
 
@@ -396,7 +396,7 @@ local STATUS = {}
 		end
 	end)
 	
-//Cloak
+--Cloak
 
 local STATUS = {}
 	
@@ -414,7 +414,7 @@ local STATUS = {}
 				v:SetColor(Color(r,g,b,0))
 				v:SetRenderMode(RENDERMODE_TRANSALPHA)
 			end
-			/*if SERVER then
+			--[[if SERVER then
 				for i, npc in ipairs( ents.FindByClass( "npc_*" ) ) do
 					if IsValid( npc ) and npc:IsNPC() then
 						if IsValid(npc:GetEnemy()) and npc:GetEnemy() == self.Owner then
@@ -423,14 +423,14 @@ local STATUS = {}
 						end
 					end
 				end
-			end*/
+			end]]--
 		end
 		if CLIENT then
 			if (self.Owner == LocalPlayer()) then
 				local pos = self.Owner:GetPos()
 				pos.z = pos.z+1
 				self.Owner:SetPos(pos)
-				//self.Owner:GetViewModel():SetMaterial("models/shadertest/predator")
+				--self.Owner:GetViewModel():SetMaterial("models/shadertest/predator")
 				self.Owner:GetViewModel():SetMaterial("models/props_combine/com_shield001a")
 				self.Owner:GetHands():SetMaterial("models/props_combine/com_shield001a")
 			end
@@ -444,7 +444,7 @@ local STATUS = {}
 	end
 	
 	function STATUS:Think()
-		/*if SERVER then
+		--[[if SERVER then
 			for i, npc in ipairs( ents.FindByClass( "npc_*" ) ) do
 				if IsValid( npc ) and npc:IsNPC() then
 					if IsValid(npc:GetEnemy()) and npc:GetEnemy() == self.Owner then
@@ -453,7 +453,7 @@ local STATUS = {}
 					end
 				end
 			end
-		end*/
+		end]]--
 	end
 	
 	function STATUS:Finish()
@@ -465,7 +465,7 @@ local STATUS = {}
 				v:SetColor(Color(r,g,b,255))
 				v:SetRenderMode(RENDERMODE_NORMAL)
 			end
-			/*if SERVER then
+			--[[if SERVER then
 				for i, npc in ipairs( ents.FindByClass( "npc_*" ) ) do
 					if IsValid( npc ) and npc:IsNPC() then
 						if npc:GetRelationship(self.Owner) == D_NU then --and npc:GetRelationship(CLASS_PLAYER) == D_HT then --Not sure how to test for this
@@ -474,7 +474,7 @@ local STATUS = {}
 						end
 					end
 				end
-			end*/
+			end]]--
 		end
 		if CLIENT then
 			if (self.Owner == LocalPlayer()) then
@@ -501,7 +501,7 @@ local STATUS = {}
 	end
 	
 
-//Frozen
+--Frozen
 	local STATUS = {}
 	
 	STATUS.Name = "Frozen"
@@ -556,7 +556,7 @@ local STATUS = {}
 		end
 		local noshatter = {DMG_FREEZE, DMG_SLOWFREEZE, DMG_ENERGYBEAM, DMG_DIRECT, DMG_BURN, DMG_SLOWBURN, DMG_POISON, DMG_RADIATION, DMG_PARALYZE, DMG_DROWN, DMG_DROWNRECOVER, DMG_NERVEGAS, DMG_CHEMICAL}
 		hook.Add("EntityTakeDamage","FrozenDmg",function(ent,dmginfo)
-			if ent.Status_frozen and !table.HasValue(noshatter,dmginfo:GetDamageType()) then
+			if ent.Status_frozen and not table.HasValue(noshatter,dmginfo:GetDamageType()) then
 				dmginfo:ScaleDamage(10)
 			end
 			if ent.Status_frozen and ((dmginfo:GetDamageType() == DMG_DIRECT) or (dmginfo:GetDamageType() == DMG_BURN) or (dmginfo:GetDamageType() == DMG_SLOWBURN)) then
@@ -648,7 +648,7 @@ local STATUS = {}
 	end
 	
 	function STATUS:Finish()
-		if !self.Owner:IsValid() then
+		if not self.Owner:IsValid() then
 			return
 		end
 		self.Owner.Status_frozen = false
@@ -670,7 +670,7 @@ local STATUS = {}
 				dmg:SetDamageType(DMG_DIRECT)
 				self.Owner:TakeDamageInfo(dmg)
 			end
-			if !self.Owner:IsPlayer() then
+			if not self.Owner:IsPlayer() then
 				self.Owner:SetMaterial(self.mat)
 				local phys = self.Owner:GetPhysicsObject()
 				if IsValid(phys) and not phys:IsMotionEnabled() and self.Owner.wasmotionenabled then
@@ -722,7 +722,7 @@ local STATUS = {}
 		self.EndTime = self.EndTime+duration
 	end
 	
-//Shock
+--Shock
 
 local STATUS = {}
 	
@@ -735,7 +735,7 @@ local STATUS = {}
 	if CLIENT then
 		function STATUS:Think()	
 			if (self.Owner == LocalPlayer()) then
-				//self.Owner:SetEyeAngles(EyeAngles()+Angle(math.Rand(-2,2),math.Rand(-2,2),0))
+				--self.Owner:SetEyeAngles(EyeAngles()+Angle(math.Rand(-2,2),math.Rand(-2,2),0))
 				self.Owner:SetEyeAngles((VectorRand()*0.02+self.Owner:GetAimVector()):Angle())
 			end
 			self:NextThink(CurTime()+1/self.Value)
@@ -759,7 +759,7 @@ local STATUS = {}
 	
 	hook.Add("GetMotionBlurValues","ShockBlur",function(x,y,fwd,spin) if GetViewEntity().Status_shock then return math.Rand(-1,1),math.Rand(-1,1),fwd,spin end end)
 	
-//Burning
+--Burning
 
 
 	function STATUS_ENT:Extinguish()
@@ -831,7 +831,7 @@ local STATUS = {}
 	
 	function STATUS:Add(duration,value)
 		self.EndTime = CurTime()+duration
-		//print(duration)
+		--print(duration)
 		if SERVER then
 			self.Owner:IgniteOld(duration,self.value)
 		end
@@ -839,7 +839,7 @@ local STATUS = {}
 	
 	Status2.Register("Burning",STATUS)
 
-//Acid Burning
+--Acid Burning
 	
 local STATUS = {}
 	
@@ -907,7 +907,7 @@ local STATUS = {}
 	
 	Status2.Register("Acid",STATUS)
 
-//Deaf
+--Deaf
 	
 local STATUS = {}
 
@@ -947,7 +947,7 @@ local STATUS = {}
 	
 	Status2.Register("Deaf",STATUS)
 	
-//Disease
+--Disease
 	
 local STATUS = {}
 	
@@ -1005,7 +1005,7 @@ local STATUS = {}
 	
 	Status2.Register("Disease",STATUS)
 
-//DamageX
+--DamageX
 	
 local STATUS = {}
 	
@@ -1013,8 +1013,8 @@ local STATUS = {}
 	
 	function STATUS:Initialize()
 		if CLIENT then
-//			self.Owner.Status_DmgXSnd = CreateSound(self.Owner,"HL1/ambience/alien_cycletone.wav")
-//			self.Owner.Status_DmgXSnd:Play()
+--			self.Owner.Status_DmgXSnd = CreateSound(self.Owner,"HL1/ambience/alien_cycletone.wav")
+--			self.Owner.Status_DmgXSnd:Play()
 		end
 	end
 	
@@ -1042,7 +1042,7 @@ local STATUS = {}
 				else
 					ent = self.Owner:GetViewModel()
 				end
-				if !ent:IsValid() then
+				if not ent:IsValid() then
 					return true
 				end
 				local att = ent:LookupAttachment("muzzle")
@@ -1058,7 +1058,7 @@ local STATUS = {}
 			self:NextThink(CurTime()+1/self.Value/4)
 			local sprite = math.random(1,7)
 			
-			if !pos then 
+			if not pos then
 				local mins = self.Owner:OBBMins()
 				local maxs = self.Owner:OBBMaxs()
 				pos = self.Owner:OBBCenter()
@@ -1082,7 +1082,7 @@ local STATUS = {}
 	
 	function STATUS:Finish()
 		if CLIENT then
-//			self.Owner.Status_DmgXSnd:Stop()
+--			self.Owner.Status_DmgXSnd:Stop()
 		end
 	end
 	
@@ -1093,7 +1093,7 @@ local STATUS = {}
 	
 	Status2.Register("DamageX",STATUS)
 
-//Invulnerability
+--Invulnerability
 	
 local STATUS = {}
 	
@@ -1175,7 +1175,7 @@ local STATUS = {}
 	
 	Status2.Register("Invuln",STATUS)
 	
-//Radiation
+--Radiation
 	
 local STATUS = {}
 	
@@ -1239,7 +1239,7 @@ local STATUS = {}
 	
 	Status2.Register("Radiation",STATUS)
 	
-//Numbness
+--Numbness
 	
 local STATUS = {}
 	
@@ -1286,7 +1286,7 @@ if CLIENT then
 
 end
 
-//Temporary Health
+--Temporary Health
 --Functions like in L4D, slowly decays over time, isn't used before permanent health is down to 1
 
 local STATUS = {}
@@ -1342,7 +1342,7 @@ local STATUS = {}
 		hook.Add("HUDDrawTargetID","TemporaryHealth",function() end)
 	end
 
-//Drunk
+--Drunk
 
 local STATUS = {}
 	

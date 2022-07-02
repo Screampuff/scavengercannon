@@ -11,7 +11,7 @@ end
 util.AddNetworkString("scv_killstream")
 
 function ENT:Kill()
-	self.dt.DeathTime = CurTime()
+	self:SetDeathTime(CurTime())
 	net.Start("scv_killstream")
 		local rf = RecipientFilter()
 		rf:AddAllPlayers()
@@ -23,7 +23,7 @@ function ENT:Kill()
 end
 
 function ENT:OnRemove()
-	if !self.Killed then
+	if not self.Killed then
 		self:OnKill()
 	end
 end

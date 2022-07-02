@@ -8,7 +8,7 @@ local color_red = Color(255,0,0,255)
 function ENT:Initialize()
 	self:AddEffects(EF_NOSHADOW)
 	if SERVER then
-		self.WayPoints = self.WayPoints||{}
+		self.WayPoints = self.WayPoints or {}
 		self:PhysicsInitSphere(1)
 		self:SetSolid(SOLID_NONE)
 		self:StartMotionController()
@@ -29,25 +29,25 @@ function ENT:Initialize()
 end
 
 function ENT:SetupDataTables()
-	self:DTVar("Float",0,"Charge")
+	self:NetworkVar("Float",0,"ChargeAmt")
 end
 
 function ENT:Think()
 	if SERVER then
-		//local dest = self:GetCurrentDestination()
-		//if dest:Distance() < 400 then
-		if !IsValid(self.WayPoint) && !self.Killed then
+		--local dest = self:GetCurrentDestination()
+		--if dest:Distance() < 400 then
+		if not IsValid(self.WayPoint) and not self.Killed then
 			self:Kill()
 		end
 		self:GetPhysicsObject():Wake()
 	else
-		//self:PerformPull() --this is somewhat too performance intensive.. maybe a convar
+		--self:PerformPull() --this is somewhat too performance intensive.. maybe a convar
 	end
 end
 
 function ENT:PerformPull()
 	local speed
-	if SERVER && self.Killed then
+	if SERVER and self.Killed then
 		speed = math.max(1200)
 	else
 		speed = math.max(200,self:GetVelocity():Length()*1.4)
@@ -56,12 +56,12 @@ function ENT:PerformPull()
 	local ctime = CurTime()
 	local pos = self:GetPos()
 	for k,v in pairs(ents.FindInSphere(pos,300)) do
-		if IsValid(v) && (v:GetMoveType() == MOVETYPE_VPHYSICS) && v:GetPhysicsObject():IsValid() && (v:GetClass() != "scav_gravball") then
+		if IsValid(v) and (v:GetMoveType() == MOVETYPE_VPHYSICS) and v:GetPhysicsObject():IsValid() and (v:GetClass() ~= "scav_gravball") then
 			for i=0,v:GetPhysicsObjectCount()-1 do
 				v:GetPhysicsObjectNum(i):SetVelocity((pos-v:GetPos()-v:OBBCenter())*velmultiplier)
 			end
 			if SERVER then
-				if !v.GravBall || (v.GravBall.ball == self) then --this is for kill data
+				if not v.GravBall or (v.GravBall.ball == self) then --this is for kill data
 					v.GravBall = {
 						["ball"]=self,
 						["gun"]=self.BHG,
@@ -85,7 +85,7 @@ if CLIENT then
 		end
 		local ctime = CurTime()
 		local refvar = self.Created
-		local scale = math.max(0,math.Round(self.dt.Charge/150*15*(math.abs(math.sin(ctime*64))+1)))
+		local scale = math.max(0,math.Round(self:GetChargeAmt()/150*15*(math.abs(math.sin(ctime*64))+1)))
 		return scale
 	end
 	
@@ -99,7 +99,7 @@ if CLIENT then
 else
 
 	function ENT:SetCharge(charge)
-		self.dt.Charge = charge
+		self:SetChargeAmt(charge)
 		self:Fire("Kill",nil,charge/25)
 		util.SpriteTrail(self,0,color_red,false,22,0,6*charge/250,1/11,"trails/laser.vmt")
 	end
@@ -110,7 +110,7 @@ else
 		local amount = dmginfo:GetDamage()
 		if (inflictor.GravBall) then
 			local gb=inflictor.GravBall
-			if gb.owner != inflictor:GetPhysicsAttacker() then --If the attacker wasn't us, caused by something moving the object after the gravball has, we're no longer interested.
+			if gb.owner ~= inflictor:GetPhysicsAttacker() then --If the attacker wasn't us, caused by something moving the object after the gravball has, we're no longer interested.
 				return
 			end
 			if IsValid(gb.gun) then
@@ -126,7 +126,7 @@ else
 
 	function ENT:OnRemove()
 		self.SoundLoop:Stop()
-		if SERVER && IsValid(self.WayPoint) then
+		if SERVER and IsValid(self.WayPoint) then
 			self.WayPoint:DestroyPath()
 		end
 	end
@@ -136,11 +136,11 @@ else
 			return
 		end
 		self.Killed = true
-		//self:GetPhysicsObject():SetVelocity(Vector(0,0,0))
+		--self:GetPhysicsObject():SetVelocity(Vector(0,0,0))
 	end
 
 	function ENT:Touch(hitent)
-		if self.WayPoints[1] && (self.WayPoints[1] == hitent) then
+		if self.WayPoints[1] and (self.WayPoints[1] == hitent) then
 			self:AdvanceWaypoint()
 		end
 	end
@@ -154,10 +154,10 @@ else
 	end
 	
 	function ENT:AdvanceWaypoint()
-		if !IsValid(self.WayPoint) then
+		if not IsValid(self.WayPoint) then
 			self:Kill()
-		elseif IsValid(self.WayPoint.dt.waypointNext) then
-			local nextwaypoint = self.WayPoint.dt.waypointNext
+		elseif IsValid(self.WayPoint:GetwaypointNext()) then
+			local nextwaypoint = self.WayPoint:GetwaypointNext()
 			self.WayPoint.GravBall = nil
 			SafeRemoveEntityDelayed(self.WayPoint,0)
 			self.WayPoint = nextwaypoint
@@ -167,7 +167,7 @@ else
 	
 	function ENT:GetCurrentDestination()
 		local wp = self.WayPoint
-		if !IsValid(wp) then
+		if not IsValid(wp) then
 			return self:GetPos()
 		end
 		return wp:GetPos()
@@ -181,7 +181,7 @@ else
 		local dest = self:GetCurrentDestination()
 		local dir = dest-self:GetPos()
 		local length = dir:Length()
-		//local acc = math.max(1000,10000/length)
+		--local acc = math.max(1000,10000/length)
 		acc = 200000
 		dir = dir:GetNormalized()
 		
@@ -192,7 +192,7 @@ else
 			linearforce = dir*acc*deltatime
 		end
 		local decellerationforce = (phys:GetVelocity()*phys:GetMass())
-		return Vector(0,0,0), (linearforce||Vector(0,0,0))-(decellerationforce/deltatime*0.025), SIM_GLOBAL_ACCELERATION
+		return Vector(0,0,0), (linearforce or Vector(0,0,0))-(decellerationforce/deltatime*0.025), SIM_GLOBAL_ACCELERATION
 	end
 	
 	hook.Add("Tick","BHGPull",function() for k,v in pairs(ents.FindByClass("scav_gravball")) do v:PerformPull() end end)

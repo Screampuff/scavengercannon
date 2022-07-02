@@ -63,7 +63,7 @@ function SWEP:DrawCharging()
 				.."\n-------------------------------\n"
 				..ScavLocalize("scav.bhg.ammo",self:GetAmmo(),self:GetMaxAmmo())
 				.."\n"..ScavLocalize("scav.bhg.charge",math.floor(self.Charge))
-				.."\n"..ScavLocalize("scav.bhg.waypoints",self.dt.WaypointCount,self.dt.MaxWaypoints),
+				.."\n"..ScavLocalize("scav.bhg.waypoints",self:GetWaypointCount(),self:GetMaxWaypoints()),
 				"BHG10",5,5,col_textcol,0)
 end
 
@@ -77,7 +77,7 @@ function SWEP:DrawScreen()
 	render.SetViewPort(0,0,256,256)
 	cam.Start2D()
 	local bootprogress = math.floor((CurTime()-self.DeployedTime)*2)
-	if (bootprogress > 14) || (self.ChargeTime != 0) then
+	if (bootprogress > 14) or (self.ChargeTime ~= 0) then
 		self:DrawCharging()
 	else
 		self:DrawScreenBoot(bootprogress)
@@ -102,7 +102,7 @@ function SWEP:DrawHUD()
 	local xmid = ScrW()/2
 	local ymid = ScrH()/2
 	surface.SetTexture(chairtex)
-	if (self:GetCharge() > 0) && (self.ChargeTime != 0) then
+	if (self:GetCharge() > 0) and (self.ChargeTime ~= 0) then
 		chairalpha = math.Clamp(chairalpha+FrameTime()*2000,0,255)
 	else
 		chairalpha = math.Clamp(chairalpha-FrameTime()*1000,0,255)
@@ -114,21 +114,21 @@ function SWEP:DrawHUD()
 	end
 	local whitescale = 1
 	local distmin = 16
-	if self.waypointtime != 0 then
+	if self.waypointtime ~= 0 then
 		whitescale = (CurTime()-self.waypointtime)*2
 		dist = whitescale/255*8+16
 	else
 		dist = chairalpha/255*8+16
 	end
-	//Fuck you, it's efficient. I think.
-	if self.dt.WaypointCount > 0 then
+	--Fuck you, it's efficient. I think.
+	if self:GetWaypointCount() > 0 then
 		surface.SetDrawColor(255,0,0,chairalpha)
 		surface.DrawTexturedRectRotated(xmid-distmin,ymid-distmin,32,32,0)
-		if self.dt.WaypointCount > 1 then
+		if self:GetWaypointCount() > 1 then
 			surface.DrawTexturedRectRotated(xmid+distmin,ymid-distmin,32,32,270)
-			if self.dt.WaypointCount > 2 then
+			if self:GetWaypointCount() > 2 then
 				surface.DrawTexturedRectRotated(xmid+distmin,ymid+distmin,32,32,180)
-				if self.dt.WaypointCount > 3 then
+				if self:GetWaypointCount() > 3 then
 					surface.DrawTexturedRectRotated(xmid-distmin,ymid+distmin,32,32,90)
 				else
 					surface.SetDrawColor(255,255*whitescale,255*whitescale,chairalpha)

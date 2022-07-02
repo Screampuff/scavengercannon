@@ -21,7 +21,7 @@ function SWEP:DrawWeaponSelection(x,y,w,h,a)
 end
 
 function SWEP:PreDrawViewModel(vm,wep,pl)
-	if wep:GetClass() != "weapon_backuppistol" then
+	if wep:GetClass() ~= "weapon_backuppistol" then
 		return
 	end
 	local ctime = CurTime()
@@ -33,14 +33,14 @@ function SWEP:PreDrawViewModel(vm,wep,pl)
 end
 
 function SWEP:PostDrawViewModel(vm,wep,pl)
-	if wep:GetClass() != "weapon_backuppistol" then
+	if wep:GetClass() ~= "weapon_backuppistol" then
 		return
 	end
 	mat:SetVector("$selfillumtint",illumtint)
 end
 
 function SWEP:GetGlowAmount()
-	return math.Clamp((self.dt.Charges/self.MaxCharge+math.Clamp(self.LastFired+1-CurTime(),0,1)+0.3)*1.3,0.3,1.7)
+	return math.Clamp((self:GetCharges()/self.MaxCharge+math.Clamp(self.LastFired+1-CurTime(),0,1)+0.3)*1.3,0.3,1.7)
 end
 
 function SWEP:DrawWorldModel()
@@ -73,7 +73,7 @@ function PANEL:AutoSetup()
 end
 
 function PANEL:Think()
-	if !IsValid(LocalPlayer():GetActiveWeapon()) || (LocalPlayer():GetActiveWeapon() != self.Weapon) then
+	if not IsValid(LocalPlayer():GetActiveWeapon()) or (LocalPlayer():GetActiveWeapon() ~= self.Weapon) then
 		self:SetVisible(false)
 	else
 		self.AmmoLabel:SetText(self.Weapon:GetAmmo())
@@ -82,7 +82,7 @@ function PANEL:Think()
 end
 
 function PANEL:InvalidateLayout()
-	if !self.Initialized then
+	if not self.Initialized then
 		return
 	end
 	self.AmmoLabel:SizeToContents()

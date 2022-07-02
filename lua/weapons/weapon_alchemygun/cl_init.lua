@@ -34,12 +34,12 @@ end
 function SWEP:ViewModelDrawn()
 	local tr = self.Owner:GetEyeTraceNoCursor()
 	local ent = tr.Entity
-	if !ent:IsValid() || (ent:GetMoveType() != MOVETYPE_VPHYSICS) then
+	if not ent:IsValid() or (ent:GetMoveType() ~= MOVETYPE_VPHYSICS) then
 		return
 	end
 	
 	local model = ScavData.FormatModelname(ent:GetModel())
-	if !self:CheckForAlchemyInfo(model) then
+	if not self:CheckForAlchemyInfo(model) then
 		timer.Simple(0,function() self:GetAlchemyInfo(model) end)
 		return
 	end
@@ -64,12 +64,12 @@ local vec_col = Vector(1,1,1)
 
 function SWEP:DrawWorldModel()
 	if IsValid(self.wmodel) then
-		if self:GetOwner():IsValid() && (self.wmodel.parent != self:GetOwner()) then
+		if self:GetOwner():IsValid() and (self.wmodel.parent ~= self:GetOwner()) then
 			timer.Simple(0, function() self:BuildWModel(self:GetOwner()) end)
-		elseif !self:GetOwner():IsValid() && (self.wmodel.parent != self) then
+		elseif not self:GetOwner():IsValid() and (self.wmodel.parent ~= self) then
 			timer.Simple(0, function() self:BuildWModel(self) end)
 		end
-		if self.dt.Ghosting then
+		if self:GetGhosting() then
 			self.PanelPose = math.Approach(self.PanelPose,1,FrameTime()*5)
 		else
 			self.PanelPose = math.Approach(self.PanelPose,0,FrameTime()*5)
@@ -90,7 +90,7 @@ function SWEP:DrawWorldModel()
 		render.MaterialOverride()
 	else
 		local parent = self:GetOwner()
-		if !parent:IsValid() then
+		if not parent:IsValid() then
 			parent = self
 		end
 		timer.Simple(0, function() self.BuildWModel(self,parent) end)
@@ -98,7 +98,7 @@ function SWEP:DrawWorldModel()
 end
 
 function SWEP:BuildWModel(parent) --using a cmodel since SetPoseParameter only works on the LocalPlayer's weapon normally
-	if !IsValid(self) || !IsValid(parent) then
+	if not IsValid(self) or not IsValid(parent) then
 		return
 	end
 	if IsValid(self.wmodel) then
@@ -123,7 +123,7 @@ function SWEP:DestroyWModel()
 end
 
 function SWEP:ResetMenu()
-	if CLIENT && (self:GetOwner() == LocalPlayer()) then
+	if CLIENT and (self:GetOwner() == LocalPlayer()) then
 		self.Menu:PopulateWithStock()
 		self.Menu:SelectIcon(self.Menu.StockBox.Items[1])
 		self.HUD:Update()
@@ -137,7 +137,7 @@ hook.Add("InputMouseApply","scav_alchrot",function(cmd,x,y,ang)
 	else
 		return
 	end
-	if IsValid(wep) && pl:KeyDown(IN_USE) && (wep:GetClass() == "weapon_alchemygun") && wep.dt.Ghosting  then
+	if IsValid(wep) and pl:KeyDown(IN_USE) and (wep:GetClass() == "weapon_alchemygun") and wep:GetGhosting() then
 		RunConsoleCommand("sg_alch_x",x/30)
 		RunConsoleCommand("sg_alch_y",y/30)
 		cmd:SetMouseX(0)

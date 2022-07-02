@@ -4,7 +4,7 @@ local mat2 = Material("effects/scav_elec1")
 
 
 function ENT:Draw()
-	if !self.points then
+	if not self.points then
 		return
 	end
 	render.SetMaterial(mat)

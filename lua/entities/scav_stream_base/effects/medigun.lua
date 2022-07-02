@@ -8,7 +8,7 @@ ENT.PosOffset = Vector(12,0,0)
 
 function ENT:OnInit()
 	if CLIENT then
-		if self.dt.blue then
+		if self:Getblue() then
 			self.ParticleName = "medicgun_beam_blue"
 		else
 			self.ParticleName = "medicgun_beam_red"
@@ -20,8 +20,8 @@ function ENT:OnInit()
 end
 
 function ENT:OnSetupDataTables()
-	self:DTVar("Entity",0,"endent")
-	self:DTVar("Bool",0,"blue")
+	self:NetworkVar("Entity",0,"endent")
+	self:NetworkVar("Bool",0,"blue")
 end
 
 function ENT:OnKill()
@@ -35,7 +35,7 @@ if SERVER then
 	PrecacheParticleSystem("medicgun_beam_blue")
 
 	function ENT:BeginSound()
-		if !self.sound then
+		if not self.sound then
 			self.sound = CreateSound(self,"weapons/medigun_heal.wav")
 		end
 		self.sound:Play()
@@ -52,12 +52,12 @@ if SERVER then
 		local currentdist = self.Range
 		local currentang = self.Cone
 		for k,v in pairs(ents.FindInSphere(pos,self.Range)) do
-			if v:IsNPC() || (v:IsPlayer() && v != self:GetPlayer() && v:Alive()) then
+			if v:IsNPC() or (v:IsPlayer() and v ~= self:GetPlayer() and v:Alive()) then
 				local entpos = v:GetPos()+v:OBBCenter()
 				local dist = entpos:Distance(pos)
 				if (dist < currentdist) then
 					local ang = math.abs(self:EntAng(v,pos,dir))
-					if (ang <= self.Cone) && (ang <= currentang) then
+					if (ang <= self.Cone) and (ang <= currentang) then
 						currentang = ang
 						currentdist = dist
 						ent = v
@@ -80,14 +80,14 @@ if SERVER then
 	function ENT:OnThink()
 		local ctime = CurTime()
 		local tr = self:GetTrace(self.Range)
-		local ent = self.dt.endent
+		local ent = self:Getendent()
 		local pos = self:GetShootPos()
 		local ang = self:GetAimVector():Angle()
 		if IsValid(ent) then
 			local entpos = ent:GetPos()+ent:OBBCenter()
 			local dist = entpos:Distance(pos)
-			if (dist > self.Range) || (ent:IsPlayer() && !ent:Alive()) || (ent:IsNPC() && (ent:Health() <= 0)) then
-				self.dt.endent = NULL
+			if (dist > self.Range) or (ent:IsPlayer() and not ent:Alive()) or (ent:IsNPC() and (ent:Health() <= 0)) then
+				self:Setendent(NULL)
 				ent = NULL
 			else
 				if self.LastHeal+0.1 < ctime then
@@ -97,12 +97,12 @@ if SERVER then
 				end
 			end
 		end
-		if !IsValid(ent) then
+		if not IsValid(ent) then
 			self:EndSound()
 			local newent = self:SeekTarget(pos,ang:Forward())
-			if IsValid(newent) && (newent != self) then
+			if IsValid(newent) and (newent ~= self) then
 				self:BeginSound()
-				self.dt.endent = newent
+				self:Setendent(newent)
 			else
 				if self.LastBeep+0.5 < ctime then
 					self:EmitSound("weapons/medigun_no_target.wav")
@@ -124,14 +124,14 @@ if CLIENT then
 		local ang = angpos.Ang
 		self:SetPos(angpos.Pos)
 		self:SetAngles(angpos.Ang)
-		if IsValid(self.dt.endent) then
-			if !IsValid(self.CPoint1Ent) || (self.CPoint1Ent:GetParent() != self.dt.endent) then
-				self:StartBeam(self.dt.endent)
+		if IsValid(self:Getendent()) then
+			if not IsValid(self.CPoint1Ent) or (self.CPoint1Ent:GetParent() ~= self:Getendent()) then
+				self:StartBeam(self:Getendent())
 			end
 		else
 			self:StopBeam()
 		end
-		if IsValid(self.CPoint1Ent) && IsValid(self.CPoint1Ent:GetParent()) then
+		if IsValid(self.CPoint1Ent) and IsValid(self.CPoint1Ent:GetParent()) then
 			local cpoint = self.CPoint1Ent
 			if cpoint.Attachment then
 				cpoint:SetPos(cpoint:GetParent():GetAttachment(cpoint.Attachment).Pos)
@@ -149,7 +149,7 @@ if CLIENT then
 			cmodel:SetPos(ent:GetPos()+ent:OBBCenter())
 			cmodel:SetParent(ent)
 			local att = ent:LookupAttachment("chest")
-			if att && (att != 0) then
+			if att and (att ~= 0) then
 				cmodel.Attachment = att
 			end
 			self.CPoint1Ent = cmodel

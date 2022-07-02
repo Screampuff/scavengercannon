@@ -16,7 +16,7 @@ function ENT:Initialize()
 	self.Created = CurTime()
 	self:SetMoveType(MOVETYPE_NONE)
 	if SERVER then	
-		if !self.filter then
+		if not self.filter then
 			self.filter = {self.Owner}
 		end
 	else
@@ -42,7 +42,7 @@ function ENT:Think()
 			return
 		end
 		self:NextThink(CurTime()+0.05)
-	//MOVEMENT CODE	
+	--MOVEMENT CODE
 		local tr = {}
 		tr.Hit = true
 		local vel = self.vel*(CurTime()-self.lasttrace)
@@ -73,7 +73,7 @@ local DMG_HYPER = bit.bor(DMG_ENERGYBEAM,DMG_GENERIC,DMG_DIRECT,DMG_BLAST,DMG_PL
 
 function ENT:OnHit(tr)
 	local hitent = tr.Entity
-	if hitent && hitent:IsValid() then
+	if hitent and hitent:IsValid() then
 		if tr.Entity:IsNPC() then
 			tr.Entity:SetSchedule(SCHED_BIG_FLINCH)
 		end

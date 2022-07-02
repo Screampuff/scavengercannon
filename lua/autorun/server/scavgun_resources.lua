@@ -1,6 +1,6 @@
 function resource.AddDirectory(folder)
 	for _,v in ipairs(file.Find(folder.."*","GAME"), true) do
-		if !string.find(v,"svn") then
+		if not string.find(v,"svn") then
 			resource.AddFile(folder..v)
 		end
 	end

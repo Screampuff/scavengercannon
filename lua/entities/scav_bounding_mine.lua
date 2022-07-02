@@ -6,7 +6,7 @@ ENT.PrintName 	= "Hopper Mine"
 ENT.Author 		= "Ghor"
 
 function ENT:SetupDataTables()
-	self:DTVar("Int",0,"state")
+	self:NetworkVar("Int",0,"AlertState")
 end
 
 function ENT:Initialize()
@@ -91,7 +91,7 @@ function ENT:Think()
 
 						self:EmitSound("npc/roller/mine/rmine_blip3.wav")	
 						self:Disarm()
-						self.dt.state = 0
+						self:SetAlertState(0)
 						self.nothink = true
 						
 						break
@@ -112,14 +112,14 @@ function ENT:Think()
 			
 			if prox then
 				if prox:IsFriendlyToPlayer(self.Owner) then
-					self.dt.state = 1
+					self:SetAlertState(1)
 				else
 					self.sound1:Play()
-					self.dt.state = 2
+					self:SetAlertState(2)
 				end
 			else
 				self.sound1:Stop()
-				self.dt.state = 0
+				self:SetAlertState(0)
 			end
 			
 		elseif self:IsHeld() then
@@ -179,11 +179,11 @@ if CLIENT then
 	function ENT:Draw()
 		render.SetMaterial(self.mat)
 		local pos = self:GetBonePosition(self:LookupBone("body"))
-		if self.dt.state == 1 then -- ally
+		if self:GetAlertState() == 1 then -- ally
 			render.DrawSprite(pos,24,24,color_green)
-		elseif self.dt.state == 2 then -- enemy
+		elseif self:GetAlertState() == 2 then -- enemy
 			render.DrawSprite(pos,24,24,color_red)
-		elseif self.dt.state == 3 then -- disarmed
+		elseif self:GetAlertState() == 3 then -- disarmed
 			render.DrawSprite(pos,24,24,color_blue)
 		end
 		self:DrawModel()
@@ -201,7 +201,7 @@ if SERVER then
 		self:EmitSound("npc/roller/blade_cut.wav")
 		self:EmitSound("npc/roller/mine/combine_mine_deploy1.wav")
 		self.constrained = true
-		self.dt.state = 0
+		self:SetAlertState(0)
 	end
 
 	function ENT:Disarm()
@@ -213,7 +213,7 @@ if SERVER then
 		self:SetPoseParameter("blendstates",65)
 		self:EmitSound("npc/roller/blade_in.wav")
 		self.constrained = false
-		self.dt.state = 3
+		self:SetAlertState(3)
 		
 	end
 

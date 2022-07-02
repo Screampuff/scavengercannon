@@ -14,14 +14,14 @@ end
 
 function ENT:OnKill()
 	self:StopParticles()
-	if CLIENT && self.sound then
+	if CLIENT and self.sound then
 		self.sound:Stop()
 	end
 end
 
 function ENT:OnSetupDataTables()
-	self:DTVar("Float",0,"Charge")
-	self:DTVar("Float",1,"LastWaypointSet")
+	self:NetworkVar("Float",0,"Charge")
+	self:NetworkVar("Float",1,"LastWaypointSet")
 end
 
 if SERVER then
@@ -76,7 +76,7 @@ if CLIENT then
 		end
 		local ctime = CurTime()
 		local refvar = self.Created
-		local scale = math.max(0,math.Round(self.dt.Charge*15*(math.abs(math.sin(ctime*64))+1)))
+		local scale = math.max(0,math.Round(self:GetCharge()*15*(math.abs(math.sin(ctime*64))+1)))
 		return scale
 	end
 	
@@ -91,19 +91,19 @@ if CLIENT then
 		render.DrawSprite(pos,scale,scale,glowcol)
 		render.SetMaterial(beammat)
 		local endpos
-		if self:IsInViewMode() && (self.Player:GetViewModel():GetActivity() != ACT_VM_FIDGET) then
+		if self:IsInViewMode() and (self.Player:GetViewModel():GetActivity() ~= ACT_VM_FIDGET) then
 			endpos = self:GetModelTrace(8000,self.Player,beam_mins,beam_maxs,MASK_SOLID).HitPos
 		else
 			endpos = self:GetTrace(8000,self.Player,beam_mins,beam_maxs,MASK_SOLID).HitPos
 		end
-		render.DrawBeam(pos,endpos,2+(1-math.Clamp(CurTime()-self.dt.LastWaypointSet,0,1))*28,0,1,lasercol)
-		//render.SetMaterial(beammat)
-		//beammat:SetVector("$color",redvec)
-		//render.DrawBeam(laserpos,endpos,2,0,1,color_white)
+		render.DrawBeam(pos,endpos,2+(1-math.Clamp(CurTime()-self:GetLastWaypointSet(),0,1))*28,0,1,lasercol)
+		--render.SetMaterial(beammat)
+		--beammat:SetVector("$color",redvec)
+		--render.DrawBeam(laserpos,endpos,2,0,1,color_white)
 		render.SetMaterial(chargemat)
-		//glowmat:SetVector("$color",redvec)
+		--glowmat:SetVector("$color",redvec)
 		render.DrawSprite(endpos,4,4,lasercol)
-		//beammat:SetVector("$color",whitevec)
+		--beammat:SetVector("$color",whitevec)
 		
 	end
 

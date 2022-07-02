@@ -20,18 +20,18 @@ function ENT:OnKill()
 end
 
 function ENT:OnSetupDataTables()
-	self:DTVar("Vector",0,"endpos")
-	self:DTVar("Entity",0,"endent")
-	self:DTVar("Bool",0,"useendent")
+	self:NetworkVar("Vector",0,"endpos")
+	self:NetworkVar("Entity",0,"endent")
+	self:NetworkVar("Bool",0,"useendent")
 end
 
 function ENT:SetEndPoint(pos)
-	self.dt.endpos = pos
+	self:Setendpos(pos)
 end
 
 function ENT:SetEndEnt(ent)
-	self.dt.endent = ent
-	self.dt.useendent = true
+	self:Setendent(ent)
+	self:Setuseendent(true)
 end
 
 if CLIENT then
@@ -77,32 +77,31 @@ if CLIENT then
 	local col = Color(255,255,255,255)
 	local colbluevec = Vector(0.45,0.45,0.7)
 	local colwhitevec = Vector(1,1,1)
-	//local endpos = Vector(0,0,0)
+	--local endpos = Vector(0,0,0)
 
 	
 	function ENT:Draw2()
 		local endpos
-		if self.dt.useendent then
-			if IsValid(self.dt.endent) then
-				//print("endent: "..tostring(self.dt.endent))
-				endpos = self.dt.endent:LocalToWorld(self.dt.endpos)
+		if self:Getuseendent() then
+			if IsValid(self:Getendent()) then
+				endpos = self:Getendent():LocalToWorld(self:Getendpos())
 			else
 				return
 			end
 		else
-			endpos = self.dt.endpos
+			endpos = self:Getendpos()
 		end
 		
 		local angpos = self:GetMuzzlePosAng()
 		local trace = self:GetTrace(10000,nil,mins,maxs)
 		local ang = angpos.Ang
 		local pos = angpos.Pos
-		local pos2 = self.dt.endpos
+		local pos2 = self:Getendpos()
 		local epscale = math.Clamp((CurTime()-self.Created)*4,0,1)
 		endpos = pos+(endpos-pos)*epscale
-		//endpos.x = (pos2.x-pos.x)*epscale+pos.x
-		//endpos.y = (pos2.y-pos.y)*epscale+pos.y
-		//endpos.z = (pos2.z-pos.z)*epscale+pos.z
+		--endpos.x = (pos2.x-pos.x)*epscale+pos.x
+		--endpos.y = (pos2.y-pos.y)*epscale+pos.y
+		--endpos.z = (pos2.z-pos.z)*epscale+pos.z
 		local offset = (CurTime()*2)%1
 		beammat:SetVector("$color",colbluevec)
 		render.SetMaterial(beammat)

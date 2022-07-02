@@ -38,9 +38,9 @@ local dodsshelleject = function(self,shellsize)
 	end
 end
 
-/*==============================================================================================
+--[[==============================================================================================
 	--.30 cal
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.30cal"
@@ -82,8 +82,8 @@ end
 						self:TakeSubammo(item,1)
 					end
 				end
-				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
-				if !continuefiring then
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
 					if SERVER then
 						self.ChargeAttack = nil
 						self:SetBarrelRestSpeed(0)
@@ -107,9 +107,9 @@ end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_30cal.mdl")
 		
-/*==============================================================================================
+--[[==============================================================================================
 	--BAR
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.bar"
@@ -148,8 +148,8 @@ end
 						self:TakeSubammo(item,1)
 					end
 				end
-				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
-				if !continuefiring then
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
 					if SERVER then
 						self.ChargeAttack = nil
 						self:SetBarrelRestSpeed(0)
@@ -171,9 +171,9 @@ end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_bar.mdl")
 
-/*==============================================================================================
+--[[==============================================================================================
 	--C96
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.c96"
@@ -207,8 +207,8 @@ end
 						self:TakeSubammo(item,1)
 					end
 				end
-				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
-				if !continuefiring then
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
 					if SERVER then
 						self.ChargeAttack = nil
 						self:SetBarrelRestSpeed(0)
@@ -230,9 +230,9 @@ end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_c96.mdl")
 
-/*==============================================================================================
+--[[==============================================================================================
 	--Kar 98
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.kar98"
@@ -277,9 +277,9 @@ end
 		ScavData.RegisterFiremode(tab,"models/weapons/w_k98.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/w_k98s.mdl")
 
-/*==============================================================================================
+--[[==============================================================================================
 	--M1 Carbine
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.carbine"
@@ -318,9 +318,9 @@ end
 			tab.Cooldown = 0.3
 		ScavData.RegisterFiremode(tab,"models/weapons/w_m1carb.mdl")
 
-/*==============================================================================================
+--[[==============================================================================================
 	--M1 Garand
-==============================================================================================*/
+==============================================================================================]]--
 		
 		util.PrecacheModel("models/scav/shells/garand_clip.mdl")
 		local tab = {}
@@ -384,9 +384,9 @@ end
 			tab.Cooldown = 0.74
 		ScavData.RegisterFiremode(tab,"models/weapons/w_garand.mdl")
 
-/*==============================================================================================
+--[[==============================================================================================
 	--M1903 Springfield
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.springfield"
@@ -429,9 +429,9 @@ end
 			tab.Cooldown = 1.85
 		ScavData.RegisterFiremode(tab,"models/weapons/w_spring.mdl")
 
-/*==============================================================================================
+--[[==============================================================================================
 	--M1911
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.m1911"
@@ -473,9 +473,9 @@ end
 			tab.Cooldown = 0.3
 		ScavData.RegisterFiremode(tab,"models/weapons/w_colt.mdl")
 
-/*==============================================================================================
+--[[==============================================================================================
 	--MG42
-==============================================================================================*/
+==============================================================================================]]--
 		
 		if SERVER then util.AddNetworkString("scv_setheat") end
 		--PrecacheParticleSystem("grenadetrail")
@@ -493,7 +493,7 @@ end
 			local function mgcooloff(self,item)
 				if item:IsValid() then
 					--local tab = ScavData.models[item.ammo]
-					if not (self:ProcessLinking(item) && self:StopChargeOnRelease()) then
+					if not (self:ProcessLinking(item) and self:StopChargeOnRelease()) then
 						if heat > 0 then
 							if SERVER then
 								heat = math.max(0,heat - 1)
@@ -614,8 +614,8 @@ end
 						end
 					end
 				end
-				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
-				if !continuefiring then
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
 					timer.Simple(0.25, function() mgcooloff(self,item) end)
 					if SERVER then
 						self.ChargeAttack = nil
@@ -647,9 +647,9 @@ end
 		ScavData.RegisterFiremode(tab,"models/weapons/w_mg42bd.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/w_mg42bu.mdl")
 		
-/*==============================================================================================
+--[[==============================================================================================
 	--MP40
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.mp40"
@@ -683,8 +683,8 @@ end
 						self:TakeSubammo(item,1)
 					end
 				end
-				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
-				if !continuefiring then
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
 					if SERVER then
 						self.ChargeAttack = nil
 						self:SetBarrelRestSpeed(0)
@@ -706,9 +706,9 @@ end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_mp40.mdl")
 
-/*==============================================================================================
+--[[==============================================================================================
 	--MP44
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.mp44"
@@ -742,8 +742,8 @@ end
 						self:TakeSubammo(item,1)
 					end
 				end
-				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
-				if !continuefiring then
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
 					if SERVER then
 						self.ChargeAttack = nil
 						self:SetBarrelRestSpeed(0)
@@ -765,9 +765,9 @@ end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_mp44.mdl")
 
-/*==============================================================================================
+--[[==============================================================================================
 	--P38
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.p38"
@@ -804,9 +804,9 @@ end
 			tab.Cooldown = 0.3
 		ScavData.RegisterFiremode(tab,"models/weapons/w_p38.mdl")
 
-/*==============================================================================================
+--[[==============================================================================================
 	--Tommy Gun
-==============================================================================================*/
+==============================================================================================]]--
 		
 		local tab = {}
 			tab.Name = "#scav.scavcan.tommy"
@@ -840,8 +840,8 @@ end
 						self:TakeSubammo(item,1)
 					end
 				end
-				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
-				if !continuefiring then
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
 					if SERVER then
 						self.ChargeAttack = nil
 						self:SetBarrelRestSpeed(0)

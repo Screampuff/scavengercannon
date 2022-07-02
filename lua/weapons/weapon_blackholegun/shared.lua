@@ -42,8 +42,8 @@ function SWEP:GetTrace()
 end
 
 local function waypointiterate(startent,currentent)
-	if IsValid(currentent.dt.waypointNext) then
-		return currentent.dt.waypointNext
+	if IsValid(currentent:GetwaypointNext()) then
+		return currentent:GetwaypointNext()
 	end
 end
 
@@ -52,13 +52,13 @@ function SWEP.WaypointIterate(startent)
 end
 
 function SWEP:SetupDataTables()
-	self:DTVar("Int",0,"Ammo")
-	self:DTVar("Int",1,"MaxAmmo")
-	self:DTVar("Int",2,"WaypointCount")
-	self:DTVar("Int",3,"MaxWaypoints")
-	self:DTVar("Entity",0,"waypointNext")
-	self.dt.MaxAmmo = 1000
-	self.dt.MaxWaypoints = 4
+	self:NetworkVar("Int",0,"Ammo")
+	self:NetworkVar("Int",1,"MaxAmmo")
+	self:NetworkVar("Int",2,"WaypointCount")
+	self:NetworkVar("Int",3,"MaxWaypoints")
+	self:NetworkVar("Entity",0,"waypointNext")
+	self:SetMaxAmmo(1000)
+	self:SetMaxWaypoints(4)
 end
 
 function SWEP:Initialize()
@@ -75,24 +75,24 @@ end
 
 function SWEP:GetAmmo(predicted)
 	if CLIENT then
-		if self.LastDTAmmo < self.dt.Ammo then
-			self.Ammo = self.dt.Ammo
+		if self.LastDTAmmo < self:GetAmmo() then
+			self.Ammo = self:GetAmmo()
 		end
-		self.LastDTAmmo = self.dt.Ammo
+		self.LastDTAmmo = self:GetAmmo()
 		return self.Ammo
 	end
-	return self.dt.Ammo
+	return self:GetAmmo()
 end
 
 function SWEP:GetMaxAmmo()
-	return self.dt.MaxAmmo
+	return self:GetMaxAmmo()
 end
 
 function SWEP:TakeAmmo(amt)
 	if CLIENT then
 		self.Ammo = math.max(self.Ammo-amt,0)
 	else
-		self.dt.Ammo = math.max(self.dt.Ammo-amt,0)
+		self:SetAmmo(math.max(self:GetAmmo()-amt,0))
 	end
 end
 
@@ -107,33 +107,33 @@ end
 
 function SWEP:Think()
 	local ctime = CurTime()
-	if (self.ChargeTime != 0) then
-		if (self:GetAmmo() > 0) && IsFirstTimePredicted() then
+	if (self.ChargeTime ~= 0) then
+		if (self:GetAmmo() > 0) and IsFirstTimePredicted() then
 			self.Charge = math.Clamp(self.Charge+FrameTime()*self.ChargeRate,0,self.MaxCharge)
 			if math.floor(self.Charge) > self.LastCharge then
-				//if SERVER then
+				--if SERVER then
 					self:TakeAmmo(math.floor(self.Charge-self.LastCharge))
-				//end
+				--end
 				self.LastCharge = math.floor(self.Charge)
 			end
 		end
 		if SERVER then
 			self.SoundCharge:ChangePitch((self.Charge/self.MaxCharge)*254+1)
 			if IsValid(self.ChargeEffect) then
-				self.ChargeEffect.dt.Charge = self.Charge/self.MaxCharge
+				self.ChargeEffect:SetCharge(self.Charge/self.MaxCharge)
 			end
 		end
-		if !self.Owner:KeyDown(IN_ATTACK) && (self.Charge >= 50) then
+		if not self.Owner:KeyDown(IN_ATTACK) and (self.Charge >= 50) then
 			self:PrimaryRelease()
 		end
-	elseif (self.BeginIdle != 0) && (self.BeginIdle < ctime) then
+	elseif (self.BeginIdle ~= 0) and (self.BeginIdle < ctime) then
 		self:ViewmodelAnimation(ACT_VM_IDLE)
-		//self.BeginIdle = 0
+		--self.BeginIdle = 0
 	end	
 end
 
 function SWEP:Reload()
-	if SERVER && self.Owner:KeyPressed(IN_RELOAD) && (self.ChargeTime != 0) then
+	if SERVER and self.Owner:KeyPressed(IN_RELOAD) and (self.ChargeTime ~= 0) then
 		local tr = self:GetTrace()
 		if tr.Hit and tr.HitPos then
 			self:AddWaypoint(tr.Entity,tr.Entity:WorldToLocal(tr.HitPos))
@@ -142,7 +142,7 @@ function SWEP:Reload()
 end
 
 function SWEP:PrimaryAttack()
-	if (self.ChargeTime == 0) && (self:GetAmmo() >= 50) && IsFirstTimePredicted() then
+	if (self.ChargeTime == 0) and (self:GetAmmo() >= 50) and IsFirstTimePredicted() then
 		if SERVER then
 			self.SoundRattle:PlayEx(50,170)
 			self.SoundCharge:Play()
@@ -162,7 +162,7 @@ end
 
 function SWEP:PrimaryRelease()
 	self:ViewmodelAnimation(ACT_VM_PRIMARYATTACK)
-	if !IsFirstTimePredicted() then
+	if not IsFirstTimePredicted() then
 		return
 	end
 	local tr = self:GetTrace()
@@ -187,12 +187,12 @@ function SWEP:PrimaryRelease()
 		if tr.Entity == NULL then
 			tr.Entity = game.GetWorld()
 		end
-		if !IsValid(self.dt.waypointNext) then
+		if not IsValid(self:GetwaypointNext()) then
 			self:AddWaypoint(tr.Entity,tr.Entity:WorldToLocal(tr.HitPos))
 		end
-		local waypoint = self.dt.waypointNext
+		local waypoint = self:GetwaypointNext()
 		proj:SetWaypoint(waypoint)
-		waypoint.dt.waypointPrevious = NULL
+		waypoint:SetwaypointPrevious(NULL)
 		self:DetachFromWaypointPath() --cut ourselves off from the chain, it's independant now
 		proj:GetPhysicsObject():SetVelocity(self.Owner:GetAimVector()*1300)
 	end
@@ -200,7 +200,7 @@ function SWEP:PrimaryRelease()
 	self.ChargeTime = 0
 	self.Charge = 0
 	self.LastCharge = 0
-	//self:SetNextFire(CurTime()+0.5)
+	--self:SetNextFire(CurTime()+0.5)
 end
 
 local dragtrace = {}
@@ -208,12 +208,12 @@ dragtrace.mask = MASK_SHOT
 
 function SWEP:SecondaryAttack()
 	self:SetNextPrimaryFire(math.max(self:GetNextPrimaryFire(),CurTime()+1))
-	if (self.ChargeTime != 0) || CLIENT then
+	if (self.ChargeTime ~= 0) or CLIENT then
 		return
 	end
 	local tr = self.Owner:GetEyeTraceNoCursor()
 	local ent = tr.Entity
-	if !tr.Entity:IsValid() || tr.HitWorld then
+	if not tr.Entity:IsValid() or tr.HitWorld then
 		local tracep = {}
 			tracep.start = self.Owner:GetShootPos()
 			tracep.endpos = self.Owner:GetShootPos()+self.Owner:GetAimVector()*56100*FrameTime()
@@ -224,7 +224,7 @@ function SWEP:SecondaryAttack()
 		tr = util.TraceHull(tracep)
 		ent = tr.Entity
 	end
-	if !ent || !ent:IsValid() then
+	if not ent or not ent:IsValid() then
 		return false
 	end
 	local phys = ent:GetPhysicsObject()
@@ -250,7 +250,7 @@ end
 function SWEP:Deploy()
 	self:ViewmodelAnimation(ACT_VM_DEPLOY)
 	if SERVER then
-		if game.SinglePlayer() || self.FirstDeploy then
+		if game.SinglePlayer() or self.FirstDeploy then
 			timer.Simple(0.1, function() screenresetondeploy(self) end)
 			self.FirstDeploy = false
 		end

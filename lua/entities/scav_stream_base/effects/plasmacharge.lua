@@ -8,8 +8,8 @@ PrecacheParticleSystem("scav_bigshot_charge_vm")
 
 function ENT:OnInit()
 	if CLIENT then
-		//self:CreateParticleEffect("scav_bigshot_charge",0)
-		//ParticleEffectAttach("scav_bigshot_charge",PATTACH_ABSORIGIN_FOLLOW,self,0)
+		--self:CreateParticleEffect("scav_bigshot_charge",0)
+		--ParticleEffectAttach("scav_bigshot_charge",PATTACH_ABSORIGIN_FOLLOW,self,0)
 	end
 end
 
@@ -54,7 +54,7 @@ function ENT:OnKill()
 end
 
 function ENT:OnThink()
-	if (self.dt.DeathTime == 0) then
+	if (self:GetDeathTime() == 0) then
 		if CLIENT then
 			local angpos = self:GetMuzzlePosAng()
 			self:SetPos(angpos.Pos)

@@ -9,7 +9,7 @@ function ENT:OnInit()
 	self.sound = CreateSound(self,"ambient/levels/labs/equipment_beep_loop1.wav")
 	self.sound:Play()
 	if CLIENT then
-		//self:CreateParticleEffect("scav_radio",self:GetOwner():LookupAttachment("muzzle"))
+		--self:CreateParticleEffect("scav_radio",self:GetOwner():LookupAttachment("muzzle"))
 	end
 end
 

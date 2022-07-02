@@ -12,7 +12,7 @@ PrecacheParticleSystem("alch_melt")
 function ENT:Initialize()
 	self:AddEffects(EF_NOSHADOW)
 	self.StartMeltTime = CurTime()
-	if CLIENT && (self:GetOwner() == LocalPlayer()) then
+	if CLIENT and (self:GetOwner() == LocalPlayer()) then
 		currentmelt = self
 	end
 	self:SetColor(Color(255,255,255,254))
@@ -20,7 +20,7 @@ function ENT:Initialize()
 end
 
 function ENT:SetupDataTables()
-	self:DTVar("Float",0,"MassToComplete")
+	self:NetworkVar("Float",0,"MassToComplete")
 end
 
 if SERVER then
@@ -33,7 +33,7 @@ if SERVER then
 	function ENT:SetProp(ent)
 		self:SetParent(ent)
 		self:SetModel(ent:GetModel())
-		self.dt.MassToComplete = ent:GetPhysicsObject():GetMass()
+		self:SetMassToComplete(ent:GetPhysicsObject():GetMass())
 	end
 
 	function ENT:Finish()
@@ -50,25 +50,25 @@ end
 function ENT:Think()
 	if SERVER then
 		local owner = self:GetOwner()
-		if !IsValid(owner) then
+		if not IsValid(owner) then
 			return
 		end
 		local tr = owner:GetEyeTraceNoCursor()
-		if !owner:KeyDown(IN_ATTACK2) || !IsValid(owner:GetActiveWeapon()) || (owner:GetActiveWeapon():GetClass() != "weapon_alchemygun") || ((self:GetOwner():GetPos():Distance(self:GetPos()+self:OBBCenter()) > 250) && ((tr.Entity != self) || (tr.HitPos:Distance(tr.StartPos) > 250))) then
+		if not owner:KeyDown(IN_ATTACK2) or not IsValid(owner:GetActiveWeapon()) or (owner:GetActiveWeapon():GetClass() ~= "weapon_alchemygun") or ((self:GetOwner():GetPos():Distance(self:GetPos()+self:OBBCenter()) > 250) and ((tr.Entity ~= self) or (tr.HitPos:Distance(tr.StartPos) > 250))) then
 			self:Remove()
 			return
 		end
-		if !IsValid(self:GetParent()) then
+		if not IsValid(self:GetParent()) then
 			return
 		end
-		if self.StartMeltTime+self.dt.MassToComplete/kgpersec < CurTime() then
+		if self.StartMeltTime+self:GetMassToComplete()/kgpersec < CurTime() then
 			self:Finish()
 		end
 	end
 end
 
 function ENT:GetProgress()
-	return math.Clamp(((self.StartMeltTime+self.dt.MassToComplete/kgpersec)-CurTime())/(self.dt.MassToComplete/kgpersec),0,1)
+	return math.Clamp(((self.StartMeltTime+self:GetMassToComplete()/kgpersec)-CurTime())/(self:GetMassToComplete()/kgpersec),0,1)
 end
 
 
@@ -76,7 +76,7 @@ end
 if CLIENT then
 	local shinymat = Material("models/shiny")
 	function ENT:Draw()
-		if !IsValid(self:GetParent()) then
+		if not IsValid(self:GetParent()) then
 			return
 		end
 		render.MaterialOverride(shinymat)
@@ -91,7 +91,7 @@ if CLIENT then
 	end
 
 	hook.Add("HUDPaint","AlchMeltProgress",function()
-		if IsValid(currentmelt) && IsValid(currentmelt:GetParent()) then
+		if IsValid(currentmelt) and IsValid(currentmelt:GetParent()) then
 			local xmid = ScrW()/2
 			local ymid = ScrH()/2+32
 			local progress = currentmelt:GetProgress()

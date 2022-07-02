@@ -24,21 +24,21 @@ function EFFECT:Init(data)
 end
 
 function EFFECT:GetTracerShootPos2(start)
-	if !self.Weapon:IsValid() then
+	if not self.Weapon:IsValid() then
 		return start
 	end
 	if (self.Owner == GetViewEntity()) then
 		return (self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos)
-	elseif self.Owner != GetViewEntity() then
-		return self.Weapon:GetTracerOrigin()||(self.Weapon:GetAttachment(self.Weapon:LookupAttachment("muzzle")).Pos)
+	elseif self.Owner ~= GetViewEntity() then
+		return self.Weapon:GetTracerOrigin()or(self.Weapon:GetAttachment(self.Weapon:LookupAttachment("muzzle")).Pos)
 	else
 		return (self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos+self.Owner:GetAimVector():Angle():Right()*36-self.Owner:GetAimVector():Angle():Up()*36)
 	end
 end
 
 function EFFECT:Think()
-	//do return false end
-	if (self.Created+self.LifeTime < UnPredictedCurTime()) && (UnPredictedCurTime()-self.Created > 0.1) then
+	--do return false end
+	if (self.Created+self.LifeTime < UnPredictedCurTime()) and (UnPredictedCurTime()-self.Created > 0.1) then
 		return false
 	end
 	return true

@@ -39,9 +39,9 @@ function ENT:OnKill()
 end
 
 function ENT:OnThink()
-	if (self.dt.DeathTime == 0) && IsValid(self.Weapon) then
+	if (self:GetDeathTime() == 0) and IsValid(self.Weapon) then
 		local angpos = self:GetMuzzlePosAng()
-		if !angpos then
+		if not angpos then
 			return
 		end
 		self:SetPos(angpos.Pos)

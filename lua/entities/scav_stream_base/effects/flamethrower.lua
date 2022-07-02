@@ -16,7 +16,7 @@ function ENT:OnInit()
 			["attachtype"]= PATTACH_ABSORIGIN_FOLLOW,
 			},
 			{
-			["position"] = Vector(self.Weapon.dt.ForceScale,0,0)
+			["position"] = Vector(self.Weapon:GetForceScale(),0,0)
 			}
 		})
 		self.em = ParticleEmitter(self:GetPos())
@@ -68,7 +68,7 @@ if CLIENT then
 		part.lastmove = CurTime()
 		part.lastpos = part:GetPos()
 		local contents = util.PointContents(tr.HitPos)
-		if tr.Hit || (bit.band(CONTENTS_WATER, contents) != CONTENTS_WATER) then
+		if tr.Hit or (bit.band(CONTENTS_WATER, contents) ~= CONTENTS_WATER) then
 			part:SetVelocity(vector_origin)
 			part:SetDieTime(0)
 			return false
@@ -82,8 +82,8 @@ if CLIENT then
 		self:SetAngles(angpos.Ang)
 		local pos = angpos.Pos
 		local forcescale = 1
-		if self.Weapon && self.Weapon:IsValid() && (self.Weapon:GetClass() == "scav_gun") then
-			forcescale = self.Weapon.dt.ForceScale
+		if self.Weapon and self.Weapon:IsValid() and (self.Weapon:GetClass() == "scav_gun") then
+			forcescale = self.Weapon:GetForceScale()
 		end
 		local aimvec = self.Player:GetAimVector()
 		local vel = self.Player:GetVelocity()
@@ -118,13 +118,13 @@ function ENT:OnThink()
 		self:SetPos(angpos.Pos)
 		self:SetAngles(angpos.Ang)
 		self:UpdateDLight()
-		if !self.Underwater && (self:WaterLevel() > 0) then
+		if not self.Underwater and (self:WaterLevel() > 0) then
 			self:StopParticles()
 			self.Underwater = true
 		end
 		if self.Underwater then
 			if (self:WaterLevel() == 0) then
-				self:CreateParticleEffect("scav_flamethrower",PATTACH_ABSORIGIN_FOLLOW,{[1]={position=Vector(self.Weapon.dt.ForceScale,0,0)}})
+				self:CreateParticleEffect("scav_flamethrower",PATTACH_ABSORIGIN_FOLLOW,{[1]={position=Vector(self.Weapon:GetForceScale(),0,0)}})
 				self.Underwater = false
 			end
 			self:MakeBubbles()
@@ -133,15 +133,15 @@ function ENT:OnThink()
 end
 
 function ENT:OnViewMode()
-	//local vm = self:GetViewModel()
-	//self:GetOwner():StopParticleEmission()
-	//vm:CreateParticleEffect("scav_flamethrower_vm",vm:LookupAttachment("muzzle"))
+	--local vm = self:GetViewModel()
+	--self:GetOwner():StopParticleEmission()
+	--vm:CreateParticleEffect("scav_flamethrower_vm",vm:LookupAttachment("muzzle"))
 end
 
 function ENT:OnWorldMode()
-	//local vm = self:GetViewModel()
-	//vm:StopParticleEmission()
-	//self:GetOwner():CreateParticleEffect("scav_flamethrower",self:GetOwner():LookupAttachment("muzzle"))
+	--local vm = self:GetViewModel()
+	--vm:StopParticleEmission()
+	--self:GetOwner():CreateParticleEffect("scav_flamethrower",self:GetOwner():LookupAttachment("muzzle"))
 end
 
 scripted_ents.Register(ENT,"scav_stream_fthrow")

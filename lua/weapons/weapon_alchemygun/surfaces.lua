@@ -111,10 +111,10 @@ AlchSurfs["wood_solid"] = alchorg
 
 local propcache = {}
 
-function SWEP:GetAlchemyInfo(model) //IMPORTANT!!! This function can be passed any model on the server, but if you are attempting to get info about a model on the client it must be precached on the server first!
+function SWEP:GetAlchemyInfo(model) --IMPORTANT!!! This function can be passed any model on the server, but if you are attempting to get info about a model on the client it must be precached on the server first!
 	model = ScavData.FormatModelname(model)
-	local cache = propcache[model] //if we have the model cached, we will return that
-	if !cache then //if the model is not cached, we must gather the information about it by spawning an entity using that model and collecting the material from its physics object
+	local cache = propcache[model] --if we have the model cached, we will return that
+	if !cache then --if the model is not cached, we must gather the information about it by spawning an entity using that model and collecting the material from its physics object
 		local prop
 		if SERVER then
 			prop = ents.Create("prop_physics") --would check all physics objects if it was a ragdoll prop, but there's no way to get ragdoll info on the client so we're just going to stay consistent
@@ -146,5 +146,5 @@ function SWEP:CheckForAlchemyInfo(model)
 end
 
 function SWEP:GetSurfaceInfo(surf)
-	return AlchSurfs[surf]||alchnone
+	return AlchSurfs[surf] or alchnone
 end

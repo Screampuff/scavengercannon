@@ -5,7 +5,7 @@ function EFFECT:Init(data)
 	self.em = ParticleEmitter(self:GetPos())
 		local owner = data:GetEntity()
 		sound.Play("weapons/scav_gun/pickup.wav",self:GetPos())
-		if !IsValid(owner) || !owner:GetActiveWeapon():IsValid() || !self.coltab[owner:GetActiveWeapon():GetClass()] then
+		if not IsValid(owner) or not owner:GetActiveWeapon():IsValid() or not self.coltab[owner:GetActiveWeapon():GetClass()] then
 			return
 		end
 		local col = owner:GetActiveWeapon():GetClass()
@@ -47,12 +47,12 @@ end
 
 function scav_partmove(part)
 	part:SetNextThink(CurTime()+0.1)
-	if !part.Owner || !part.Owner:IsValid() || !part.Owner:GetActiveWeapon() || !part.Owner:GetActiveWeapon():IsValid() || part.StartTime > CurTime() then
+	if not part.Owner or not part.Owner:IsValid() or not part.Owner:GetActiveWeapon() or not part.Owner:GetActiveWeapon():IsValid() or part.StartTime > CurTime() then
 		return false
 	end
-	if (GetViewEntity() != part.Owner) && (part.Owner:GetActiveWeapon():LookupAttachment("muzzle") != 0) then
+	if (GetViewEntity() ~= part.Owner) and (part.Owner:GetActiveWeapon():LookupAttachment("muzzle") ~= 0) then
 		part:SetPos(LerpVector(math.sqrt(part.life-CurTime()),part.Owner:GetActiveWeapon():GetAttachment(part.Owner:GetActiveWeapon():LookupAttachment("muzzle")).Pos,part.startpos+part.vel*(CurTime()-part.StartTime)))
-	elseif part.Owner:GetViewModel():IsValid() && part.Owner:GetViewModel():LookupAttachment("muzzle") != 0 then
+	elseif part.Owner:GetViewModel():IsValid() and part.Owner:GetViewModel():LookupAttachment("muzzle") ~= 0 then
 		part:SetPos(LerpVector(math.sqrt(part.life-CurTime()),part.Owner:GetViewModel():GetAttachment(part.Owner:GetViewModel():LookupAttachment("muzzle")).Pos,part.startpos+part.vel*(CurTime()-part.StartTime)))
 	end
 	

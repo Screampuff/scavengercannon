@@ -50,7 +50,7 @@ SWEP.StockProps = {
 					{["model"] = "models/roller.mdl", ["skin"] = 0},
 					{["model"] = "models/items/car_battery01.mdl", ["skin"] = 0},
 					{["model"] = "models/weapons/w_stunbaton.mdl", ["skin"] = 0},
-					//{["model"] = "models/props_c17/substation_transformer01d.mdl", ["skin"] = 0},
+					--{["model"] = "models/props_c17/substation_transformer01d.mdl", ["skin"] = 0},
 					{["model"] = "models/weapons/w_physics.mdl", ["skin"] = 0},
 					{["model"] = "models/props_junk/sawblade001a.mdl", ["skin"] = 0},
 					{["model"] = "models/props_junk/cinderblock01a.mdl", ["skin"] = 0},
@@ -75,18 +75,18 @@ function SWEP:Initialize()
 end
 
 function SWEP:Think()
-	if self.M1Down && !self.Owner:KeyDown(IN_ATTACK) then
-		self.dt.Ghosting = false
+	if self.M1Down and not self.Owner:KeyDown(IN_ATTACK) then
+		self:SetGhosting(false)
 		self.M1Down = false
 		self:PrimaryRelease()
 		self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 	end
-	if self.endlock != 0 && (self.endlock < CurTime()) then
+	if self.endlock ~= 0 and (self.endlock < CurTime()) then
 		self.endlock = 0
 		self:OnUnlock()
 	end
 	if SERVER then
-		if self.dt.Ghosting then
+		if self:GetGhosting() then
 			self.PanelPose = math.Approach(self.PanelPose,1,FrameTime()*5)
 		else
 			self.PanelPose = math.Approach(self.PanelPose,0,FrameTime()*5)
@@ -99,15 +99,11 @@ function SWEP:Think()
 end
 
 function SWEP:SetupDataTables()
-	self:DTVar("Bool",0,"Ghosting")
-	self:DTVar("Float",0,"Ammo1")
-	self:DTVar("Float",1,"Ammo2")
-	self:DTVar("Float",2,"Ammo3")
-	self:DTVar("Float",3,"Ammo4")
-	//self:SetDTFloat("Ammo1",self.dt.Ammo1||0)
-	//self:SetDTFloat("Ammo2",self.dt.Ammo2||0)
-	//self:SetDTFloat("Ammo3",self.dt.Ammo3||0)
-	//self:SetDTFloat("Ammo4",self.dt.Ammo4||0)
+	self:NetworkVar("Bool",0,"Ghosting")
+	self:NetworkVar("Float",0,"Ammo1")
+	self:NetworkVar("Float",1,"Ammo2")
+	self:NetworkVar("Float",2,"Ammo3")
+	self:NetworkVar("Float",3,"Ammo4")
 end
 
 function SWEP:GetAmmo(slot)
@@ -154,7 +150,7 @@ function SWEP:OnUnlock()
 end
 
 function SWEP:IsLocked()
-	return (self.endlock > CurTime() && self.startlock <= CurTime())
+	return (self.endlock > CurTime() and self.startlock <= CurTime())
 end
 
 function SWEP:PrimaryAttack()
@@ -162,7 +158,7 @@ function SWEP:PrimaryAttack()
 	local skin = tonumber(self.Owner:GetInfo("scav_ag_skin"))
 	local modelinfo = self:GetAlchemyInfo(model)
 	local surfaceinfo = self:GetSurfaceInfo(modelinfo.material)
-	if self:IsLocked() || !self:KnowsItem(model,skin) || (self.dt.Ammo1 < surfaceinfo.metal*modelinfo.mass) || (self.dt.Ammo2 < surfaceinfo.chem*modelinfo.mass) || (self.dt.Ammo3 < surfaceinfo.org*modelinfo.mass) || (self.dt.Ammo4 < surfaceinfo.earth*modelinfo.mass) then
+	if self:IsLocked() or not self:KnowsItem(model,skin) or (self:GetAmmo1() < surfaceinfo.metal*modelinfo.mass) or (self:GetAmmo2() < surfaceinfo.chem*modelinfo.mass) or (self:GetAmmo3() < surfaceinfo.org*modelinfo.mass) or (self:GetAmmo4() < surfaceinfo.earth*modelinfo.mass) then
 		return false
 	end
 	if self.Owner:KeyDown(IN_ATTACK2) then
@@ -171,12 +167,12 @@ function SWEP:PrimaryAttack()
 		end
 		return
 	end
-	if !self.M1Down then
-		if !util.IsValidProp(model) && !util.IsValidRagdoll(model) then
+	if not self.M1Down then
+		if not util.IsValidProp(model) and not util.IsValidRagdoll(model) then
 			return
 		end
 		self.M1Down = true
-		self.dt.Ghosting = true
+		self:SetGhosting(true)
 		self:SendWeaponAnim(ACT_VM_FIDGET)
 		if SERVER then
 			self.Ghost = ents.Create("scav_alchghost")
@@ -208,14 +204,14 @@ function SWEP:PrimaryRelease()
 	if self:IsLocked() then
 		return false
 	end
-	if SERVER && IsValid(self.Ghost) then
+	if SERVER and IsValid(self.Ghost) then
 		local model = self.Ghost:GetModel()
 		local modelinfo = self:GetAlchemyInfo(model)
 		local surfaceinfo = self:GetSurfaceInfo(modelinfo.material)
-		self.dt.Ammo1 = self.dt.Ammo1-surfaceinfo.metal*modelinfo.mass
-		self.dt.Ammo2 = self.dt.Ammo2-surfaceinfo.chem*modelinfo.mass
-		self.dt.Ammo3 = self.dt.Ammo3-surfaceinfo.org*modelinfo.mass
-		self.dt.Ammo4 = self.dt.Ammo4-surfaceinfo.earth*modelinfo.mass
+		self:SetAmmo1(self:GetAmmo1()-surfaceinfo.metal*modelinfo.mass)
+		self:SetAmmo2(self:GetAmmo2()-surfaceinfo.chem*modelinfo.mass)
+		self:SetAmmo3(self:GetAmmo3()-surfaceinfo.org*modelinfo.mass)
+		self:SetAmmo4(self:GetAmmo4()-surfaceinfo.earth*modelinfo.mass)
 		local prop
 		local ragdoll = false
 		if util.IsValidRagdoll(model) then
@@ -238,7 +234,7 @@ function SWEP:PrimaryRelease()
 			["owner"]=self:GetOwner()
 		}
 		SuppressHostEvents(NULL)
-		//ParticleEffectAttach("alch_spawn",PATTACH_ABSORIGIN_FOLLOW,prop,0)
+		--ParticleEffectAttach("alch_spawn",PATTACH_ABSORIGIN_FOLLOW,prop,0)
 		SuppressHostEvents(self.Owner)
 		self:AddItem(prop)
 		self:KillGhost()
@@ -255,7 +251,7 @@ local dragtrace = {}
 dragtrace.mask = MASK_SHOT
 
 function SWEP:SecondaryAttack()
-	if self:IsLocked() || IsValid(self.MeltdownEnt) then
+	if self:IsLocked() or IsValid(self.MeltdownEnt) then
 		return false
 	end
 	self:CancelGhosting()
@@ -264,7 +260,7 @@ function SWEP:SecondaryAttack()
 	end
 	local tr = self.Owner:GetEyeTraceNoCursor()
 	local ent = tr.Entity
-	if !tr.Entity:IsValid() || tr.HitWorld then
+	if not tr.Entity:IsValid() or tr.HitWorld then
 		local tracep = {}
 			tracep.start = self.Owner:GetShootPos()
 			tracep.endpos = self.Owner:GetShootPos()+self.Owner:GetAimVector()*56100*FrameTime()
@@ -275,7 +271,7 @@ function SWEP:SecondaryAttack()
 		tr = util.TraceHull(tracep)
 		ent = tr.Entity
 	end
-	if !ent || !ent:IsValid() then
+	if not ent or not ent:IsValid() then
 		return false
 	end
 	local phys = ent:GetPhysicsObject()
@@ -297,7 +293,7 @@ function SWEP:KillGhost()
 	self.HoldSound:Stop()
 	self.Ghost = NULL
 	self.M1Down = false
-	self.dt.Ghosting = false
+	self:SetGhosting (false)
 	if IsValid(self.ActiveEffect) then
 		self.ActiveEffect:Kill()
 	end
@@ -305,13 +301,13 @@ end
 
 function SWEP:CancelGhosting(suppressanim)
 	if SERVER then
-		if IsValid(self.Ghost) && !self.Ghost.Killed then
+		if IsValid(self.Ghost) and not self.Ghost.Killed then
 			timer.Simple(0, function() ParticleEffectAttach("alch_fizzle",PATTACH_ABSORIGIN_FOLLOW,self.Ghost,0) end)
 			self.Ghost:SetSolid(SOLID_NONE)
 			self.Ghost:Fire("Kill",nil,0.3)
 		end
 	end
-	if !suppressanim then
+	if not suppressanim then
 		self:SendWeaponAnim(ACT_VM_IDLE)
 	end
 	if self.M1Down then
@@ -350,12 +346,12 @@ end
 
 function SWEP:KnowsItem(model,skin)
 	for k,v in pairs(self.StockProps) do
-		if (v.model == model) && (v.skin == skin) then
+		if (v.model == model) and (v.skin == skin) then
 			return true
 		end
 	end
 	for k,v in pairs(self.LearnedProps) do
-		if (v.model == model) && (v.skin == skin) then
+		if (v.model == model) and (v.skin == skin) then
 			return true
 		end
 	end

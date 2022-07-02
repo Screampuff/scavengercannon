@@ -242,7 +242,7 @@ function SKIN:PaintTab( panel )
 	local cw = math.min(16,w/2,h/2)
 	local ch = cw
 	local cr,cg,cb,ca
-	if !panel.mb_bgColor then
+	if not panel.mb_bgColor then
 		cr,cg,cb,ca = getscavmenucolor()
 	else
 		cr,cg,cb,ca = panel.mb_bgColor.r,panel.mb_bgColor.g,panel.mb_bgColor.b,panel.mb_bgColor.a

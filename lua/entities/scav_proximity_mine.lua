@@ -16,14 +16,13 @@ PrecacheParticleSystem("scav_proxmine_red")
 PrecacheParticleSystem("scav_proxmine_red_colorblind")
 
 function ENT:SetupDataTables()
-	self:DTVar("Int",0,"state")
-	self:DTVar("Bool",0,"sticky")
-	self:DTVar("Bool",1,"silent")
-	self:DTVar("Bool",2,"showrings")
-	self:DTVar("Bool",2,"showrings")
-	self.dt.sticky = true
-	self.dt.silent = false
-	self.dt.showrings = true
+	self:NetworkVar("Int",0,"State")
+	self:NetworkVar("Bool",0,"Sticky")
+	self:NetworkVar("Bool",1,"Silent")
+	self:NetworkVar("Bool",2,"ShowRings")
+	self:SetSticky(true)
+	self:SetSilent(false)
+	self:SetShowRings(true)
 end
 
 function ENT:Initialize()
@@ -135,7 +134,7 @@ if SERVER then
 	ENT.constraint = NULL
 
 	function ENT:PhysicsCollide(data,physobj)
-		if not self.dt.sticky then return end
+		if not self:GetSticky() then return end
 		local ent = data.HitEntity
 		if not IsValid(self.constraint) and ((ent:GetPhysicsObjectCount() == 1 and not (ent:IsPlayer() or ent:IsNPC())) or ent:IsWorld()) then
 			timer.Simple(0, function() self:Constrain(ent, data.HitPos - self:OBBCenter()) end)
@@ -151,14 +150,14 @@ if SERVER then
 
 	function ENT:SetState(state)
 
-		if state ~= self.dt.state then
+		if state ~= self:GetState() then
 		
 			self:StopParticles()
-			self.dt.state = state
+			self:SetState(state)
 			
 			if state == 1 then --friendly
 			
-				if self.dt.showrings then
+				if self:GetShowRings() then
 					if not GetConVar("cl_scav_colorblindmode"):GetBool() then
 						ParticleEffectAttach("scav_proxmine_green",PATTACH_ABSORIGIN_FOLLOW,self,0)
 					else
@@ -170,7 +169,7 @@ if SERVER then
 				
 			elseif state == 2 then --enemy
 			
-				if self.dt.showrings then
+				if self:GetShowRings() then
 					if not GetConVar("cl_scav_colorblindmode"):GetBool() then
 						ParticleEffectAttach("scav_proxmine_red",PATTACH_ABSORIGIN_FOLLOW,self,0)
 					else
@@ -178,7 +177,7 @@ if SERVER then
 					end
 				end
 				
-				if not self.dt.silent then
+				if not self:GetSilent() then
 					self.sound1:PlayEx(15,255)
 				end
 				

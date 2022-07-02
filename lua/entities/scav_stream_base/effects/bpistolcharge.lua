@@ -15,13 +15,13 @@ function ENT:OnInit()
 end
 
 function ENT:OnKill()
-	if CLIENT && self.sound then
+	if CLIENT and self.sound then
 		self.sound:Stop()
 	end
 end
 
 function ENT:OnSetupDataTables()
-	self:DTVar("Float",0,"level")
+	self:NetworkVar("Float",0,"level")
 end
 
 if SERVER then
@@ -42,9 +42,9 @@ if CLIENT then
 			self:SetAngles(angpos.Ang)
 			self:UpdateDLight()
 		end
-		local desiredpitch = self.dt.level*15+100
+		local desiredpitch = self:Getlevel()*15+100
 		self.Pitch = math.Approach(self.Pitch,desiredpitch,self.Weapon.ChargeRate*20*FrameTime())
-		if !self.Killed then
+		if not self.Killed then
 			self.sound:PlayEx(100,self.Pitch)
 		end
 	end
@@ -77,7 +77,7 @@ if CLIENT then
 	function ENT:GetChargeglowScale()
 		local ctime = CurTime()
 		local refvar = self.Created
-		local scale = math.Round(self.dt.level*(math.abs(math.sin(ctime*64))+1))
+		local scale = math.Round(self:Getlevel()*(math.abs(math.sin(ctime*64))+1))
 		return scale
 	end
 	

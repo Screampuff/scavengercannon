@@ -22,17 +22,17 @@ end
 
 
 function EFFECT:GetTracerShootPos2(start,wep)
-	if !wep:IsValid() then
+	if not wep:IsValid() then
 		return start
 	end
-	if (self.Owner == GetViewEntity()) && !(wep.zoomed) then
-		//self:SetShouldDrawInViewMode(true)
+	if (self.Owner == GetViewEntity()) and not (wep.zoomed) then
+		--self:SetShouldDrawInViewMode(true)
 		return (self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos)
-	elseif !(self.Owner:GetActiveWeapon().zoomed) || (self.Owner != GetViewEntity()) && self.weapon  then
-		//self:SetShouldDrawInViewMode(false)
+	elseif not (self.Owner:GetActiveWeapon().zoomed) or (self.Owner ~= GetViewEntity()) and self.weapon  then
+		--self:SetShouldDrawInViewMode(false)
 		return (self.Weapon:GetAttachment(wep:LookupAttachment("muzzle")).Pos)
 	else
-		//self:SetShouldDrawInViewMode(true)
+		--self:SetShouldDrawInViewMode(true)
 		return (self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos+self.Owner:GetAimVector():Angle():Right()*6-self.Owner:GetAimVector():Angle():Up()*5)
 	end
 end
@@ -47,10 +47,10 @@ end
 
 function EFFECT:Render()
 	local dtime = CurTime()-self.Created
-	if !self.startpos then
+	if not self.startpos then
 		self.startpos = self:GetTracerShootPos2(self:GetPos(),self.Weapon,1)
 		self.dir = self.endpos-self.startpos
-		//self.lifetime = self.endpos:Distance(self.startpos)/10000
+		--self.lifetime = self.endpos:Distance(self.startpos)/10000
 	end
 	self.col.a = Lerp(dtime,255,0)
 	render.SetMaterial(self.mat)

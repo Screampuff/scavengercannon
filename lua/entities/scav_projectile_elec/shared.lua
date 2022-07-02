@@ -40,7 +40,7 @@ local tracep = {}
 		
 function ENT:Think()
 	if CLIENT then
-		if !self.points then
+		if not self.points then
 			return
 		end
 		if CurTime()-self.Created > 0.1 then
@@ -62,7 +62,7 @@ function ENT:Think()
 		tracep.endpos = self:GetPos()+vel
 		local tr = util.TraceHull(tracep)
 		if tr.HitWorld then
-			if (tr.MatType == MAT_SLOSH) && !self.electrocuted then
+			if (tr.MatType == MAT_SLOSH) and not self.electrocuted then
 				ScavData.Electrocute(self,self.Owner,tr.HitPos,500,500,true)
 				ParticleEffect("scav_exp_elec",tr.HitPos,Angle(0,0,0),game.GetWorld())
 				self.electrocuted = true

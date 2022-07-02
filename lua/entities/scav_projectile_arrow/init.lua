@@ -21,7 +21,7 @@ function ENT:Initialize()
 end
 
 function ENT:PhysicsCollide(physdata, hitent)
-	if physdata.Entity != self.Owner then
+	if physdata.Entity ~= self.Owner then
 		self.selfkill = 1
 		self:SetMoveType(MOVETYPE_NONE)
 	end
@@ -31,7 +31,7 @@ function ENT:EntityImpactEffects(tr)
 	local ef = EffectData()
 	ef:SetStart(self.vel:GetNormalized()*-1)
 	ef:SetOrigin(tr.HitPos)
-	if (tr.MatType == MAT_BLOODYFLESH)||(tr.MatType == MAT_FLESH) then
+	if (tr.MatType == MAT_BLOODYFLESH) or (tr.MatType == MAT_FLESH) then
 		util.Effect("BloodImpact",ef)
 		sound.Play("physics/flesh/flesh_impact_bullet"..math.random(1,5)..".wav",self:GetPos(),50)
 	elseif (tr.MatType == MAT_CONCRETE) then
@@ -40,18 +40,18 @@ function ENT:EntityImpactEffects(tr)
 	elseif (tr.MatType == MAT_PLASTIC) then
 		util.Decal("impact.concrete",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 		sound.Play("physics/plastic/plastic_box_impact_hard"..math.random(1,4)..".wav",self:GetPos(),50)
-	elseif (tr.MatType == MAT_GLASS)||(tr.MatType == MAT_TILE) then
+	elseif (tr.MatType == MAT_GLASS) or (tr.MatType == MAT_TILE) then
 		util.Effect("GlassImpact",ef)
 		util.Decal("impact.glass",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 		sound.Play("physics/concrete/concrete_impact_bullet"..math.random(1,4)..".wav",self:GetPos(),50)
-	elseif (tr.MatType == MAT_METAL)||(tr.MatType == MAT_GRATE) then
+	elseif (tr.MatType == MAT_METAL) or (tr.MatType == MAT_GRATE) then
 		util.Effect("MetalSpark",ef)
 		util.Decal("impact.metal",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 		sound.Play("physics/metal/metal_solid_impact_bullet"..math.random(1,4)..".wav",self:GetPos(),50)
 	elseif (tr.MatType == MAT_WOOD) then
 		util.Decal("impact.wood",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 		sound.Play("physics/wood/wood_solid_impact_bullet"..math.random(1,5)..".wav",self:GetPos(),50)
-	elseif (tr.MatType == MAT_DIRT)||(tr.MatType == MAT_SAND) then
+	elseif (tr.MatType == MAT_DIRT) or (tr.MatType == MAT_SAND) then
 		util.Decal("impact.sand",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 		sound.Play("physics/surfaces/sand_impact_bullet"..math.random(1,4)..".wav",self:GetPos(),50)
 	end
@@ -64,9 +64,9 @@ function ENT:WorldImpactEffects(tr)
 	else
 		self:SetPos(tr.HitPos)
 	end
-	//self.Gravity = vector_origin
-	//self.vel = vector_origin
-	//self:Fire("Kill",1,60)
+	--self.Gravity = vector_origin
+	--self.vel = vector_origin
+	--self:Fire("Kill",1,60)
 end
 
 local function MakeRagdoll(ent)
@@ -106,7 +106,7 @@ local function MakeRagdoll(ent)
 	end
 	
 	gamemode.Call("CreateEntityRagdoll",ent,rag) --just a good idea
-	if ent:IsPlayer() && ent:GetRagdollEntityOld() then --remove the old ragdoll
+	if ent:IsPlayer() and ent:GetRagdollEntityOld() then --remove the old ragdoll
 		ent:GetRagdollEntityOld():Remove()
 	end
 	
@@ -117,12 +117,12 @@ end
 local tracep = {}
 
 function ENT:Think()
-		if !self.didhit then
+		if not self.didhit then
 			self.vel = self.vel+self.Gravity*(CurTime()-self.lasttrace)
 
 			local tr = self:ProcessMovement()
-			if tr.Hit || tr.HitSky  then
-				if tr.Entity && tr.Entity:IsValid() then
+			if tr.Hit or tr.HitSky  then
+				if tr.Entity and tr.Entity:IsValid() then
 					self:EntityImpactEffects(tr)
 				end
 				if tr.HitWorld then
@@ -152,7 +152,7 @@ function ENT:Think()
 					return
 				end
 				if tr.Entity:IsValid() then
-					if tr.Entity:IsPlayer() && GetConVar("mp_teamplay"):GetBool() && (tr.Entity:Team() == self.Owner:Team()) then
+					if tr.Entity:IsPlayer() and GetConVar("mp_teamplay"):GetBool() and (tr.Entity:Team() == self.Owner:Team()) then
 						table.insert(self.filter,tr.Entity)
 						self:NextThink(CurTime()+0.01)
 						return true
@@ -179,7 +179,7 @@ function ENT:Think()
 						self:Remove()
 						return
 					end
-					if (tr.Entity:IsNPC() || tr.Entity:IsPlayer()) && (tr.Entity:GetMoveType() != MOVETYPE_VPHYSICS) then
+					if (tr.Entity:IsNPC() or tr.Entity:IsPlayer()) and (tr.Entity:GetMoveType() ~= MOVETYPE_VPHYSICS) then
 						
 						
 						--Make Ragdoll
@@ -203,9 +203,9 @@ function ENT:Think()
 						tr2 = util.TraceLine(tracep)
 
 						local arrow = self:CreateArrowProp() --create arrow physics prop or w/e
-						//arrow:Spawn()
+						--arrow:Spawn()
 						
-						if tr.Entity:IsValid() && arrow:GetPhysicsObject():IsValid() then
+						if tr.Entity:IsValid() and arrow:GetPhysicsObject():IsValid() then
 							constraint.Weld(arrow,tr.Entity,0,tr.PhysicsBone,0,true)
 							local offset = arrow:GetPhysicsObject():GetPos()-tr.Entity:GetPhysicsObjectNum(tr.PhysicsBone):GetPos()
 							
@@ -238,11 +238,11 @@ function ENT:Think()
 						
 						local oldfilter = self.filter
 						self.filter = {self.Owner,tr.Entity}
-						//tr2 = self:ProcessMovement()
+						--tr2 = self:ProcessMovement()
 						self.filter = oldfilter
 						local arrow = self:CreateArrowProp()
 						constraint.Weld(arrow,tr.Entity,0,tr.PhysicsBone,0,true)
-						//local offset = arrow:GetPhysicsObject():GetPos()-tr.Entity:GetPhysicsObjectNum(tr.PhysicsBone):GetPos()
+						--local offset = arrow:GetPhysicsObject():GetPos()-tr.Entity:GetPhysicsObjectNum(tr.PhysicsBone):GetPos()
 						arrow:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
 						if IsValid(self.trail) then
 							local target = ents.Create("info_target")

@@ -7,7 +7,7 @@ function ENT:OnInit()
 	self.sound = CreateSound(self,"ambient/gas/steam_loop1.wav")
 	self.sound:Play()
 	if CLIENT then
-		//self:CreateParticleEffect("scav_flamethrower",self:GetOwner():LookupAttachment("muzzle"))
+		--self:CreateParticleEffect("scav_flamethrower",self:GetOwner():LookupAttachment("muzzle"))
 		self.em = ParticleEmitter(self:GetPos())
 	end
 end
@@ -48,8 +48,8 @@ if CLIENT then
 		self:SetAngles(angpos.Ang)
 		local pos = angpos.Pos
 		local forcescale = 1
-		if self.Weapon && self.Weapon:IsValid() && (self.Weapon:GetClass() == "scav_gun") then
-			forcescale = self.Weapon.dt.ForceScale
+		if self.Weapon and self.Weapon:IsValid() and (self.Weapon:GetClass() == "scav_gun") then
+			forcescale = self.Weapon:GetForceScale()
 		end
 		local aimvec = self.Player:GetAimVector()
 		local vel = self.Player:GetVelocity()

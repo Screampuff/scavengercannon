@@ -4,7 +4,7 @@ AddCSLuaFile( "shared.lua" )
 CreateConVar("sbox_maxscav_turrets",4,{FCVAR_REPLICATED,FCVAR_ARCHIVE})
 include('shared.lua')
 
-//ENT.Mode = "Rocket"
+--ENT.Mode = "Rocket"
 ENT.Charge = 0
 
 --[=[---------------------------------------------------------
@@ -28,7 +28,7 @@ function ENT:Initialize()
 	self.Firing 	= false
 	self.NextShot 	= 0
 	self.Inputs = Wire_CreateInputs(self.Entity, { "Fire" })
-	if !self.Mode then
+	if not self.Mode then
 		self.Mode = self.Owner:GetInfo("scavturret_type")
 	end
 	self.soundloops = {}
@@ -130,7 +130,7 @@ ENT.Firefuncs = {}
 		proj:SetAngles(shootAngles)
 		proj:SetOwner(self)
 		proj:Spawn()
-		//self:EmitSound("weapons/stinger_fire1.wav",40,100)
+		--self:EmitSound("weapons/stinger_fire1.wav",40,100)
 		proj:GetPhysicsObject():Wake()
 		proj:GetPhysicsObject():SetVelocity(shootDir*2500+self:GetVelocity())
 		self.NextShot = CurTime() + 1
@@ -177,7 +177,7 @@ ENT.Firefuncs = {}
 			tracep.endpos = shootOrigin+shootDir*20000
 			tracep.filter = self
 			local tr = util.TraceHull(tracep)
-			if tr.Entity && tr.Entity:IsValid() then
+			if tr.Entity and tr.Entity:IsValid() then
 				dmg = DamageInfo()
 				dmg:SetDamage(5)
 				dmg:SetDamageForce(vector_origin)
@@ -247,7 +247,7 @@ ENT.Firefuncs = {}
 				end
 			end
 			local ent = tr.Entity
-			if ent && ent:IsValid() && (!ent:IsPlayer()||gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) && (self:WaterLevel() < 2) then
+			if ent and ent:IsValid() and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) and (self:WaterLevel() < 2) then
 					local proj = ScavData.models["models/props_junk/propanecanister001a.mdl"].proj
 					proj:SetOwner(self.Owner)
 						proj:SetInflictor(self)
@@ -261,7 +261,7 @@ ENT.Firefuncs = {}
 		
 		local freezecb = function(self,tr)
 			local ent = tr.Entity
-			if ent && ent:IsValid() && (!ent:IsPlayer()||gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
+			if ent and ent:IsValid() and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
 				local dmg = DamageInfo()
 				dmg:SetAttacker(self.Owner)
 				if self.inflictor:IsValid() then
@@ -274,11 +274,11 @@ ENT.Firefuncs = {}
 				dmg:SetDamagePosition(tr.HitPos)
 				dmg:SetDamageType(DMG_FREEZE)
 				tr.Entity:TakeDamageInfo(dmg)
-				if !ent:GetStatusEffect("Frozen") || (ent:GetStatusEffect("Frozen").EndTime-30 < CurTime()) then
+				if not ent:GetStatusEffect("Frozen") or (ent:GetStatusEffect("Frozen").EndTime-30 < CurTime()) then
 				ent:InflictStatusEffect("Slow",0.1,-10,self.Owner)
-					if ent:IsPlayer() && (ent:GetWalkSpeed() == 0) then
+					if ent:IsPlayer() and (ent:GetWalkSpeed() == 0) then
 						ent:InflictStatusEffect("Frozen",0.1,0,self.Owner)
-					elseif !ent:IsPlayer() && ((ent:IsNPC() && ((ent:Health() < 10) || (ent:GetStatusEffect("Slow").EndTime > CurTime()+10))) || !ent:IsNPC()) then
+					elseif not ent:IsPlayer() and ((ent:IsNPC() and ((ent:Health() < 10) or (ent:GetStatusEffect("Slow").EndTime > CurTime()+10))) or not ent:IsNPC()) then
 						ent:InflictStatusEffect("Frozen",0.2,0,self.Owner)
 					end
 				end
@@ -292,7 +292,7 @@ ENT.Firefuncs = {}
 						break
 					end
 				end
-				if !ice:IsValid() then
+				if not ice:IsValid() then
 					local ice = ents.Create("prop_physics")
 					ice:SetModel(model)
 					ice:SetPos(tr.HitPos-Vector(0,0,30))
@@ -379,7 +379,7 @@ ENT.Firefuncs = {}
 	end
 	
 	ENT.Firefuncs["BFG"] = function(self)
-		if !self.soundloops.bfgcharge then
+		if not self.soundloops.bfgcharge then
 			self.soundloops.bfgcharge = CreateSound(self.Owner,"ambient/machines/combine_shield_loop3.wav")
 			self.soundloops.bfgcharge2 = CreateSound(self.Owner,"npc/attack_helicopter/aheli_crash_alert2.wav")
 		end
@@ -395,7 +395,7 @@ ENT.Firefuncs = {}
 		self.soundloops.bfgcharge2:PlayEx(100,60+math.min(self.Charge,4)*40)
 		if self.Charge >= 6 then
 			util.ScreenShake(self:GetPos(),500,10,4,4000)
-			util.BlastDamage(self,self.Owner,self:GetPos(),360,400) //540,300
+			util.BlastDamage(self,self.Owner,self:GetPos(),360,400) --540,300
 			ParticleEffect("scav_exp_bigshot",self:GetPos(),Angle(0,0,0),Entity(0))
 			self:EmitSound("ambient/explosions/explode_3.wav")
 			self:EmitSound("physics/body/body_medium_break3.wav")
@@ -409,7 +409,7 @@ ENT.Firefuncs = {}
 
 ENT.Releasefuncs = {}
 	ENT.Releasefuncs["BFG"] = function(self)
-		//ParticleEffectAttach("scav_bigshot_charge",PATTACH_POINT_FOLLOW,self,self:LookupAttachment("muzzle"))
+		--ParticleEffectAttach("scav_bigshot_charge",PATTACH_POINT_FOLLOW,self,self:LookupAttachment("muzzle"))
 		self:EmitSound("HL1/ambience/particle_suck1.wav")
 		self:BFGShoot()
 		self.NextShot = CurTime() + 7
@@ -420,13 +420,13 @@ ENT.IsFiring = false
 function ENT:IsFirstShot()
 	local val = self.IsFiring
 	self.IsFiring = self.Firing
-	return !val
+	return not val
 end
 	
 function ENT:KillEffect()
 	if self.toggleeffect then
 		timer.Simple(0.1, function() self:TimerKillEffect(self.toggleeffect) end)
-		//print("killing effect "..self.toggleeffect)
+		--print("killing effect "..self.toggleeffect)
 		--effects_onoff[self.toggleeffect] = false
 		self.toggleeffect = nil
 	end
@@ -438,7 +438,7 @@ end
 function ENT:AddToggleEffect(efdata,name)
 	local efindex = self.toggleeffect
 	self:KillEffect()
-	/*
+	--[[
 	local tablelength = table.maxn(effects_onoff)
 	local pos = tablelength+1
 	for i=1,tablelength do
@@ -451,7 +451,7 @@ function ENT:AddToggleEffect(efdata,name)
 	end
 	self.toggleeffect = pos
 	effects_onoff[pos] = self.Owner
-	*/
+	]]--
 	efdata:SetScale(pos)
 	util.Effect(name,efdata,nil,true)
 end
@@ -468,7 +468,7 @@ function ENT:Think()
 	if( self.Firing ) then
 		self:FireShot()
 	elseif ( self.NextShot < CurTime() ) then
-		if self.IsFiring && self.Releasefuncs[self.Mode] then
+		if self.IsFiring and self.Releasefuncs[self.Mode] then
 			self.Releasefuncs[self.Mode](self)
 		end
 		self.IsFiring = false

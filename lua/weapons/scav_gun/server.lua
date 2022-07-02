@@ -1,6 +1,6 @@
-/////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////Server Code///////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////
+----------------------------------------------------------------------------------------/
+--------------------------------------/Server Code--------------------------------------/
+----------------------------------------------------------------------------------------/
 
 if SERVER then
 
@@ -59,7 +59,7 @@ if SERVER then
 	function SWEP:EquipAmmo(pl)
 		local wep = pl:GetWeapon("scav_gun")
 		if wep:IsValid() then
-			wep.dt.Level = math.max(self.dt.Level,wep.dt.Level)
+			wep:SetLevel(math.max(self:GetLevel(),wep:GetLevel()))
 		end
 	end
 
@@ -76,7 +76,7 @@ if SERVER then
 	
 	function SWEP:OwnerChanged()
 		if IsValid(self.Owner) then
-			self.dt.Level = math.max(self.Owner:GetPlayerScavLevel(), self.dt.Level)
+			self:SetLevel(math.max(self.Owner:GetPlayerScavLevel(), self:GetLevel()))
 			self:AssignInventory()
 		end
 	end
@@ -115,7 +115,7 @@ if SERVER then
 
 	function SWEP:AddItem(--[[string]] modelname, --[[int]] subammo, --[[int]] data, --[[int]] number, --[[int, optional, if nil then the entry will be added to the end of the list]] pos)
 
-		local availableslots = self.dt.Capacity - self.inv:GetItemCount()
+		local availableslots = self:GetCapacity() - self.inv:GetItemCount()
 		
 		if availableslots <= 0 then
 			return
@@ -153,7 +153,7 @@ if SERVER then
 		
 		local modeinfo = ScavData.models[item.ammo]
 		
-		if availableslots == self.dt.Capacity and modeinfo then
+		if availableslots == self:GetCapacity() and modeinfo then
 			if modeinfo.OnArmed then
 				modeinfo.OnArmed(self,item,"")
 			end
@@ -304,8 +304,9 @@ if SERVER then
 	end
 
 	function SWEP:AddBarrelSpin(speed)
-		self.dt.BarrelSpinSpeed = self.dt.BarrelSpinSpeed + speed
-		self.dt.BarrelSpinSpeed = math.Clamp(self.dt.BarrelSpinSpeed, -1440, 1440)
+		--self:SetBarrelSpinSpeed(self:GetBarrelSpinSpeed() + speed)
+		--self:SetBarrelSpinSpeed(math.Clamp(self:GetBarrelSpinSpeed(), -1440, 1440))
+		self:SetBarrelSpinSpeed(math.Clamp(self:GetBarrelSpinSpeed() + speed, -1440, 1440))
 	end
 
 	function SWEP:SetBarrelRestSpeed(speed)
@@ -338,16 +339,16 @@ if SERVER then
 		local tr = self.Owner:GetEyeTraceNoCursor()
 		
 		if not IsValid(tr.Entity) then
-			self.dt.CanScav = false
+			self:SetCanScav(false)
 		else
 			if tr.Entity ~= self.lastlookent then
 				self.lastlookentcanscav = self:CheckCanScav(tr.Entity)
 				self.lastlookent = tr.Entity
 			end
 			if IsValid(tr.Entity) then
-				self.dt.CanScav = self.lastlookentcanscav
+				self:SetCanScav(self.lastlookentcanscav)
 			else
-				self.dt.CanScav = false
+				self:SetCanScav(false)
 			end
 		end
 
@@ -355,8 +356,8 @@ if SERVER then
 			self.Inaccuracy = math.Max(1, self.Inaccuracy - 10 * FrameTime())
 		end
 		
-		self.dt.BarrelSpinSpeed = math.Approach(self.dt.BarrelSpinSpeed, self.BarrelRestSpeed, 600 * FrameTime())
-		self.BarrelRotation = (self.BarrelRotation + self.dt.BarrelSpinSpeed * FrameTime()) % 360
+		self:SetBarrelSpinSpeed(math.Approach(self:GetBarrelSpinSpeed(), self.BarrelRestSpeed, 600 * FrameTime()))
+		self.BarrelRotation = (self.BarrelRotation + self:GetBarrelSpinSpeed() * FrameTime()) % 360
 		
 		local vm = self.Owner:GetViewModel()
 		local vmexists = IsValid(vm)
@@ -405,7 +406,7 @@ if SERVER then
 		if not self:IsLocked() and self.ChargeAttack and self.nextfire < CurTime() then
 		
 			local item = self.chargeitem
-			local cooldown = self:ChargeAttack(item) * self.dt.CooldownScale
+			local cooldown = self:ChargeAttack(item) * self:GetCooldownScale()
 			
 			self.nextfire = CurTime()+cooldown
 			
@@ -501,7 +502,7 @@ if SERVER then
 		self.inv:AddOnClient(self.Owner)
 		self.shouldholster = false
 
-		self.dt.BarrelSpinSpeed = 0
+		self:SetBarrelSpinSpeed(0)
 		self.BarrelRestSpeed = 0
 		self.BarrelRotation = 0
 
@@ -612,7 +613,7 @@ if SERVER then
 			
 			local item = self:GetCurrentItem()
 			
-			if ScavData.models[item.ammo] and ScavData.models[item.ammo].Level > self.dt.Level then
+			if ScavData.models[item.ammo] and ScavData.models[item.ammo].Level > self:GetLevel() then
 				self.Owner:EmitSound("vehicles/APC/apc_shutdown.wav",80)
 				self:SendWeaponAnim(ACT_VM_FIDGET)
 				self:SetNextPrimaryFire(shoottime + 2)
@@ -638,7 +639,7 @@ if SERVER then
 				
 				self:AddBarrelSpin(modeinfo.BarrelSpeedAdd or 0)
 				
-				local cooldown = ScavData.models[self.currentmodel].Cooldown * self.dt.CooldownScale
+				local cooldown = ScavData.models[self.currentmodel].Cooldown * self:GetCooldownScale()
 				
 				if ScavData.models[self.currentmodel].anim then
 					self:SendWeaponAnim(ScavData.models[self.currentmodel].anim)
@@ -686,13 +687,13 @@ if SERVER then
 				for i=0,prop:GetPhysicsObjectCount()-1 do --setup bone positions
 					local phys = prop:GetPhysicsObjectNum(i)
 					if IsValid(phys) then
-						phys:SetVelocity(self:GetAimVector() * 2000 * self.dt.ForceScale)
+						phys:SetVelocity(self:GetAimVector() * 2000 * self:GetForceScale())
 						phys:AddGameFlag(FVPHYSICS_WAS_THROWN)
 						mass = mass + phys:GetMass()
 					end
 				end
 				
-				self.nextfire = shoottime+(math.sqrt(mass) * 0.05) * self.dt.CooldownScale
+				self.nextfire = shoottime+(math.sqrt(mass) * 0.05) * self:GetCooldownScale()
 				self:SendWeaponAnim(ACT_VM_SECONDARYATTACK)
 				EntReaper.AddDyingEnt(prop,10)
 				prop:CallOnRemove("scavdeath",deathshit)
@@ -724,7 +725,7 @@ if SERVER then
 	end
 	
 	function SWEP:CheckCanScav(ent)
-		if self.inv:GetItemCount() < self.dt.Capacity and self.Owner:CanScavPickup(ent) then
+		if self.inv:GetItemCount() < self:GetCapacity() and self.Owner:CanScavPickup(ent) then
 			return true
 		end
 		return false

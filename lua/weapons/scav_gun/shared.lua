@@ -64,30 +64,30 @@ local ScavData 	= ScavData
 
 function SWEP:SetupDataTables()
 
-	self:DTVar("Int", 0, 	"Capacity")
-	self:DTVar("Int", 1, 	"MaxExplosives")
-	self:DTVar("Int", 2, 	"Level")
-	self:DTVar("Float", 0, 	"CooldownScale")
-	self:DTVar("Float", 1, 	"ForceScale")
-	self:DTVar("Float", 2, 	"BarrelSpinSpeed")
-	self:DTVar("Entity", 0, "NWFiremodeEnt") --you can use this if the client needs to know about an entity in a firemode (like in the grappling beam), you should reset it to NULL when you're done though
-	self:DTVar("Bool", 0, 	"CanScav")
-	self:DTVar("Bool", 1, 	"UpgradeLaser")
-	self:DTVar("Bool", 3, 	"Zoomed")
+	self:NetworkVar("Int", 0, 	"Capacity")
+	self:NetworkVar("Int", 1, 	"MaxExplosives")
+	self:NetworkVar("Int", 2, 	"Level")
+	self:NetworkVar("Float", 0, 	"CooldownScale")
+	self:NetworkVar("Float", 1, 	"ForceScale")
+	self:NetworkVar("Float", 2, 	"BarrelSpinSpeed")
+	self:NetworkVar("Entity", 0, "NWFiremodeEnt") --you can use this if the client needs to know about an entity in a firemode (like in the grappling beam), you should reset it to NULL when you're done though
+	self:NetworkVar("Bool", 0, 	"CanScav")
+	self:NetworkVar("Bool", 1, 	"UpgradeLaser")
+	self:NetworkVar("Bool", 3, 	"Zoomed")
 	
-	self.dt.CanScav = false
-	self.dt.UpgradeLaser = false
-	self.dt.Capacity = 20
-	self.dt.MaxExplosives = 6
-	self.dt.CooldownScale = 1
-	self.dt.ForceScale = 1
+	self:SetCanScav(false)
+	self:SetUpgradeLaser(false)
+	self:SetCapacity(20)
+	self:SetMaxExplosives(6)
+	self:SetCooldownScale(1)
+	self:SetForceScale(1)
 	
 	if SERVER then
-		self.dt.Level = self.StartLevel or 9
+		self:SetLevel(self.StartLevel or 9)
 		SWEP.StartLevel = nil
 	end
 	
-	self.dt.NWFiremodeEnt = NULL
+	self:SetNWFiremodeEnt(NULL)
 	
 end
 

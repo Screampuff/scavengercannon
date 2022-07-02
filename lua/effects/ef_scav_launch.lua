@@ -18,7 +18,7 @@ end
 
 function EFFECT:Think()
 	local scaleamt = math.Clamp((UnPredictedCurTime()-self.Created)*4,0.05,1)
-	if !IsValid(self.Ent) || (UnPredictedCurTime() > self.Created+self.LifeTime) then
+	if not IsValid(self.Ent) or (UnPredictedCurTime() > self.Created+self.LifeTime) then
 		return false
 	end
 	scalevec = scaleamt

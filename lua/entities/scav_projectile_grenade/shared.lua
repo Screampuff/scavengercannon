@@ -23,7 +23,7 @@ function ENT:Initialize()
 		self.DangerPoint = self:CreateDangerSound()
 	else
 		ParticleEffectAttach("scav_smoketrail_2",PATTACH_ABSORIGIN_FOLLOW,self,0)
-		//self.em = ParticleEmitter(self:GetPos())
+		--self.em = ParticleEmitter(self:GetPos())
 	end
 end
 

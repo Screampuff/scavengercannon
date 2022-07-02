@@ -7,12 +7,12 @@ ENT.lastping = 0
 ENT.pingparticle = NULL
 
 function ENT:Think()
-	self.constraint = self.constraint||NULL
-	if self.constraint:IsValid() && (self.lastping+3 < CurTime()) then
+	self.constraint = self.constraint or NULL
+	if self.constraint:IsValid() and (self.lastping+3 < CurTime()) then
 		self.lastping = CurTime()
 		self:Ping()
 	end
-	if !self.constraint:IsValid() && self.pingparticle:IsValid() then
+	if not self.constraint:IsValid() and self.pingparticle:IsValid() then
 		self.pingparticle:Fire("Stop",nil,0)
 	end
 end
@@ -43,14 +43,14 @@ function ENT:Detach()
 end
 
 function ENT:PhysicsCollide(data,physobj)
-	self.constraint = self.constraint||NULL
+	self.constraint = self.constraint or NULL
 	local ent = data.HitEntity
 	local hitobj = data.HitObject
-	if (data.Speed > 500) && ent:IsWorld() then
+	if (data.Speed > 500) and ent:IsWorld() then
 		timer.Simple(0, function() self:ExplodeDud() end)
 		return
 	end
-	if (data.Speed > 500) && (!self.attachedent:IsValid() || !self.constraint:IsValid()) && (ent:GetSolid() == SOLID_VPHYSICS) then
+	if (data.Speed > 500) and (not self.attachedent:IsValid() or not self.constraint:IsValid()) and (ent:GetSolid() == SOLID_VPHYSICS) then
 		local bone
 		for i=0,ent:GetPhysicsObjectCount()-1 do
 			if ent:GetPhysicsObjectNum(i) == hitobj then
@@ -98,14 +98,14 @@ function ENT:Gib()
 end
 
 function ENT:Explode(activator)
-	if !self.expl && self.attachedent:IsValid() then
+	if not self.expl and self.attachedent:IsValid() then
 		self.expl = true
 		local constrainedents = constraint.GetAllConstrainedEntities(self.attachedent)
 		for k,v in pairs(constrainedents) do
-			//print("removing constraints for "..tostring(v))
+			--print("removing constraints for "..tostring(v))
 			constraint.RemoveAll(v)
 		end
-		if (self.attachedent:GetClass() == "phys_bone_follower") && (self.attachedent:GetOwner():GetClass() == "npc_strider") then --if we hit a strider, then we've ACTUALLY hit one of its bone-followers instead, so we'll need to look up the strider that owns it to bust it
+		if (self.attachedent:GetClass() == "phys_bone_follower") and (self.attachedent:GetOwner():GetClass() == "npc_strider") then --if we hit a strider, then we've ACTUALLY hit one of its bone-followers instead, so we'll need to look up the strider that owns it to bust it
 			gamemode.Call("OnNPCKilled",self.attachedent:GetOwner(),activator,self)
 			self.attachedent:GetOwner():Fire("break",nil,0) --this should only cause the strider to break if we've hit the bone-follower for the head, but at the moment there is no way to access what bone the follower is assigned to through lua
 			local data = EffectData()
@@ -130,7 +130,7 @@ function ENT:Explode(activator)
 		end
 
 		if breakables[self.attachedent:GetClass()] then
-			//print("BREAKING!")
+			--print("BREAKING!")
 			gamemode.Call("OnNPCKilled",self.attachedent,activator,self)
 			self.attachedent:Fire("break",nil,0)
 			
@@ -140,7 +140,7 @@ function ENT:Explode(activator)
 		self:EmitSound("Weapon_StriderBuster.Detonate")
 		util.ScreenShake(self:GetPos(),700,1,1,800)
 		self:Remove()
-	elseif !self.expl then
+	elseif not self.expl then
 		self:ExplodeDud()
 	end
 end
@@ -155,7 +155,7 @@ function ENT:ExplodeDud()
 end
 
 function ENT:OnTakeDamage(dmginfo)
-	if dmginfo:GetInflictor():GetClass() != "hunter_flechette" then
+	if dmginfo:GetInflictor():GetClass() ~= "hunter_flechette" then
 		self:Explode(dmginfo:GetAttacker())
 	else
 		self:Detach()

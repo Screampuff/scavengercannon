@@ -130,7 +130,7 @@ if not EntReaper then --To ensure that the system isn't already loaded..
 	end
 
 	function EntReaper.FreezeEntDeath(ent) -- Pauses an entity's death countdown.
-		if !ent.deathtime then
+		if not ent.deathtime then
 			return
 		end
 		EntReaper.RemoveDyingEnt(ent)
@@ -139,7 +139,7 @@ if not EntReaper then --To ensure that the system isn't already loaded..
 	end
 	
 	function EntReaper.UnfreezeEntDeath(ent) -- Resumes an entity's death countdown.
-		if !ent.deathtime2 then
+		if not ent.deathtime2 then
 			return
 		end
 		local deathtime = ent.deathtime2

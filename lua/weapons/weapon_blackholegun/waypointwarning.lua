@@ -7,7 +7,7 @@ PrecacheParticleSystem("scav_bhg_warning")
 local playerspecificthink
 if SERVER then
 	function playerspecificthink(self)
-		if self:GetParent():IsPlayer() && !self:GetParent():Alive() then
+		if self:GetParent():IsPlayer() and not self:GetParent():Alive() then
 			self:Remove()
 		end
 	end
@@ -19,11 +19,11 @@ function ENT:Initialize()
 		ParticleEffectAttach("scav_bhg_warning",PATTACH_ABSORIGIN_FOLLOW,self,0)
 		local pl = LocalPlayer()
 		local wep = pl:GetActiveWeapon()
-		if (self:GetOwner() == pl) && IsValid(wep) && (wep:GetClass() == "weapon_bhg") then
+		if (self:GetOwner() == pl) and IsValid(wep) and (wep:GetClass() == "weapon_bhg") then
 			wep.waypointtime = CurTime()
 		end
 	else
-		if IsValid(self:GetParent()) && self:GetParent():IsPlayer() then
+		if IsValid(self:GetParent()) and self:GetParent():IsPlayer() then
 			self.Think = playerspecificthink
 		end
 	end
@@ -34,8 +34,8 @@ function ENT:UpdateTransmitState()
 end
 
 function ENT:SetupDataTables()
-	self:DTVar("Entity",0,"waypointPrevious")
-	self:DTVar("Entity",1,"waypointNext")
+	self:NetworkVar("Entity",0,"waypointPrevious")
+	self:NetworkVar("Entity",1,"waypointNext")
 end
 
 if SERVER then
@@ -48,15 +48,15 @@ if SERVER then
 	end
 	
 	function ENT:OnRemove()
-		if IsValid(self.dt.waypointPrevious) && IsValid(self.dt.waypointNext) then
-			self.dt.waypointPrevious.dt.waypointNext = self.dt.waypointNext
-			self.dt.waypointNext.dt.waypointPrevious = self.dt.waypointPrevious
+		if IsValid(self:GetwaypointPrevious()) and IsValid(self:GetwaypointNext()) then
+			self:GetwaypointPrevious():SetwaypointNext(self:GetwaypointNext())
+			self:GetwaypointNext():SetwaypointPrevious(self:GetwaypointPrevious())
 		end
 		if IsValid(self.BHG) then
 			self.BHG:RecalculateWaypointCount()
 		end
-		if IsValid(self.GravBall) && self.dt.waypointNext then
-			self.GravBall:SetWaypoint(self.dt.waypointNext)
+		if IsValid(self.GravBall) and self:GetwaypointNext() then
+			self.GravBall:SetWaypoint(self:GetwaypointNext())
 		end
 	end
 end
@@ -64,7 +64,7 @@ end
 if CLIENT then
 	local chargemat = Material("effects/scav_shine_HR")
 	local glowcol = Color(255,128,128,255)
-	//local lasercol = Color(255,0,0,255)
+	--local lasercol = Color(255,0,0,255)
 	local beammat = Material("trails/laser")
 	
 	function ENT:GetGlowScale()
@@ -80,8 +80,8 @@ if CLIENT then
 	function ENT:Draw()
 		local pos = self:GetPos()
 		render.SetMaterial(chargemat)
-		if IsValid(self.dt.waypointNext) then
-			render.DrawBeam(pos,self.dt.waypointNext:GetPos(),3,0,1,glowcol)
+		if IsValid(self:GetwaypointNext()) then
+			render.DrawBeam(pos,self:GetwaypointNext():GetPos(),3,0,1,glowcol)
 		end
 		local scale = 64
 		render.DrawSprite(pos,scale,scale,glowcol)

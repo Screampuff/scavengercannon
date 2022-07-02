@@ -34,8 +34,8 @@ if CLIENT then
 				ParticleEffect("scav_exp_acid",tr.HitPos,tr.HitNormal:Angle(),Entity(0))
 			end
 			util.Decal("fadingscorch",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
-			//self:SetVelocity(vector_origin)
-			//self:SetEndSize(48)
+			--self:SetVelocity(vector_origin)
+			--self:SetEndSize(48)
 			self:SetEndAlpha(0)
 			local dir = self:GetVelocity():GetNormalized()
 			self:SetVelocity((dir-(2*tr.HitNormal*dir:Dot(tr.HitNormal)))*self:GetVelocity():Length()*0.5)
@@ -64,8 +64,8 @@ if CLIENT then
 		self:SetPos(angpos.Pos)
 		self:SetAngles(angpos.Ang)
 		local forcescale = 1
-		if self.Weapon && self.Weapon:IsValid() && (self.Weapon:GetClass() == "scav_gun") then
-			forcescale = self.Weapon.dt.ForceScale
+		if self.Weapon and self.Weapon:IsValid() and (self.Weapon:GetClass() == "scav_gun") then
+			forcescale = self.Weapon:GetForceScale()
 		end
 		local pos = angpos.Pos
 		local vel = self.Player:GetVelocity()

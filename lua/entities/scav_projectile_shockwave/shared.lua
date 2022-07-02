@@ -31,7 +31,7 @@ function ENT:Think()
 	if SERVER then
 		local tab = ents.FindInSphere(self:GetPos(),300)
 		for k,v in ipairs(tab) do
-			if (v:GetMoveType() == MOVETYPE_VPHYSICS) && v:GetPhysicsObject():IsValid() then
+			if (v:GetMoveType() == MOVETYPE_VPHYSICS) and v:GetPhysicsObject():IsValid() then
 				v:GetPhysicsObject():ApplyForceCenter(self:GetVelocity():GetNormalized()*50000)
 				v:SetPhysicsAttacker(self.Owner)
 			end
@@ -48,7 +48,7 @@ function ENT:OnImpact(hitent)
 	local ent = ents.FindInSphere(pos,300)
 	for k,v in ipairs(ent) do
 		local intensity = (300-pos:Distance(pos+v:OBBCenter()))/15
-		if (v:IsPlayer() || v:IsNPC()) && !v:IsFriendlyToPlayer(self.Owner) then
+		if (v:IsPlayer() or v:IsNPC()) and not v:IsFriendlyToPlayer(self.Owner) then
 			v:InflictStatusEffect("Deaf",intensity,0)
 			local dmg = DamageInfo()
 			dmg:SetDamage(intensity)

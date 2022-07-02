@@ -7,10 +7,10 @@ PrecacheParticleSystem("scav_plasmatorch")
 
 function ENT:OnInit()	
 	if CLIENT then
-		//self:CreateParticleEffect("scav_plasmatorch",self:GetOwner():LookupAttachment("muzzle"))
+		--self:CreateParticleEffect("scav_plasmatorch",self:GetOwner():LookupAttachment("muzzle"))
 		self.points = {}
 	else
-		//self:EmitSound("ambient/energy/NewSpark09.wav")
+		--self:EmitSound("ambient/energy/NewSpark09.wav")
 		self:EmitSound("ambient/energy/weld2.wav")
 	end
 end
@@ -23,7 +23,7 @@ end
 
 if CLIENT then
 	function ENT:OnThink()
-		if self.dt.DeathTime == 0 then
+		if self:GetDeathTime() == 0 then
 			local angpos = self:GetMuzzlePosAng()
 			if angpos.Pos then
 				self:SetPos(angpos.Pos)
@@ -72,7 +72,7 @@ if CLIENT then
 		local pos1 = angpos.Pos-ang:Forward()*5
 		local pos2 = pos1+ang:Forward()*70
 		local p = self.points	
-		if self.dt.DeathTime == 0 then
+		if self:GetDeathTime() == 0 then
 			render.SetMaterial(beammat2)
 			glowcol.a = math.random(10,20)
 			local a = beammat2:GetMaterialFloat("$alpha")

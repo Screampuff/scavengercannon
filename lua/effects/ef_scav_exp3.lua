@@ -1,10 +1,10 @@
 AddCSLuaFile()
 
-//EFFECT.coltab = {["scav_gun"] = Color(200,200,255),["blackhole_gun"] = Color(128,0,0),["capture_device"] = Color(0,255,0),["alchemy_gun"] = Color(128,0,156)}
+--EFFECT.coltab = {["scav_gun"] = Color(200,200,255),["blackhole_gun"] = Color(128,0,0),["capture_device"] = Color(0,255,0),["alchemy_gun"] = Color(128,0,156)}
 function EFFECT:Init(data)
 	local dlight = DynamicLight(0)
 	if (dlight) then
-		//local r, g, b, a = self:GetColor()
+		--local r, g, b, a = self:GetColor()
 		dlight.Pos = self:GetPos()
 		dlight.r = 255
 		dlight.g = 255
@@ -16,7 +16,7 @@ function EFFECT:Init(data)
 	end
 	self:EmitSound("ambient/explosions/explode_4.wav",125)
 	self.em = ParticleEmitter(self:GetPos())
-		//self:EmitSound("ambient/energy/ion_cannon_shot3.wav")
+		--self:EmitSound("ambient/energy/ion_cannon_shot3.wav")
 		local part = self.em:Add("effects/scav_shine5",self:GetPos())
 		if part then
 			part:SetColor(255,255,200)

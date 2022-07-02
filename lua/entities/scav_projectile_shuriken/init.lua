@@ -10,7 +10,7 @@ bonetrace.mins = Vector(-1,-1,-1)
 bonetrace.maxs = Vector(1,1,1)
 
 local function ragdollweld(self,ragdoll,hitbone,localpos,localang)
-    if IsValid(self) && IsValid(ragdoll) then
+    if IsValid(self) and IsValid(ragdoll) then
 
         self:SetMoveType(MOVETYPE_VPHYSICS)
         self:SetSolid(SOLID_VPHYSICS)
@@ -29,8 +29,8 @@ end
 
 local function transfertoragdoll(self,ragdoll)
     self:SetParent()
-    self.dt.StickEntity = NULL
-    ragdollweld(self,ragdoll,ragdoll:TranslateBoneToPhysBone(self.dt.StickBone),self.dt.StickPos,self.dt.StickAngle)
+    self:SetStickEntity(NULL)
+    ragdollweld(self,ragdoll,ragdoll:TranslateBoneToPhysBone(self:GetStickBone()),self:GetStickPos(),self:GetStickAngle())
 end
 
 hook.Add("CreateEntityRagdoll","ScavTransferShurikens",function(ent,rag)
@@ -48,7 +48,7 @@ local function safegravity(phys)
 end
 
 function ENT:PhysicsCollide(data,phys)
-	if !self.GravityEnabled then
+	if not self.GravityEnabled then
 		timer.Simple(0, function() safegravity(phys) end)
 		self.GravityEnabled = true
 	end
@@ -60,7 +60,7 @@ function ENT:PhysicsCollide(data,phys)
 		self.Trail = nil
 	end
     local class = data.HitEntity:GetClass()
-    if !IsValid(self) || self.Stuck then
+    if not IsValid(self) or self.Stuck then
         return
     end
 	local brush = string.find(data.HitEntity:GetModel(),"*",0,true)
@@ -69,17 +69,17 @@ function ENT:PhysicsCollide(data,phys)
     bonetrace.filter = {self,self:GetOwner()}
     local tr = util.TraceLine(bonetrace)
     if data.HitEntity:IsWorld() then
-        self.dt.StickEntity = data.HitEntity
-        self.dt.StickBone = 0
-        self.dt.StickPos = data.HitPos+data.OurOldVelocity:GetNormalized()*self.Penetration
-        self.dt.StickAngle = self:GetAngles()
+        self:SetStickEntity(data.HitEntity)
+        self:SetStickBone(0)
+        self:SetStickPos(data.HitPos+data.OurOldVelocity:GetNormalized()*self.Penetration)
+        self:SetStickAngle(self:GetAngles())
         self:Fire("Kill",nil,30)
         self.Stuck = true
         timer.Simple(0, function() self:ImpactEffect(tr) end)
         return
     end
     local getbonecenter = false
-    if tr.Entity != data.HitEntity then
+    if tr.Entity ~= data.HitEntity then
         bonetrace.endpos = data.HitEntity:GetPos()+data.HitEntity:OBBCenter()
         tr = util.TraceLine(bonetrace)
     end
@@ -108,23 +108,25 @@ function ENT:PhysicsCollide(data,phys)
                 end
             end 
         else
-            if tr.Entity:IsNPC() && (ent:GetClass() != "npc_antlionguard") then
+            if tr.Entity:IsNPC() and (ent:GetClass() ~= "npc_antlionguard") then
                 tr.Entity:SetSchedule(SCHED_BIG_FLINCH)
             end
             local hitbox = tr.HitBox
             local bone = ent:GetHitBoxBone(hitbox,0)
             local bonepos,boneang = ent:GetBonePosition(bone)  
             
-            self.dt.StickEntity = ent
+            self:SetStickEntity(ent)
             self.laststuckentity = ent
 
-            self.dt.StickBone = bone
+            self:SetStickBone(bone)
             if bonepos then
                 local stickpos,stickang = WorldToLocal(tr.HitPos+tr.Normal*self.Penetration,self:GetAngles(),bonepos,boneang)
-                self.dt.StickPos,self.dt.StickAngle = stickpos,stickang
+                self:SetStickPos(stickpos)
+                self:SetStickAngle(stickang)
             else
                 local stickpos,stickang = WorldToLocal(tr.HitPos+tr.Normal*self.Penetration,self:GetAngles(),ent:GetPos(),ent:GetAngles())
-                self.dt.StickPos,self.dt.StickAngle = stickpos,stickang
+                self:SetStickPos(stickpos)
+                self:SetStickAngle(stickang)
             end
             local dmg = DamageInfo()
             dmg:SetDamageType(DMG_SLASH)
@@ -144,18 +146,18 @@ function ENT:PhysicsCollide(data,phys)
     end
 end
 
-//5pm
-//18 closed
+--5pm
+--18 closed
 
 function ENT:PhysicsUpdate()
-    if self.Stuck && (self.dt.StickEntity != NULL) then
+    if self.Stuck and (self:GetStickEntity() ~= NULL) then
         self:SetMoveType(MOVETYPE_NONE)
         self:SetSolid(SOLID_NONE)
     end
 end
 
 function ENT:ImpactEffect(tr)
-if !IsValid(self) || dodebug then
+if not IsValid(self) or dodebug then
     return
 end
     local ef = EffectData()
@@ -163,26 +165,26 @@ end
     ef:SetNormal(tr.HitNormal)
     local mat = tr.MatType
     local pos = self:GetPos()
-    if (mat == MAT_BLOODYFLESH)||(mat == MAT_FLESH) then
+    if (mat == MAT_BLOODYFLESH) or (mat == MAT_FLESH) then
         util.Effect("BloodImpact",ef)
         sound.Play("physics/flesh/flesh_impact_bullet"..math.random(1,5)..".wav",pos,50)
-    elseif (mat == MAT_CONCRETE) || (mat == MAT_DIRT) then
-        //util.Effect("Impact",ef)
+    elseif (mat == MAT_CONCRETE) or (mat == MAT_DIRT) then
+        --util.Effect("Impact",ef)
         sound.Play("physics/concrete/concrete_impact_bullet"..math.random(1,4)..".wav",pos,50)
     elseif (mat == MAT_PLASTIC) then
-        //util.Effect("Impact",ef)
+        --util.Effect("Impact",ef)
         sound.Play("physics/plastic/plastic_box_impact_hard"..math.random(1,4)..".wav",pos,50)
-    elseif (mat == MAT_GLASS)||(mat == MAT_TILE) then
+    elseif (mat == MAT_GLASS) or (mat == MAT_TILE) then
         util.Effect("GlassImpact",ef)
         sound.Play("physics/concrete/concrete_impact_bullet"..math.random(1,4)..".wav",pos,50)
-    elseif (mat == MAT_METAL)||(mat == MAT_GRATE) then
+    elseif (mat == MAT_METAL) or (mat == MAT_GRATE) then
         util.Effect("Sparks",ef)
         sound.Play("physics/metal/metal_solid_impact_bullet"..math.random(1,4)..".wav",pos,50)
     elseif (mat == MAT_WOOD) then
-        //util.Effect("Impact",ef)
+        --util.Effect("Impact",ef)
         sound.Play("physics/wood/wood_solid_impact_bullet"..math.random(1,5)..".wav",pos,50)
     elseif (mat == MAT_SAND) then
-        //util.Effect("Impact",ef)
+        --util.Effect("Impact",ef)
         sound.Play("physics/surfaces/sand_impact_bullet"..math.random(1,4)..".wav",pos,50)
     end
     self:EmitSound("physics/metal/sawblade_stick2.wav")

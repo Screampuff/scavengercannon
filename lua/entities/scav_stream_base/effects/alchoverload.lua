@@ -54,7 +54,7 @@ function ENT:OnKill()
 end
 
 function ENT:OnThink()
-	if (self.dt.DeathTime == 0) then
+	if (self:GetDeathTime() == 0) then
 		if CLIENT then
 			local angpos = self:GetMuzzlePosAng()
 			self:SetPos(angpos.Pos)

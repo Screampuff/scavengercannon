@@ -15,14 +15,14 @@ function SWEP:AddWaypoint(ent,localpos,forcepoint)
 	if ent == NULL then
 		return
 	end
-	if !ent:IsWorld() then
+	if not ent:IsWorld() then
 		for k,v in pairs(self.WayPoints) do
 			if v.Entity == ent then
 				return
 			end
 		end
 	end
-	if !forcepoint && (self.dt.WaypointCount >= self.dt.MaxWaypoints) then
+	if not forcepoint and (self:GetWaypointCount() >= self:GetMaxWaypoints()) then
 		self.Owner:EmitSound("buttons/button16.wav")
 		return
 	end
@@ -37,20 +37,20 @@ function SWEP:AddWaypoint(ent,localpos,forcepoint)
 	marker:SetOwner(self.Owner)
 	marker.BHG = self
 	marker:Spawn()
-	local lastwaypoint = self.dt.waypointNext --we'll start trying to find the last waypoint in our path from the very beginning, checking the references and advancing down the path until we hit NULL
+	local lastwaypoint = self:GetwaypointNext() --we'll start trying to find the last waypoint in our path from the very beginning, checking the references and advancing down the path until we hit NULL
 	if IsValid(lastwaypoint) then
 		for current in self:WaypointIterate() do
 			lastwaypoint = current
 		end
 		--now that the iteration is over, we've found our last waypoint in the path, so fix up the references for that waypoint and the new one
-		lastwaypoint.dt.waypointNext = marker
-		marker.dt.waypointPrevious = lastwaypoint
+		lastwaypoint:SetwaypointNext(marker)
+		marker:SetwaypointPrevious(lastwaypoint)
 	else
-		self.dt.waypointNext = marker --we have no waypoints at all, so we'll put the new one at the start
-		marker.dt.waypointPrevious = self
+		self:SetwaypointNext(marker) --we have no waypoints at all, so we'll put the new one at the start
+		marker:SetwaypointPrevious(self)
 	end
 	if IsValid(self.ChargeEffect) then
-		self.ChargeEffect.dt.LastWaypointSet = CurTime()
+		self.ChargeEffect:SetLastWaypointSet(CurTime())
 	end
 	self:EmitSound("npc/scanner/scanner_nearmiss2.wav")
 	if ent:IsWorld() then
@@ -67,7 +67,7 @@ function SWEP:RecalculateWaypointCount()
 	for current in self:WaypointIterate() do
 		waypointcount = waypointcount+1
 	end
-	self.dt.WaypointCount = waypointcount
+	self:SetWaypointCount(waypointcount)
 end
 
 function SWEP:DestroyWaypoints()
@@ -80,16 +80,16 @@ function SWEP:DetachFromWaypointPath()
 	for current in self:WaypointIterate() do
 		current.BHG = NULL
 	end
-	self.dt.waypointNext = NULL
-	self.dt.WaypointCount = 0
+	self:SetwaypointNext(NULL)
+	self:SetWaypointCount(0)
 end
 
 function SWEP:AddAmmo(amt)
-	self.dt.Ammo = math.min(self.dt.Ammo+amt,self.dt.MaxAmmo)
+	self:SetAmmo(math.min(self:GetAmmo()+amt,self:GetMaxAmmo()))
 end
 
 function SWEP:CheckCanScav(ent)
-	if (self.dt.Ammo < self.dt.MaxAmmo) and self.Owner:CanScavPickup(ent) then
+	if (self:GetAmmo() < self:GetMaxAmmo()) and self.Owner:CanScavPickup(ent) then
 		return true
 	end
 	return false

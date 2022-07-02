@@ -20,7 +20,7 @@ function ENT:OnImpact(hitent)
 	dmg:SetDamagePosition(self:GetPos())
 	dmg:SetDamageForce(vector_origin)
 	dmg:SetDamageType(DMG_ENERGYBEAM)
-	if !hitent.Status_frozen then
+	if not hitent.Status_frozen then
 		dmg:SetDamage(math.min(hitent:Health()-1,35))
 	else
 		dmg:SetDamage(35)

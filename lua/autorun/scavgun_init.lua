@@ -506,9 +506,9 @@ else
 
 end
 
-/*=======================================================================*/
+--[[=======================================================================]]--
 --		New Player methods
-/*=======================================================================*/
+--[[=======================================================================]]--
 
 if SERVER then
 
@@ -532,9 +532,9 @@ if SERVER then
 		end
 		--print(ent:GetClass())
 		if ent.CanScav or
-		(((ScavData.OKClasses[ent:GetClass()] ~= nil and GetConVar("scav_override_pickups"):GetInt() >= ScavData.OKClasses[ent:GetClass()]) or 
-		(GetConVar("scav_override_pickups"):GetInt() >= 3 and (ent:IsWeapon() /*or TODO: test for items*/))) and
-		ent:GetMoveType() == MOVETYPE_VPHYSICS and not ent.NoScav) then
+		((ScavData.OKClasses[ent:GetClass()] ~= nil and GetConVar("scav_override_pickups"):GetInt() >= ScavData.OKClasses[ent:GetClass()]) or
+		(GetConVar("scav_override_pickups"):GetInt() >= 3 and ent:IsWeapon())) and
+		ent:GetMoveType() == MOVETYPE_VPHYSICS and not ent.NoScav then
 			if ent:GetClass() == "npc_rollermine" and not ent:GetInternalVariable("m_bHackedByAlyx") then return false end
 			return true
 		end
@@ -632,7 +632,7 @@ if SERVER then
 		local wep = self:GetWeapon("scav_gun")
 		
 		if IsValid(wep) then
-			maxexpl = wep.dt.MaxExplosives
+			maxexpl = wep:GetMaxExplosives()
 		end
 		
 		if #explosives >= maxexpl then

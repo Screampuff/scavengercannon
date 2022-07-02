@@ -1,6 +1,6 @@
 AddCSLuaFile()
 
-local SWEP = SWEP||weapons.GetStored("weapon_alchemygun")
+local SWEP = SWEP or weapons.GetStored("weapon_alchemygun")
 local PANEL = {}
 local color_red = Color(255,0,0,255)
 local color_red_colorblind = Color(190,76,0,255)
@@ -8,7 +8,7 @@ local color_green = Color(0,255,0,255)
 local color_green_colorblind = Color(124,218,255,255)
 
 function PANEL:SetWeapon(wep)
-	if self.wep != wep then
+	if self.wep ~= wep then
 		self.wep = wep
 		self.CostFrame:SetWeapon(wep)
 	end
@@ -65,7 +65,7 @@ function PANEL:Init()
 end
 
 function PANEL:PerformLayout()
-	if !self.Initialized then
+	if not self.Initialized then
 		return
 	end
 	local pbsize = self:GetWide()/2-16
@@ -94,7 +94,7 @@ local glowcolvec = Vector(1,1,1)
 
 local function siconpaintover(panel)
 	if panel.Menu.selectedicon == panel then
-		//surface.SetDrawColor(255,0,255,200)
+		--surface.SetDrawColor(255,0,255,200)
 		glowcolvec.x = 0.8
 		glowcolvec.y = 0
 		glowcolvec.z = 1
@@ -110,7 +110,7 @@ end
 
 local function siconpaintoverred(panel)
 	if panel.Menu.selectedicon == panel then
-		//surface.SetDrawColor(255,0,255,200)
+		--surface.SetDrawColor(255,0,255,200)
 		glowcolvec.x = 0.8
 		glowcolvec.y = 0
 		glowcolvec.z = 1
@@ -138,7 +138,7 @@ function PANEL:AddModel(model,skin,stock)
 	panel:SetMouseInputEnabled(true)
 	panel:SetEnabled(true)
 	panel:SetToolTip(false)
-	//panel.OnMousePressed = modelselect
+	--panel.OnMousePressed = modelselect
 	panel.DoClick = modelselect
 	panel.PaintOver = siconpaintover
 	local surf = SWEP:GetAlchemyInfo(model)
@@ -230,7 +230,7 @@ function PANEL:Init()
 end
 
 function PANEL:PerformLayout()
-	if !self.Initialized then
+	if not self.Initialized then
 		return
 	end
 	self.HaveLabel:SizeToContents()
@@ -255,14 +255,14 @@ function PANEL:PerformLayout()
 end
 
 function PANEL:SetWeapon(wep)
-	if self.wep != wep then
+	if self.wep ~= wep then
 		self.wep = wep
 		self:Update()
 	end
 end
 
 function PANEL:Update()
-	if !IsValid(self.wep) || !self:IsVisible() then
+	if not IsValid(self.wep) or not self:IsVisible() then
 		return
 	end
 	for i=1,4 do
@@ -289,7 +289,7 @@ function PANEL:Update()
 					break
 				end
 			end
-			if !affordable then
+			if not affordable then
 				v.PaintOver = siconpaintoverred
 			else
 				v.PaintOver = siconpaintover
@@ -303,7 +303,7 @@ function PANEL:Update()
 					break
 				end
 			end
-			if !affordable then
+			if not affordable then
 				v.PaintOver = siconpaintoverred
 			else
 				v.PaintOver = siconpaintover
@@ -337,7 +337,7 @@ function PANEL:Think()
 	if IsValid(self.wep) then
 		local update = false
 		for i=1,4 do
-			if self.OldAmmo[i] != self.wep.dt["Ammo"..i] then
+			if self.OldAmmo[i] ~= self.wep.dt["Ammo"..i] then
 				update = true
 				self.OldAmmo[i] = self.wep.dt["Ammo"..i]
 				self.items[i].Have:SetText(math.ceil(self.OldAmmo[i]))
@@ -355,7 +355,7 @@ local PANEL = {}
 		function PANEL:Paint(w,h)
 		end
 		function PANEL:SetWeapon(wep)
-			if self.wep != wep then
+			if self.wep ~= wep then
 				self.wep = wep
 				self.CostBoard:SetWeapon(wep)
 				wep:ResetMenu()
@@ -376,7 +376,7 @@ local PANEL = {}
 		end
 		
 		function PANEL:PerformLayout()
-			if !self.Initialized then
+			if not self.Initialized then
 				return
 			end
 			self.PreviewFrame:SetSize(96,self:GetTall())
@@ -387,7 +387,7 @@ local PANEL = {}
 		
 		function PANEL:Think()
 			local wep = LocalPlayer():GetActiveWeapon()
-			if !IsValid(wep) || (wep:GetClass() != "weapon_alchemygun") then
+			if not IsValid(wep) or (wep:GetClass() ~= "weapon_alchemygun") then
 				self:SetVisible(false)
 			end
 		end
@@ -424,14 +424,14 @@ end)
 
 hook.Add("KeyPress","AlchMenuOpen",function(pl,key)
 	local wep = pl:GetActiveWeapon()
-	if IsValid(wep) && (wep:GetClass() == "weapon_alchemygun") && (key == IN_RELOAD) then
+	if IsValid(wep) and (wep:GetClass() == "weapon_alchemygun") and (key == IN_RELOAD) then
 		wep:OpenMenu()
 	end
 end)
 
 hook.Add("KeyRelease","AlchMenuOpen",function(pl,key)
 	local wep = pl:GetActiveWeapon()
-	if IsValid(wep) && (wep:GetClass() == "weapon_alchemygun") && (key == IN_RELOAD) then
+	if IsValid(wep) and (wep:GetClass() == "weapon_alchemygun") and (key == IN_RELOAD) then
 		wep:CloseMenu()
 	end
 end)

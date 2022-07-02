@@ -1,8 +1,8 @@
 AddCSLuaFile()
 
-/*=======================================================================*/
+--[[=======================================================================]]--
 --		Map Loader
-/*=======================================================================*/
+--[[=======================================================================]]--
 	
 if SERVER then
 	CreateConVar("sdm_settingsfile", "default.txt", FCVAR_ARCHIVE)
@@ -383,7 +383,7 @@ function loader:GetModString()
 		local mods = {}
 		
 		for k,v in pairs(self.data.gamevars) do
-			if v && (string.Left(k,4) == "mod_") then
+			if v and (string.Left(k,4) == "mod_") then
 				table.insert(mods,string.Right(k,#k-4))
 			end
 		end

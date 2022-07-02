@@ -1,9 +1,9 @@
 AddCSLuaFile()
-//EFFECT.mat = Material("effects/scav_shine5")
+--EFFECT.mat = Material("effects/scav_shine5")
 EFFECT.mins = Vector(-8,-8,-8)
 EFFECT.maxs = Vector(8,8,8)
-//EFFECT.sprites = {"effects/blood","effects/fleck_cement1","effects/fleck_cement2"}
-//EFFECT.em = ParticleEmitter(vector_origin)
+--EFFECT.sprites = {"effects/blood","effects/fleck_cement1","effects/fleck_cement2"}
+--EFFECT.em = ParticleEmitter(vector_origin)
 local color_yellowgreen = Color(85,255,0,255)
 
 function EFFECT:Init(data)
@@ -16,7 +16,7 @@ function EFFECT:Init(data)
 	self.TracePos = self:GetPos()
 	self:SetModel("models/Gibs/HGIBS.mdl")
 	self:SetMaterial("models/scavplasma")
-	//self:SetPos(self.Owner:GetShootPos()+self.Owner:GetAimVector()-self.Owner:GetAimVector():Angle():Up()*10)
+	--self:SetPos(self.Owner:GetShootPos()+self.Owner:GetAimVector()-self.Owner:GetAimVector():Angle():Up()*10)
 	self.LastPos = self:GetPos()
 	self:SetColor(color_yellowgreen)
 end
@@ -65,7 +65,7 @@ function EFFECT:Think()
 	return true
 end
 
-//EFFECT.col = Color(200,200,255,128)
+--EFFECT.col = Color(200,200,255,128)
 
 function EFFECT:Render()
 	self:DrawModel()

@@ -13,7 +13,7 @@ function ENT:OnTouch(hitent)
 end
 
 function ENT:OnImpact(hitent)
-	if !IsValid(self.Owner) then
+	if not IsValid(self.Owner) then
 		self.Owner = self
 	end
 	self.expl = true
@@ -22,10 +22,10 @@ function ENT:OnImpact(hitent)
 	local didhit = false
 	local knockback = {}
 	knockback = ents.FindInSphere(self:GetPos(),100)
-	if table.getn(knockback) != 0 then
+	if table.getn(knockback) ~= 0 then
 		local num = table.getn(knockback)
 		for i=1,num,1 do
-				if knockback[i].Entity and !knockback[i].Entity:IsWorld() and knockback[i]:GetCollisionGroup() !=0 then
+				if knockback[i].Entity and not knockback[i].Entity:IsWorld() and knockback[i]:GetCollisionGroup() ~=0 then
 						local tracek = {}
 						tracek.start = self:GetPos()+Vector(0,0,5)
 						tracek.endpos = knockback[i].Entity:GetPos()
@@ -58,7 +58,7 @@ hook.Add("EntityTakeDamage","scav_blastmultiplier",function(ent,dmginfo)
 	local inflictor = dmginfo:GetInflictor()
 	local attacker = dmginfo:GetAttacker()
 	local amount = dmginfo:GetDamage()
-	if dmginfo:IsExplosionDamage() && ((inflictor:GetClass() == "scav_projectile_rocket") || (inflictor:GetClass() == "scav_projectile_grenade")) then
+	if dmginfo:IsExplosionDamage() and ((inflictor:GetClass() == "scav_projectile_rocket") or (inflictor:GetClass() == "scav_projectile_grenade")) then
 		dmginfo:SetDamageForce(dmginfo:GetDamageForce()*20)
 	end
 end)

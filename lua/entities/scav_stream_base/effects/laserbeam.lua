@@ -37,7 +37,7 @@ if CLIENT then
 		local tr = self:GetTrace(10000,nil,mins,maxs)
 		local part = self.em:Add("particle/smokesprites_000"..math.random(1,9),tr.HitPos)
 		if part then
-			if tr.Entity:IsNPC() || tr.Entity:IsPlayer() then
+			if tr.Entity:IsNPC() or tr.Entity:IsPlayer() then
 				part:SetColor(100,100,100)
 			end
 			part:SetDieTime(1)
@@ -77,7 +77,7 @@ if CLIENT then
 	local lasercol = Color(255,255,255,127)
 	
 	function ENT:Draw2()
-		//cam.Start3D(EyePos(),EyeAngles())
+		--cam.Start3D(EyePos(),EyeAngles())
 		local angpos = self:GetMuzzlePosAng()
 		local trace = self:GetTrace(10000,nil,mins,maxs)
 		local ang = angpos.Ang
@@ -87,14 +87,14 @@ if CLIENT then
 		render.DrawBeam(pos1,pos2,math.random(20,30),0,1,lasercol)
 		render.SetMaterial(beamglowmat2)
 		render.DrawSprite(pos1,math.random(20,30),math.random(20,30),lasercol)
-		//render.SetMaterial(self.mat3)
-		if trace.Entity:IsNPC() || trace.Entity:IsPlayer() then
+		--render.SetMaterial(self.mat3)
+		if trace.Entity:IsNPC() or trace.Entity:IsPlayer() then
 			local size = math.random(20,50)
 			render.DrawSprite(pos2+(pos1-pos2):GetNormalized()*8,size,size,color_white)
 		else
 			render.DrawSprite(pos2+(pos1-pos2):GetNormalized()*8,math.random(20,30),math.random(20,30),lasercol)
 		end
-		//cam.End3D()
+		--cam.End3D()
 	end
 
 	function ENT:OnViewMode()

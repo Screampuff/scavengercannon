@@ -15,12 +15,12 @@ function EFFECT:Init(data)
 	else
 		self.Owner = self.Weapon
 	end
-	if !self.Weapon || !self.Weapon:IsValid() then
+	if not self.Weapon or not self.Weapon:IsValid() then
 		return false
 	end
 	self:SetPos(self:GetTracerShootPos(self.Owner:GetShootPos(),self.Weapon,1))
 	self:SetParent(self.Weapon)
-	if (self.Owner == GetViewEntity()) && self.Owner:IsPlayer() then
+	if (self.Owner == GetViewEntity()) and self.Owner:IsPlayer() then
 		local vm = self.Owner:GetViewModel()
 		--ParticleEffectAttach(typetranslate[effecttype].."_vm",PATTACH_POINT_FOLLOW,vm,vm:LookupAttachment("muzzle"))
 		ParticleEffectAttach(typetranslate[effecttype],PATTACH_POINT_FOLLOW,vm,vm:LookupAttachment("muzzle"))
