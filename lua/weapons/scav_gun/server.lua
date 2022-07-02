@@ -292,7 +292,7 @@ if SERVER then
 		local itemid = tonumber(args[1])
 		
 		if self.inv.itemids[itemid] then
-			self.inv.itemids[itemid]:Remove()
+			self.inv.itemids[itemid]:Remove(false,nil,true)
 		end
 		
 	end
@@ -696,6 +696,9 @@ if SERVER then
 				self:SendWeaponAnim(ACT_VM_SECONDARYATTACK)
 				EntReaper.AddDyingEnt(prop,10)
 				prop:CallOnRemove("scavdeath",deathshit)
+				hook.Add("PropBreak","ScavPropDeathEffectCheck",function(client,prp)
+					prp:RemoveCallOnRemove("scavdeath")
+				end)
 				self:SetSeqEndTime(self.nextfire - 0.1)
 				self:RemoveItem(1)
 				self.Owner:EmitSound(self.shootsound, 100, math.Clamp(120 - (self.nextfire - CurTime()) * 50, 30, 255))

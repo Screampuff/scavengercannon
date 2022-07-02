@@ -105,14 +105,14 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/sentry.mdl"] = ScavData.CollectFuncs["models/combine_turrets/floor_turret.mdl"]
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/combine_turrets/floor_turret.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/combine_turrets/floor_turret.mdl")
 		--Portal
-		ScavData.models["models/props/turret_01.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/props/turret_01.mdl")
 		--TF2
-		ScavData.models["models/buildables/sentry1.mdl"] = tab
-		ScavData.models["models/buildables/sentry2.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/buildables/sentry1.mdl")
+		ScavData.RegisterFiremode(tab,"models/buildables/sentry2.mdl")
 		--HLS
-		ScavData.models["models/sentry.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/sentry.mdl")
 		
 		
 /*==============================================================================================
@@ -149,9 +149,9 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/weapons/w_magnade.mdl"] = function(self,ent) self:AddItem("models/magnusson_device.mdl",1, ent:GetSkin()) end
 			end
 			tab.Cooldown = 1.5
-		ScavData.models["models/magnusson_device.mdl"] = tab
-		ScavData.models["models/props_outland/pumpkin01.mdl"] = tab
-		ScavData.models["models/magnusson_teleporter.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/magnusson_device.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_outland/pumpkin01.mdl")
+		ScavData.RegisterFiremode(tab,"models/magnusson_teleporter.mdl")
 		
 		
 /*==============================================================================================
@@ -187,7 +187,7 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/shield_scanner.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname("models/props_combine/combine_mine01.mdl"),1,0,2) end
 			end
 			tab.Cooldown = 0.75
-		ScavData.models["models/props_combine/combine_mine01.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/props_combine/combine_mine01.mdl")
 		
 /*==============================================================================================
 	--SMG1 Grenade
@@ -232,15 +232,15 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/weapons/w_k98_rg.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname("models/weapons/w_k98_rg_grenade.mdl"),1,0,1) end
 			end
 			tab.Cooldown = 1
-		ScavData.models["models/items/ar2_grenade.mdl"] = tab
-		ScavData.models["models/weapons/ar2_grenade.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/items/ar2_grenade.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/ar2_grenade.mdl")
 		--L4D2
-		ScavData.models["models/w_models/weapons/w_grenade_launcher.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_grenade_launcher.mdl")
 		--DoD:S
-		ScavData.models["models/weapons/p_garand_rg_grenade.mdl"] = tab
-		ScavData.models["models/weapons/p_k98_rg_grenade.mdl"] = tab
-		ScavData.models["models/weapons/w_garand_rg_grenade.mdl"] = tab
-		ScavData.models["models/weapons/w_k98_rg_grenade.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/p_garand_rg_grenade.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/p_k98_rg_grenade.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_garand_rg_grenade.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_k98_rg_grenade.mdl")
 
 /*==============================================================================================
 	--Strider Cannon
@@ -369,9 +369,9 @@ local eject = "brass"
 			end
 			tab.Cooldown = 1.3
 			
-		ScavData.models["models/combine_strider.mdl"] = tab
-		--ScavData.models["models/combine_strider_vsdog.mdl"] = tab
-		ScavData.models["models/gibs/strider_weapon.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/combine_strider.mdl")
+		--ScavData.RegisterFiremode(tab,"models/combine_strider_vsdog.mdl")
+		ScavData.RegisterFiremode(tab,"models/gibs/strider_weapon.mdl")
 		
 /*==============================================================================================
 	--Spit Grenade
@@ -412,10 +412,10 @@ local eject = "brass"
 					end
 			end
 			tab.Cooldown = 1
-		ScavData.models["models/spitball_large.mdl"] = tab
-		ScavData.models["models/spitball_medium.mdl"] = tab
-		ScavData.models["models/spitball_small.mdl"] = tab
-		//ScavData.models["models/gibs/antlion_worker_gibs_head.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/spitball_large.mdl")
+		ScavData.RegisterFiremode(tab,"models/spitball_medium.mdl")
+		ScavData.RegisterFiremode(tab,"models/spitball_small.mdl")
+		//ScavData.RegisterFiremode(tab,"models/gibs/antlion_worker_gibs_head.mdl")
 		
 /*==============================================================================================
 	--bugbait
@@ -469,8 +469,8 @@ local eject = "brass"
 				--BUG TODO: doesn't currently make antlions friendly
 			end
 			tab.Cooldown = 1
-		ScavData.models["models/weapons/w_bugbait.mdl"] = tab
-		ScavData.models["models/antlion_guard.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_bugbait.mdl")
+		ScavData.RegisterFiremode(tab,"models/antlion_guard.mdl")
 		
 
 /*==============================================================================================
@@ -574,8 +574,8 @@ local eject = "brass"
 				end
 			end
 			tab.Cooldown = 0.5
-		ScavData.models["models/weapons/w_physics.mdl"] = tab
-		ScavData.models["models/dog.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_physics.mdl")
+		ScavData.RegisterFiremode(tab,"models/dog.mdl")
 		
 /*==============================================================================================
 	--Frag Grenade
@@ -616,13 +616,13 @@ local eject = "brass"
 				end
 			end
 			tab.Cooldown = 1
-		ScavData.models["models/weapons/w_grenade.mdl"] = tab
-		ScavData.models["models/weapons/w_npcnade.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_grenade.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_npcnade.mdl")
 		--DoD:S
-		ScavData.models["models/weapons/w_frag.mdl"] = tab
-		ScavData.models["models/weapons/w_stick.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_frag.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_stick.mdl")
 		--L4D/2
-		ScavData.models["models/w_models/weapons/w_eq_pipebomb.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_eq_pipebomb.mdl")
 
 
 
@@ -654,7 +654,7 @@ local eject = "brass"
 					end
 			end
 			tab.Cooldown = 1
-		ScavData.models["models/combine_helicopter/helicopter_bomb01.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/combine_helicopter/helicopter_bomb01.mdl")
 		
 /*==============================================================================================
 	--Armor Battery
@@ -700,15 +700,15 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/player/german_support.mdl"] = ScavData.CollectFuncs["models/player/german_assault.mdl"]
 			end
 			tab.Cooldown = 0.2
-		ScavData.models["models/items/battery.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/items/battery.mdl")
 		--TF2
-		ScavData.models["models/pickups/pickup_powerup_defense.mdl"] = tab
-		ScavData.models["models/pickups/pickup_powerup_resistance.mdl"] = tab
-		ScavData.models["models/weapons/c_models/c_battalion_buffpack/c_batt_buffpack.mdl"] = tab
-		ScavData.models["models/workshop/weapons/c_models/c_battalion_buffpack/c_battalion_buffpack.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/pickups/pickup_powerup_defense.mdl")
+		ScavData.RegisterFiremode(tab,"models/pickups/pickup_powerup_resistance.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_battalion_buffpack/c_batt_buffpack.mdl")
+		ScavData.RegisterFiremode(tab,"models/workshop/weapons/c_models/c_battalion_buffpack/c_battalion_buffpack.mdl")
 		--DoD:S
-		ScavData.models["models/helmets/helmet_american.mdl"] = tab
-		ScavData.models["models/helmets/helmet_german.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/helmets/helmet_american.mdl")
+		ScavData.RegisterFiremode(tab,"models/helmets/helmet_german.mdl")
 		
 /*==============================================================================================
 	--Shotgun
@@ -861,15 +861,15 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/weapons/w_ghostgun2.mdl"] = ScavData.CollectFuncs["models/weapons/w_ghostgun.mdl"]
 			end
 			tab.Cooldown = 1
-		ScavData.models["models/weapons/shotgun_shell.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/shotgun_shell.mdl")
 		--TF2
-		ScavData.models["models/weapons/shells/shell_shotgun.mdl"] = tab
-		ScavData.models["models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl"] = tab
-		ScavData.models["models/workshop_partner/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/shells/shell_shotgun.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl")
+		ScavData.RegisterFiremode(tab,"models/workshop_partner/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl")
 		--FoF
-		ScavData.models["models/weapons/shotgun_shell2.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/shotgun_shell2.mdl")
 		--HL:S
-		ScavData.models["models/shotgunshell.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/shotgunshell.mdl")
 		
 /*==============================================================================================
 	--Pistol
@@ -982,24 +982,24 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/weapons/w_deringer2.mdl"] = ScavData.CollectFuncs["models/weapons/w_deringer.mdl"]
 			end
 			tab.Cooldown = 0.4
-		ScavData.models["models/items/boxsrounds.mdl"] = tab
-		ScavData.models["models/weapons/w_pistol.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/items/boxsrounds.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_pistol.mdl")
 		--TF2
-		ScavData.models["models/weapons/w_models/w_pistol.mdl"] = tab
-		ScavData.models["models/weapons/c_models/c_pistol.mdl"] = tab
-		ScavData.models["models/weapons/c_models/c_pistol/c_pistol.mdl"] = tab
-		ScavData.models["models/weapons/c_models/c_ttg_max_gun/c_ttg_max_gun.mdl"] = tab
-		ScavData.models["models/weapons/w_models/w_ttg_max_gun.mdl"] = tab
-		ScavData.models["models/workshop/weapons/c_models/c_ttg_max_gun/c_ttg_max_gun.mdl"] = tab
-		ScavData.models["models/weapons/c_models/c_winger_pistol/c_winger_pistol.mdl"] = tab
-		ScavData.models["models/workshop/weapons/c_models/c_winger_pistol/c_winger_pistol.mdl"] = tab
-		ScavData.models["models/weapons/c_models/c_pep_pistol/c_pep_pistol.mdl"] = tab
-		ScavData.models["models/workshop/weapons/c_models/c_pep_pistol/c_pep_pistol.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_models/w_pistol.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_pistol.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_pistol/c_pistol.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_ttg_max_gun/c_ttg_max_gun.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_models/w_ttg_max_gun.mdl")
+		ScavData.RegisterFiremode(tab,"models/workshop/weapons/c_models/c_ttg_max_gun/c_ttg_max_gun.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_winger_pistol/c_winger_pistol.mdl")
+		ScavData.RegisterFiremode(tab,"models/workshop/weapons/c_models/c_winger_pistol/c_winger_pistol.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_pep_pistol/c_pep_pistol.mdl")
+		ScavData.RegisterFiremode(tab,"models/workshop/weapons/c_models/c_pep_pistol/c_pep_pistol.mdl")
 		--HLS
-		ScavData.models["models/w_9mmhandgun.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/w_9mmhandgun.mdl")
 		--FoF
-		ScavData.models["models/weapons/w_deringer.mdl"] = tab
-		ScavData.models["models/weapons/w_deringer2.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_deringer.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_deringer2.mdl")
 		
 /*==============================================================================================
 	--pulse rifle
@@ -1069,8 +1069,8 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/weapons/w_irifle.mdl"] = ScavData.CollectFuncs["models/items/combine_rifle_cartridge01.mdl"]
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/items/combine_rifle_cartridge01.mdl"] = tab
-		ScavData.models["models/weapons/w_irifle.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/items/combine_rifle_cartridge01.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_irifle.mdl")
 		
 /*==============================================================================================
 	--Strider Minigun
@@ -1140,7 +1140,7 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/gibs/strider_head.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),100,0,1) end
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/gibs/strider_head.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/gibs/strider_head.mdl")
 		
 /*==============================================================================================
 	--Airboat Gun
@@ -1238,12 +1238,12 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/mp/turret.mdl"] = function(self,ent) self:AddItem("models/mp/turret.mdl",100,0,1) end
 			end
 			tab.Cooldown = 0.05
-		ScavData.models["models/airboatgun.mdl"] = tab
-		ScavData.models["models/props_combine/bunker_gun01.mdl"] = tab
-		ScavData.models["models/gunship.mdl"] = tab
-		ScavData.models["models/gibs/gunship_gibs_nosegun.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/airboatgun.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_combine/bunker_gun01.mdl")
+		ScavData.RegisterFiremode(tab,"models/gunship.mdl")
+		ScavData.RegisterFiremode(tab,"models/gibs/gunship_gibs_nosegun.mdl")
 		--HLDM:S
-		ScavData.models["models/mp/turret.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/mp/turret.mdl")
 /*==============================================================================================
 	--Combine Ball
 ==============================================================================================*/
@@ -1306,9 +1306,9 @@ local eject = "brass"
 			end
 			tab.Cooldown = 0.5
 			
-		ScavData.models["models/items/combine_rifle_ammo01.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/items/combine_rifle_ammo01.mdl")
 		--Portal
-		ScavData.models["models/props/combine_ball_launcher.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/props/combine_ball_launcher.mdl")
 
 /*==============================================================================================
 	--Helicopter Minigun
@@ -1394,7 +1394,7 @@ local eject = "brass"
 			end
 			tab.Cooldown = 2
 			
-		ScavData.models["models/combine_helicopter.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/combine_helicopter.mdl")
 
 		
 /*==============================================================================================
@@ -1420,94 +1420,93 @@ local eject = "brass"
 			end
 
 			tab.ChargeAttack = function(self,item)
-								local target = self.Owner
-								local tab = ScavData.models[self.inv.items[1].ammo]
-									local tracep = {}
-									tracep.start = self.Owner:GetShootPos()
-									tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*100
-									tracep.filter = self.Owner
-									tracep.mask = MASK_SHOT
-									tracep.mins = tab.vmin
-									tracep.maxs = tab.vmax
-									local tr = util.TraceHull(tracep)
-									if (tr.Entity:IsPlayer() || tr.Entity:IsNPC()) && (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
-										target = tr.Entity
-									end
-								if target:GetMaxHealth() <= target:Health() then
-									if target ~= self.Owner and self.Owner:GetMaxHealth() > self.Owner:Health() then
-										target = self.Owner
-									end
-								end
-								if target:GetMaxHealth() > target:Health() then --check again, in case we switched to ourself
-									local att = self:LookupAttachment("muzzle")
-									local posang = self:GetAttachment(att)
+				local target = self.Owner
+					local tracep = {}
+					tracep.start = self.Owner:GetShootPos()
+					tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*100
+					tracep.filter = self.Owner
+					tracep.mask = MASK_SHOT
+					tracep.mins = tab.vmin
+					tracep.maxs = tab.vmax
+					local tr = util.TraceHull(tracep)
+					if (tr.Entity:IsPlayer() || tr.Entity:IsNPC()) && (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
+						target = tr.Entity
+					end
+				if target:GetMaxHealth() <= target:Health() then
+					if target ~= self.Owner and self.Owner:GetMaxHealth() > self.Owner:Health() then
+						target = self.Owner
+					end
+				end
+				if target:GetMaxHealth() > target:Health() then --check again, in case we switched to ourself
+					local att = self:LookupAttachment("muzzle")
+					local posang = self:GetAttachment(att)
 
-									local ef = EffectData()
-										ef:SetEntity(target)
-										ef:SetRadius(1)
-										ef:SetOrigin(self.Owner:GetPos())
-										ef:SetNormal(posang.Ang:Forward())
-										ef:SetStart(posang.Pos)
-										ef:SetScale(self.Owner:EntIndex())
-										ef:SetAttachment(att)
-									util.Effect("ef_scav_heal",ef,nil,true)
+					local ef = EffectData()
+						ef:SetEntity(target)
+						ef:SetRadius(1)
+						ef:SetOrigin(self.Owner:GetPos())
+						ef:SetNormal(posang.Ang:Forward())
+						ef:SetStart(posang.Pos)
+						ef:SetScale(self.Owner:EntIndex())
+						ef:SetAttachment(att)
+					util.Effect("ef_scav_heal",ef,nil,true)
 
-									--restart healing sound, in case we were holding down attack and got a valid healing target (either by looking around or our current one getting hurt)
-									self.StopBeep = true
-									if SERVER and not IsValid(self.soundloops.healthCharger) then
-										self.soundloops.healthCharger = CreateSound(self.Owner,"items/medcharge4.wav")
-										self.soundloops.healthCharger:Play()
-									end
-									target:SetHealth(math.min(target:GetMaxHealth(),target:Health()+1))
-									if SERVER then self:TakeSubammo(item,1) end
-								elseif SERVER then --our target is full health, switch over to beep loop
-									self.StopBeep = false
-									fullBeep(self,item)
-									self.soundloops.healthCharger:Stop()
-								end
-								local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
-								if !continuefiring then
-									if SERVER then
-										self.soundloops.healthCharger:Stop()
-										self.StopBeep = true
-										self.ChargeAttack = nil
-										self:SetBarrelRestSpeed(0)
-									else
-										--hook.Remove( "RenderScreenspaceEffects", "ScavHealthCharger")
-										fullBeep(self,item)
-									end
+					--restart healing sound, in case we were holding down attack and got a valid healing target (either by looking around or our current one getting hurt)
+					self.StopBeep = true
+					if SERVER and not IsValid(self.soundloops.healthCharger) then
+						self.soundloops.healthCharger = CreateSound(self.Owner,"items/medcharge4.wav")
+						self.soundloops.healthCharger:Play()
+					end
+					target:SetHealth(math.min(target:GetMaxHealth(),target:Health()+1))
+					if SERVER then self:TakeSubammo(item,1) end
+				elseif SERVER then --our target is full health, switch over to beep loop
+					self.StopBeep = false
+					fullBeep(self,item)
+					self.soundloops.healthCharger:Stop()
+				end
+				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
+				if !continuefiring then
+					if SERVER then
+						self.soundloops.healthCharger:Stop()
+						self.StopBeep = true
+						self.ChargeAttack = nil
+						self:SetBarrelRestSpeed(0)
+					else
+						--hook.Remove( "RenderScreenspaceEffects", "ScavHealthCharger")
+						fullBeep(self,item)
+					end
 
-									return 0.05
-								else
-									if SERVER and target:GetMaxHealth() > target:Health() then self.soundloops.healthCharger:Play() end
-									return 0.1
-								end
-							end
+					return 0.05
+				else
+					if SERVER and target:GetMaxHealth() > target:Health() then self.soundloops.healthCharger:Play() end
+					return 0.1
+				end
+			end
 			tab.FireFunc = function(self,item)
-								self.ChargeAttack = ScavData.models["models/props_combine/health_charger001.mdl"].ChargeAttack
-								self.chargeitem = item
-								if SERVER then
-									self.Owner:EmitSound("player/suit_denydevice.wav")
-									if not IsValid(self.soundloops.healthCharger) then self.soundloops.healthCharger = CreateSound(self.Owner,"items/medcharge4.wav") end
-									self:SetBarrelRestSpeed(400)
-								else
-									timer.Simple(1,function()
-										if self:ProcessLinking(item) && self:StopChargeOnRelease() then --make sure the player didn't cancel the charge before we even got to it
-											--hook.Add( "RenderScreenspaceEffects", "ScavHealthCharger", function() --TODO: screen effect?
-												--DrawMaterialOverlay( "models/shadertest/shader3", -0.01 )
-											--end )
-										else
-											self.StopBeep = true
-										end
-									end)
-								end
-								return false
-							end
+				self.ChargeAttack = ScavData.models["models/props_combine/health_charger001.mdl"].ChargeAttack
+				self.chargeitem = item
+				if SERVER then
+					self.Owner:EmitSound("player/suit_denydevice.wav")
+					if not IsValid(self.soundloops.healthCharger) then self.soundloops.healthCharger = CreateSound(self.Owner,"items/medcharge4.wav") end
+					self:SetBarrelRestSpeed(400)
+				else
+					timer.Simple(1,function()
+						if self:ProcessLinking(item) && self:StopChargeOnRelease() then --make sure the player didn't cancel the charge before we even got to it
+							--hook.Add( "RenderScreenspaceEffects", "ScavHealthCharger", function() --TODO: screen effect?
+								--DrawMaterialOverlay( "models/shadertest/shader3", -0.01 )
+							--end )
+						else
+							self.StopBeep = true
+						end
+					end)
+				end
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/props_combine/health_charger001.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),math.Round(GetConVar("sk_healthcharger"):GetFloat()) or 50,ent:GetSkin()) end --(default 50) health for chargers
 			end
 		
-		ScavData.models["models/props_combine/health_charger001.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/props_combine/health_charger001.mdl")
 
 
 
@@ -1532,91 +1531,91 @@ local eject = "brass"
 			end
 
 			tab.ChargeAttack = function(self,item)
-								local target = self.Owner
-									local tracep = {}
-									tracep.start = self.Owner:GetShootPos()
-									tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*100
-									tracep.filter = self.Owner
-									tracep.mask = MASK_SHOT
-									tracep.mins = Vector(-12,-12,-12)
-									tracep.maxs = Vector(12,12,12)
-									local tr = util.TraceHull(tracep)
-									if tr.Entity:IsPlayer() && (tr.Entity:Armor() < tr.Entity:GetMaxArmor()) then
-										target = tr.Entity
-									end
-								if target:GetMaxArmor() > target:Armor() then
-									local att = self:LookupAttachment("muzzle")
-									local posang = self:GetAttachment(att)
+				local target = self.Owner
+					local tracep = {}
+					tracep.start = self.Owner:GetShootPos()
+					tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*100
+					tracep.filter = self.Owner
+					tracep.mask = MASK_SHOT
+					tracep.mins = Vector(-12,-12,-12)
+					tracep.maxs = Vector(12,12,12)
+					local tr = util.TraceHull(tracep)
+					if tr.Entity:IsPlayer() && (tr.Entity:Armor() < tr.Entity:GetMaxArmor()) then
+						target = tr.Entity
+					end
+				if target:GetMaxArmor() > target:Armor() then
+					local att = self:LookupAttachment("muzzle")
+					local posang = self:GetAttachment(att)
 
-									/*local ef = EffectData() --TODO: Suit charge effect
-										ef:SetEntity(target)
-										ef:SetRadius(1)
-										ef:SetOrigin(self.Owner:GetPos())
-										ef:SetNormal(posang.Ang:Forward())
-										ef:SetStart(posang.Pos)
-										ef:SetScale(self.Owner:EntIndex())
-										ef:SetAttachment(att)
-									util.Effect("ef_scav_heal",ef,nil,true)*/
+					/*local ef = EffectData() --TODO: Suit charge effect
+						ef:SetEntity(target)
+						ef:SetRadius(1)
+						ef:SetOrigin(self.Owner:GetPos())
+						ef:SetNormal(posang.Ang:Forward())
+						ef:SetStart(posang.Pos)
+						ef:SetScale(self.Owner:EntIndex())
+						ef:SetAttachment(att)
+					util.Effect("ef_scav_heal",ef,nil,true)*/
 
-									--restart charge sound, in case we were holding down attack and got a valid charge target (either by looking around or our current one getting damaged)
-									self.StopBeep = true
-									if SERVER and not IsValid(self.soundloops.suitCharger) then
-										self.soundloops.suitCharger = CreateSound(self.Owner,"items/suitcharge1.wav")
-										self.soundloops.suitCharger:Play()
-									end
-									if SERVER then
-										target:SetArmor(math.min(target:GetMaxArmor(),target:Armor()+1))
-										self:TakeSubammo(item,1)
-									end
-								elseif SERVER then --our target is full armor, switch over to beep loop
-									self.StopBeep = false
-									fullBeep(self,item)
-									self.soundloops.suitCharger:Stop()
-								end
-								local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
-								if !continuefiring then
-									if SERVER then
-										self.soundloops.suitCharger:Stop()
-										self.StopBeep = true
-										self.ChargeAttack = nil
-										self:SetBarrelRestSpeed(0)
-									else
-										hook.Remove( "RenderScreenspaceEffects", "ScavSuitCharger")
-										fullBeep(self,item)
-									end
+					--restart charge sound, in case we were holding down attack and got a valid charge target (either by looking around or our current one getting damaged)
+					self.StopBeep = true
+					if SERVER and not IsValid(self.soundloops.suitCharger) then
+						self.soundloops.suitCharger = CreateSound(self.Owner,"items/suitcharge1.wav")
+						self.soundloops.suitCharger:Play()
+					end
+					if SERVER then
+						target:SetArmor(math.min(target:GetMaxArmor(),target:Armor()+1))
+						self:TakeSubammo(item,1)
+					end
+				elseif SERVER then --our target is full armor, switch over to beep loop
+					self.StopBeep = false
+					fullBeep(self,item)
+					self.soundloops.suitCharger:Stop()
+				end
+				local continuefiring = self:ProcessLinking(item) && self:StopChargeOnRelease()
+				if !continuefiring then
+					if SERVER then
+						self.soundloops.suitCharger:Stop()
+						self.StopBeep = true
+						self.ChargeAttack = nil
+						self:SetBarrelRestSpeed(0)
+					else
+						hook.Remove( "RenderScreenspaceEffects", "ScavSuitCharger")
+						fullBeep(self,item)
+					end
 
-									return 0.05
-								else
-									if SERVER and target:GetMaxArmor() > target:Armor() then self.soundloops.suitCharger:Play() end
-									return 0.1
-								end
-							end
+					return 0.05
+				else
+					if SERVER and target:GetMaxArmor() > target:Armor() then self.soundloops.suitCharger:Play() end
+					return 0.1
+				end
+			end
 			tab.FireFunc = function(self,item)
-								self.ChargeAttack = ScavData.models["models/props_combine/suit_charger001.mdl"].ChargeAttack
-								self.chargeitem = item
-								if SERVER then
-									self.Owner:EmitSound("player/suit_denydevice.wav")
-									if not IsValid(self.soundloops.suitCharger) then self.soundloops.suitCharger = CreateSound(self.Owner,"items/suitcharge1.wav") end
-									self:SetBarrelRestSpeed(400)
-								/*else --not worth it
-										if not self.StopBeep then
-											hook.Add( "RenderScreenspaceEffects", "ScavSuitCharger", function()
-												surface.SetDrawColor(0,100,255,100*math.sin(CurTime()))
-												surface.DrawRect(0,0,ScrW(),ScrH())
-											end )
-										else
-											self.StopBeep = true
-										end*/
-								end
-								return false
-							end
+				self.ChargeAttack = ScavData.models["models/props_combine/suit_charger001.mdl"].ChargeAttack
+				self.chargeitem = item
+				if SERVER then
+					self.Owner:EmitSound("player/suit_denydevice.wav")
+					if not IsValid(self.soundloops.suitCharger) then self.soundloops.suitCharger = CreateSound(self.Owner,"items/suitcharge1.wav") end
+					self:SetBarrelRestSpeed(400)
+				/*else --not worth it
+						if not self.StopBeep then
+							hook.Add( "RenderScreenspaceEffects", "ScavSuitCharger", function()
+								surface.SetDrawColor(0,100,255,100*math.sin(CurTime()))
+								surface.DrawRect(0,0,ScrW(),ScrH())
+							end )
+						else
+							self.StopBeep = true
+						end*/
+				end
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/props_combine/suit_charger001.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),math.Round(GetConVar("sk_suitcharger"):GetFloat()) or 75,ent:GetSkin()) end --(default 75) battery for chargers
 				ScavData.CollectFuncs["models/props_lab/hevplate.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),math.Round(GetConVar("sk_suitcharger"):GetFloat()) or 75,ent:GetSkin()) end --(default 75) battery for chargers
 			end
 		
-		ScavData.models["models/props_combine/suit_charger001.mdl"] = tab
-		ScavData.models["models/props_lab/hevplate.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/props_combine/suit_charger001.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_lab/hevplate.mdl")
 		
 /*==============================================================================================
 	-- .357 rounds
@@ -1738,8 +1737,8 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/weapons/w_sharps.mdl"] = ScavData.CollectFuncs["models/weapons/w_carbine.mdl"]
 			end
 			tab.Cooldown = 1
-		ScavData.models["models/weapons/w_357.mdl"] = tab
-		ScavData.models["models/weapons/w_annabelle.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_357.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_annabelle.mdl")
 		
 /*==============================================================================================
 	--machinegun
@@ -1886,16 +1885,16 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_pro_smg/c_pro_smg.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_pro_smg/c_pro_smg.mdl"]
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/items/boxmrounds.mdl"] = tab
-		ScavData.models["models/weapons/w_smg1.mdl"] = tab
-		ScavData.models["models/weapons/w_alyx_gun.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/items/boxmrounds.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_smg1.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_alyx_gun.mdl")
 		--TF2
-		ScavData.models["models/weapons/w_models/w_smg.mdl"] = tab
-		ScavData.models["models/weapons/c_models/c_smg/c_smg.mdl"] = tab
-		ScavData.models["models/weapons/c_models/c_pro_smg/c_pro_smg.mdl"] = tab
-		ScavData.models["models/workshop/weapons/c_models/c_pro_smg/c_pro_smg.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_models/w_smg.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_smg/c_smg.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_pro_smg/c_pro_smg.mdl")
+		ScavData.RegisterFiremode(tab,"models/workshop/weapons/c_models/c_pro_smg/c_pro_smg.mdl")
 		--HL:S
-		ScavData.models["models/w_9mmar.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/w_9mmar.mdl")
 
 /*==============================================================================================
 	--Hunter Flechettes
@@ -1926,7 +1925,7 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/ministrider.mdl"] = ScavData.CollectFuncs["models/hunter.mdl"]
 			end
 			tab.Cooldown = 0.1
-		ScavData.models["models/weapons/hunter_flechette.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/hunter_flechette.mdl")
 		
 /*==============================================================================================
 	--Grunt Hornets
@@ -1953,7 +1952,7 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/agrunt.mdl"] = function(self,ent) self:AddItem("models/agrunt.mdl",50,0) end
 			end
 			tab.Cooldown = 0.2
-		ScavData.models["models/agrunt.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/agrunt.mdl")
 		
 /*==============================================================================================
 	--Controller Energy Ball
@@ -1981,7 +1980,7 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/controller.mdl"] = function(self,ent) self:AddItem("models/controller.mdl",50,0) end
 			end
 			tab.Cooldown = 0.15
-		ScavData.models["models/controller.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/controller.mdl")
 	
 /*==============================================================================================
 	--Squid Spit
@@ -2009,7 +2008,7 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/bullsquid.mdl"] = function(self,ent) self:AddItem("models/bullsquid.mdl",50,0) end
 			end
 			tab.Cooldown = 0.6
-		ScavData.models["models/bullsquid.mdl"] = tab 
+		ScavData.RegisterFiremode(tab,"models/bullsquid.mdl") 
 
 /*==============================================================================================
 	--Vortigaunt Beam
@@ -2130,11 +2129,11 @@ local eject = "brass"
 				end
 			end
 			tab.Cooldown = 1
-		ScavData.models["models/vortigaunt.mdl"] = tab
-		ScavData.models["models/vortigaunt_slave.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/vortigaunt.mdl")
+		ScavData.RegisterFiremode(tab,"models/vortigaunt_slave.mdl")
 		--Ep1
-		ScavData.models["models/vortigaunt_blue.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/vortigaunt_blue.mdl")
 		--Ep2
-		ScavData.models["models/vortigaunt_doctor.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/vortigaunt_doctor.mdl")
 		--HL:S
-		ScavData.models["models/islave.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/islave.mdl")

@@ -105,7 +105,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_30calsr.mdl"] = ScavData.CollectFuncs["models/weapons/w_30calpr.mdl"]
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/weapons/w_30cal.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_30cal.mdl")
 		
 /*==============================================================================================
 	--BAR
@@ -169,7 +169,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_bar.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),20,0) end
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/weapons/w_bar.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_bar.mdl")
 
 /*==============================================================================================
 	--C96
@@ -228,7 +228,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_c96.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),20,0) end
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/weapons/w_c96.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_c96.mdl")
 
 /*==============================================================================================
 	--Kar 98
@@ -274,8 +274,8 @@ end
 				ScavData.CollectFuncs["models/weapons/w_k98s.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),5,0) end
 			end
 			tab.Cooldown = 1.6
-		ScavData.models["models/weapons/w_k98.mdl"] = tab
-		ScavData.models["models/weapons/w_k98s.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_k98.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_k98s.mdl")
 
 /*==============================================================================================
 	--M1 Carbine
@@ -316,7 +316,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_m1carb.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),15,0) end
 			end
 			tab.Cooldown = 0.3
-		ScavData.models["models/weapons/w_m1carb.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_m1carb.mdl")
 
 /*==============================================================================================
 	--M1 Garand
@@ -382,7 +382,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_garand.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),8,0) end
 			end
 			tab.Cooldown = 0.74
-		ScavData.models["models/weapons/w_garand.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_garand.mdl")
 
 /*==============================================================================================
 	--M1903 Springfield
@@ -427,7 +427,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_spring.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),5,0) end
 			end
 			tab.Cooldown = 1.85
-		ScavData.models["models/weapons/w_spring.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_spring.mdl")
 
 /*==============================================================================================
 	--M1911
@@ -471,7 +471,7 @@ end
 				ScavData.CollectFuncs["models/player/american_assault.mdl"] = function(self,ent) self:AddItem("models/weapons/w_colt.mdl",7,0) end
 			end
 			tab.Cooldown = 0.3
-		ScavData.models["models/weapons/w_colt.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_colt.mdl")
 
 /*==============================================================================================
 	--MG42
@@ -644,8 +644,8 @@ end
 				ScavData.CollectFuncs["models/weapons/w_mg42sr.mdl"] = ScavData.CollectFuncs["models/weapons/w_mg42pr.mdl"]
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/weapons/w_mg42bd.mdl"] = tab
-		ScavData.models["models/weapons/w_mg42bu.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_mg42bd.mdl")
+		ScavData.RegisterFiremode(tab,"models/weapons/w_mg42bu.mdl")
 		
 /*==============================================================================================
 	--MP40
@@ -704,7 +704,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_mp40.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),32,0) end
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/weapons/w_mp40.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_mp40.mdl")
 
 /*==============================================================================================
 	--MP44
@@ -763,7 +763,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_mp44.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/weapons/w_mp44.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_mp44.mdl")
 
 /*==============================================================================================
 	--P38
@@ -802,7 +802,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_p38.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),8,0) end
 			end
 			tab.Cooldown = 0.3
-		ScavData.models["models/weapons/w_p38.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_p38.mdl")
 
 /*==============================================================================================
 	--Tommy Gun
@@ -861,4 +861,4 @@ end
 				ScavData.CollectFuncs["models/weapons/w_thompson.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 			end
 			tab.Cooldown = 0
-		ScavData.models["models/weapons/w_thompson.mdl"] = tab
+		ScavData.RegisterFiremode(tab,"models/weapons/w_thompson.mdl")
