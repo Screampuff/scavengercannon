@@ -41,7 +41,7 @@ function EFFECT:GetTracerShootPos2(start)
 	if (self.Owner == GetViewEntity()) then
 		return (self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos)
 	elseif self.Owner ~= GetViewEntity() then
-		return self.Weapon:GetTracerOrigin()or(self.Weapon:GetAttachment(self.Weapon:LookupAttachment("muzzle")).Pos)
+		return self.Weapon:GetTracerOrigin() or (self.Weapon:GetAttachment(self.Weapon:LookupAttachment("muzzle")).Pos)
 	else
 		return (self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos+self.Owner:GetAimVector():Angle():Right()*36-self.Owner:GetAimVector():Angle():Up()*36)
 	end

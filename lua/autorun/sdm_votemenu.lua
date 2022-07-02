@@ -156,7 +156,7 @@ local PANEL = {}
 	end
 	
 	function PANEL:GetDesc()
-		return self.textor""
+		return self.text or ""
 	end
 	
 	vgui.Register("SDM_VoteMenuDescLabel",PANEL,"DLabel")
@@ -180,7 +180,7 @@ local PANEL = {}
 	
 	local function votebuttonpress(panel)
 		surface.PlaySound("buttons/button4.wav")
-		RunConsoleCommand("sdm_vote_submit",panel:GetParent().FileNameor"..")
+		RunConsoleCommand("sdm_vote_submit",panel:GetParent().FileName or "..")
 		--print(panel:GetParent().FileName)
 	end
 	
