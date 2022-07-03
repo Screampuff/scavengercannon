@@ -80,9 +80,9 @@ function ENT:Think()
 			end
 			
 			if prox then
-				self:SetState(2)
+				self:ChangeState(2)
 			else
-				self:SetState(1)
+				self:ChangeState(1)
 			end
 			
 		end
@@ -148,7 +148,7 @@ if SERVER then
 		self.constraint = constraint.Weld(self,hitent,0,0,2000,false)
 	end
 
-	function ENT:SetState(state)
+	function ENT:ChangeState(state)
 
 		if state ~= self:GetState() then
 		

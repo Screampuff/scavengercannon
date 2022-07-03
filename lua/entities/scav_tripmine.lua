@@ -99,18 +99,16 @@ function ENT:IsArmed()
 end
 
 function ENT:OnArmed()
-	if CLIENT then
+	if SERVER then
 		self:EmitSound("weapons/mine_activate.wav")
-	else
 		self:Fire("SetBodyGroup",1,0)
 		self.NoScav = true
 	end
 end
 
 function ENT:OnDisarmed()
-	if CLIENT then
+	if SERVER then
 		self:EmitSound("weapons/mine_activate.wav",100,52)
-	else
 		self:Fire("SetBodyGroup",0,0)
 		self.NoScav = false
 	end
