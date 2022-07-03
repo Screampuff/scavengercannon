@@ -66,7 +66,7 @@ end
 function SWEP:Initialize()
 	self.LearnedProps = {}
 	self.HoldSound = CreateSound(self,"weapons/physcannon/hold_loop.wav")
-	self:SetHoldType("melee2")
+	self:SetHoldType("melee2") --TODO: change its model up and get this on a more reasonable 3rd person anim (shotgun, ar2, etc)
 	if SERVER then
 		self.CreatedItems = {}
 	elseif LocalPlayer () == self.Owner then

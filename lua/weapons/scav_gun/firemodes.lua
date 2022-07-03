@@ -712,7 +712,7 @@ end
 						proj:SetPos(self.Owner:GetShootPos())
 						proj:SetAngles((self:GetAimVector():Angle():Up()*-1):Angle())
 						proj:Spawn()
-						if (item.ammo == "models/weapons/w_models/w_stickybomb2.mdl") or (item.ammo == "models/props_c17/doll01.mdl") then
+						if item.ammo == "models/weapons/w_models/w_stickybomb2.mdl" or item.ammo == "models/props_c17/doll01.mdl" or item.ammo == "models/props_unique/doll01.mdl" then
 							proj:SetSticky(false)
 						end
 						proj:SetSkin(item.data)				
@@ -1677,29 +1677,31 @@ end
 			tab.RemoveOnCharge = false
 			tab.Level = 9
 			if SERVER then
-				DoChargeSound = function(self,item,olditemname)
+				tab.OnArmed = function(self,item,olditemname)
 					if item.ammo ~= olditemname then
 						self.Owner:EmitSound("weapons/scav_gun/chargeup.wav")
 					end
 				end
-				tab.OnArmed = DoChargeSound
-				tab.ChargeAttack = function(self,item)
-					local tab = ScavData.models["models/props_vehicles/generatortrailer01.mdl"]
+			end
+			tab.ChargeAttack = function(self,item)
+				local tab = ScavData.models["models/props_vehicles/generatortrailer01.mdl"]
+				if SERVER then
 					self.soundloops.bfgcharge:PlayEx(100,60+math.min(self.WeaponCharge,4)*40)
 					self.soundloops.bfgcharge2:PlayEx(100,60+math.min(self.WeaponCharge,4)*40)
-					if not self.Owner:KeyDown(IN_ATTACK) and (self.WeaponCharge >= 1) then
+				end
+				if not self.Owner:KeyDown(IN_ATTACK) and (self.WeaponCharge >= 1) then
+					if SERVER then
 						local proj = self:CreateEnt("scav_projectile_bigshot")
-						proj.Charge = math.floor(math.min(self.WeaponCharge,4))
-						proj.Owner = self.Owner
-						proj:SetPos(self:GetProjectileShootPos())
-						proj:SetAngles(self:GetAimVector():Angle())
-						proj:SetOwner(self.Owner)
-						proj.SpeedScale = self:GetForceScale()
-						proj:Spawn()
+							proj.Charge = math.floor(math.min(self.WeaponCharge,4))
+							proj.Owner = self.Owner
+							proj:SetPos(self:GetProjectileShootPos())
+							proj:SetAngles(self:GetAimVector():Angle())
+							proj:SetOwner(self.Owner)
+							proj.SpeedScale = self:GetForceScale()
+							proj:Spawn()
 						if proj:GetPhysicsObject():IsValid() then
 							proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*500)
 						end
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						self.Owner:ViewPunch(Angle(math.Rand(-4,-3),math.Rand(-0.1,0.1),0))
 						net.Start("scv_falloffsound")
 							local rf = RecipientFilter()
@@ -1709,36 +1711,39 @@ end
 						net.Send(rf)
 						self.soundloops.bfgcharge:Stop()
 						self.soundloops.bfgcharge2:Stop()
-						self.ChargeAttack = nil
-						self.WeaponCharge = 0
-						tab.chargeanim = ACT_VM_SECONDARYATTACK
-						item.subammo = item.subammo-proj.Charge
+						self:TakeSubammo(item,proj.Charge)
 						self:KillEffect()
 						if item.subammo <= 0 then
 							self:RemoveItemValue(item)
 						end
 						self:SetPanelPose(0,2)
 						self:SetBlockPose(0,2)
-						if IsValid(self.ef_plasmacharge) then
-							if CLIENT then self:GetModel():StopParticleEmission() end
-							self.ef_plasmacharge:Kill()
-						end
-						return 3
-					else
-						tab.chargeanim = nil
-						self.WeaponCharge = self.WeaponCharge+0.05
-						if self.WeaponCharge >= 6 and IsValid(self.Owner) then
+					end
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:SetChargeAttack()
+					self.WeaponCharge = 0
+					tab.chargeanim = ACT_VM_SECONDARYATTACK
+					if IsValid(self.ef_plasmacharge) then
+						if CLIENT then self:GetModel():StopParticleEmission() end
+						self.ef_plasmacharge:Kill()
+					end
+					return 3
+				else
+					tab.chargeanim = ACT_VM_FIDGET
+					self.WeaponCharge = self.WeaponCharge+0.05
+					if self.WeaponCharge >= 6 and IsValid(self.Owner) then
+						if SERVER then
 							local proj = self:CreateEnt("scav_projectile_bigshot")
-							proj.Charge = math.floor(math.min(self.WeaponCharge,4))
-							proj.Owner = self.Owner
-							proj:SetPos(self:GetProjectileShootPos())
-							proj:SetAngles(self:GetAimVector():Angle())
-							proj:SetOwner(self.Owner)
-							proj.SpeedScale = self:GetForceScale()
-							proj:Spawn()
-							proj:SetMoveType(MOVETYPE_NONE)
-							proj:SetNoDraw(true)
-							proj:ProcessImpact(self.Owner)
+								proj.Charge = math.floor(math.min(self.WeaponCharge,4))
+								proj.Owner = self.Owner
+								proj:SetPos(self:GetProjectileShootPos())
+								proj:SetAngles(self:GetAimVector():Angle())
+								proj:SetOwner(self.Owner)
+								proj.SpeedScale = self:GetForceScale()
+								proj:Spawn()
+								proj:SetMoveType(MOVETYPE_NONE)
+								proj:SetNoDraw(true)
+								proj:ProcessImpact(self.Owner)
 							net.Start("scv_falloffsound")
 								local rf = RecipientFilter()
 								rf:AddAllPlayers()
@@ -1747,29 +1752,34 @@ end
 							net.Send(rf)
 							self.Owner:EmitSound("ambient/explosions/explode_3.wav")
 							self.Owner:EmitSound("physics/body/body_medium_break3.wav")
-							self.WeaponCharge = 0
-							self.ChargeAttack = nil
 							if self.Owner:Alive() then
 								self.Owner:Kill()
 							end
-							return 3
+						else
+							ParticleEffect("scav_exp_bigshot",self.Owner:GetPos(),Angle(0,0,0),Entity(0))
 						end
+						self.WeaponCharge = 0
+						self:SetChargeAttack()
+						return 3
 					end
-					return 0.025
 				end
-				tab.FireFunc = function(self,item)
-					self.ChargeAttack = ScavData.models["models/props_vehicles/generatortrailer01.mdl"].ChargeAttack
+				return 0.025
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(ScavData.models["models/props_vehicles/generatortrailer01.mdl"].ChargeAttack,item)
+				if SERVER then
 					self.Owner:EmitSound("HL1/ambience/particle_suck1.wav",100,200)
 					if not self.soundloops.bfgcharge then
 						self.soundloops.bfgcharge = CreateSound(self.Owner,"ambient/machines/combine_shield_loop3.wav")
 						self.soundloops.bfgcharge2 = CreateSound(self.Owner,"npc/attack_helicopter/aheli_crash_alert2.wav")
 					end
-					self.chargeitem = item
 					self.ef_plasmacharge = self:CreateToggleEffect("scav_stream_plasmacharge")
 					self:SetPanelPose(0.5,0.25)
 					self:SetBlockPose(0.5,0.25)
-					return false
 				end
+				return false
+			end
+			if SERVER then
 				ScavData.CollectFuncs["models/props_vehicles/generatortrailer01.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),4,0) end
 				--Ep2
 				ScavData.CollectFuncs["models/props_mining/diesel_generator.mdl"] = ScavData.CollectFuncs["models/props_vehicles/generatortrailer01.mdl"]
@@ -1780,38 +1790,6 @@ end
 				ScavData.CollectFuncs["models/props_vehicles/floodlight_generator_pose02_static.mdl"] = ScavData.CollectFuncs["models/props_vehicles/generatortrailer01.mdl"]
 				--DoD:S
 				ScavData.CollectFuncs["models/props_vehicles/generator.mdl"] = ScavData.CollectFuncs["models/props_vehicles/generatortrailer01.mdl"]
-			else
-				tab.ChargeAttack = function(self,item)
-					local tab = ScavData.models["models/props_vehicles/generatortrailer01.mdl"]
-					if not self.Owner:KeyDown(IN_ATTACK) and (self.WeaponCharge >= 1) then
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						self.ChargeAttack = nil
-						item.subammo = item.subammo-math.floor(math.min(self.WeaponCharge,4))
-						self.WeaponCharge = 0
-						tab.chargeanim = ACT_VM_SECONDARYATTACK
-						if IsValid(self.ef_plasmacharge) then
-							self:GetModel():StopParticleEmission()
-							self.ef_plasmacharge:Kill()
-						end
-						return 3
-					else
-						self.WeaponCharge = self.WeaponCharge+0.05
-						tab.chargeanim = ACT_VM_FIDGET
-						if self.WeaponCharge >= 6 then
-							ParticleEffect("scav_exp_bigshot",self.Owner:GetPos(),Angle(0,0,0),Entity(0))
-							self.WeaponCharge = 0
-							self.ChargeAttack = nil
-							return 3
-						end
-					end
-					return 0.025
-				end
-				tab.FireFunc = function(self,item)
-					--ParticleEffectAttach("scav_bigshot_charge",PATTACH_POINT_FOLLOW,self.Owner:GetViewModel(),self.Owner:GetViewModel():LookupAttachment("muzzle"))
-					self.ChargeAttack = ScavData.models["models/props_vehicles/generatortrailer01.mdl"].ChargeAttack
-					self.chargeitem = item
-					return false
-				end
 			end
 			tab.Cooldown = 0.1
 			
@@ -1835,51 +1813,53 @@ end
 			tab.chargeanim = ACT_VM_FIDGET
 			tab.RemoveOnCharge = false
 			tab.Level = 7
+			tab.ChargeAttack = function(self,item)
+				local tab = ScavData.models["models/props_phx/cannonball.mdl"]
+				if (not self.Owner:KeyDown(IN_ATTACK) and (self.WeaponCharge >= 0)) or (self.WeaponCharge >= 1) then
+					if SERVER then
+						local proj = self:CreateEnt("scav_projectile_cannonball")
+							proj:SetModel(item.ammo)
+							proj:SetSkin(item.data)
+							proj.Charge = self.WeaponCharge
+							proj.Owner = self.Owner
+							proj:SetPos(self:GetProjectileShootPos())
+							proj:SetAngles(self:GetAimVector():Angle())
+							proj:SetOwner(self.Owner)
+							proj:Spawn()
+							proj:SetPos(self.Owner:GetShootPos()-proj:OBBCenter())
+							proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*((self.WeaponCharge*3000)+500))
+							proj:SetPhysicsAttacker(self.Owner)
+							proj:GetPhysicsObject():SetDragCoefficient(-10000)
+						self:TakeSubammo(item,proj.Charge)
+						self:KillEffect()
+						self:RemoveItemValue(item)
+						self.soundloops.cannon:Stop()
+						self.Owner:EmitSound(self.shootsound)
+						--self.Owner:ViewPunch(Angle(math.Rand(-4,-3),math.Rand(-0.1,0.1),0))
+					end
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:SetChargeAttack()
+					self.WeaponCharge = 0
+					tab.chargeanim = ACT_VM_SECONDARYATTACK
+					return 1
+				else
+					tab.chargeanim = ACT_VM_FIDGET
+					self.WeaponCharge = self.WeaponCharge+0.05
+				end
+				return 0.1
+			end
+			tab.FireFunc = function(self,item)
+				if SERVER then
+					if not self.soundloops.cannon then
+						self.soundloops.cannon = CreateSound(self.Owner,"weapons/stickybomblauncher_charge_up.wav")
+						self.soundloops.cannon:ChangePitch(160)
+					end
+					self.soundloops.cannon:Play()
+				end
+				self:SetChargeAttack(ScavData.models["models/props_phx/cannonball.mdl"].ChargeAttack,item)
+				return false
+			end
 			if SERVER then
-				tab.ChargeAttack = function(self,item)
-										local tab = ScavData.models["models/props_phx/cannonball.mdl"]
-										if (not self.Owner:KeyDown(IN_ATTACK) and (self.WeaponCharge >= 0)) or (self.WeaponCharge >= 1) then
-											local proj = self:CreateEnt("scav_projectile_cannonball")
-											proj:SetModel(item.ammo)
-											proj:SetSkin(item.data)
-											proj.Charge = self.WeaponCharge
-											proj.Owner = self.Owner
-											proj:SetPos(self:GetProjectileShootPos())
-											proj:SetAngles(self:GetAimVector():Angle())
-											proj:SetOwner(self.Owner)
-											proj:Spawn()
-											proj:SetPos(self.Owner:GetShootPos()-proj:OBBCenter())
-											proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*((self.WeaponCharge*3000)+500))
-											proj:SetPhysicsAttacker(self.Owner)
-											proj:GetPhysicsObject():SetDragCoefficient(-10000)
-											self.Owner:SetAnimation(PLAYER_ATTACK1)
-											--self.Owner:ViewPunch(Angle(math.Rand(-4,-3),math.Rand(-0.1,0.1),0))
-											self.ChargeAttack = nil
-											self.WeaponCharge = 0
-											tab.chargeanim = ACT_VM_SECONDARYATTACK
-											item.subammo = item.subammo-proj.Charge
-											self:KillEffect()
-											self:RemoveItemValue(item)
-											self.soundloops.cannon:Stop()
-											self.Owner:EmitSound(self.shootsound)
-											return 1
-										else
-											tab.chargeanim = ACT_VM_FIDGET
-											self.WeaponCharge = self.WeaponCharge+0.05
-										end
-										return 0.1
-								end
-				tab.FireFunc = function(self,item)
-									if not self.soundloops.cannon then
-										self.soundloops.cannon = CreateSound(self.Owner,"weapons/stickybomblauncher_charge_up.wav")
-										self.soundloops.cannon:ChangePitch(160)
-									end
-									self.soundloops.cannon:Play()
-									self.ChargeAttack = ScavData.models["models/props_phx/cannonball.mdl"].ChargeAttack
-									self.chargeitem = item
-									return false
-								end
-
 				ScavData.CollectFuncs["models/props_phx/cannon.mdl"] = function(self,ent) self:AddItem("models/props_phx/cannonball.mdl",1,0,1) end --1 cannonball from cannon
 				--TF2
 				ScavData.CollectFuncs["models/weapons/c_models/c_demo_cannon/c_demo_cannon.mdl"] = function(self,ent) self:AddItem("models/weapons/w_models/w_cannonball.mdl",1,math.fmod(ent:GetSkin(),2),1) end --1 cannonball from TF2 Loose cannon
@@ -1890,26 +1870,6 @@ end
 				ScavData.CollectFuncs["models/props_unique/airport/atlas.mdl"] = function(self,ent) self:AddItem("models/props_unique/airport/atlas_break_ball.mdl",1,0,1) end --1 world from Atlas
 				--FoF
 				ScavData.CollectFuncs["models/weapons/cannon_top.mdl"] = function(self,ent) self:AddItem("models/weapons/cannon_ball.mdl",1,0,1) end --1 cannonball from cannon
-			else
-				tab.ChargeAttack = function(self,item)
-									local tab = ScavData.models["models/props_phx/cannonball.mdl"]
-										if (not self.Owner:KeyDown(IN_ATTACK) and (self.WeaponCharge >= 0)) or (self.WeaponCharge >= 1) then
-											self.Owner:SetAnimation(PLAYER_ATTACK1)
-											self.ChargeAttack = nil
-											self.WeaponCharge = 0
-											tab.chargeanim = ACT_VM_SECONDARYATTACK											
-											return 1
-										else
-											self.WeaponCharge = self.WeaponCharge+0.05
-											tab.chargeanim = ACT_VM_FIDGET
-										end
-										return 0.1
-								end
-				tab.FireFunc = function(self,item)
-					self.ChargeAttack = ScavData.models["models/props_phx/cannonball.mdl"].ChargeAttack
-					self.chargeitem = item
-					return false
-				end
 			end
 			tab.Cooldown = 0.1
 			
@@ -2143,163 +2103,161 @@ end
 			if SERVER then
 				hook.Add("PlayerDeath","scv_cleargrapple",function(pl) if pl.GrappleAssist and pl.GrappleAssist:IsValid() then pl.GrappleAssist:Remove() end end)
 				tab.ChargeAttack = function(self,item)
-										local tab = ScavData.models["models/props_wasteland/cranemagnet01a.mdl"]
-										if self.grapplenohit then
-											self.grapplenohit = nil
-											if IsValid(self.ef_grapplebeam) then
-												self.ef_grapplebeam:Kill()
-											end
-											self.ChargeAttack = nil
-											tab.chargeanim = ACT_VM_IDLE
-											return 0.5
-										end
-										if not self.Owner:KeyDown(IN_ATTACK) or not self.GrappleAssist:IsValid() then --let go
-											--local eyeang = self.Owner:EyeAngles()
-											--eyeang.r = 0
-											self.ChargeAttack = nil
-											tab.chargeanim = ACT_VM_PRIMARYATTACK
-											if IsValid(self.ef_grapplebeam) then
-												self.ef_grapplebeam:Kill()
-											end
-											self.Owner:SetMoveType(MOVETYPE_WALK)
-											if self.GrappleAssist:IsValid() then
-												local vel = self.GrappleAssist:GetVelocity()
-												--vel.x = vel.x*16
-												--vel.y = vel.y*16
-												if vel.z < 0 then
-													vel.z = 0
-												end
-												local length = math.max(vel:Length(),200)
-												self.Owner:SetVelocity(vel:GetNormalized()*length)
-												self.GrappleAssist:Remove()
-												self:SetNWFiremodeEnt(NULL)
-											--else
-											
-											end
-											return 0.25
-										else --grappling
-											tab.chargeanim = ACT_VM_FIDGET
-											self.Owner:SetLocalPos(vector_origin)
-											if self.Owner:KeyDown(IN_JUMP) then
-												self.GrappleTargetLength = math.min(self.GrappleTargetLength+3,1024)
-											end
-											if self.Owner.scavGoDown then
-												self.GrappleTargetLength = math.max(self.GrappleTargetLength-3,64)
-											end
-											if self.Owner:KeyDown(IN_MOVELEFT) then
-												self.GrappleAssist:GetPhysicsObject():ApplyForceCenter((self.Owner:GetAngles()):Right()*-200)
-											end
-											if self.Owner:KeyDown(IN_MOVERIGHT) then
-												self.GrappleAssist:GetPhysicsObject():ApplyForceCenter((self.Owner:GetAngles()):Right()*200)
-											end
-											if self.Owner:KeyDown(IN_FORWARD) then
-												self.GrappleAssist:GetPhysicsObject():ApplyForceCenter((self.Owner:GetAngles()):Forward()*200)
-											end
-											if self.Owner:KeyDown(IN_BACK) then
-												self.GrappleAssist:GetPhysicsObject():ApplyForceCenter((self.Owner:GetAngles()):Forward()*-200)
-											end
-											
-											if self.GrappleAssistConstraint and self.GrappleAssistConstraint:IsValid() then
-												local length = math.Approach(self.GrappleAssistConstraint.length,self.GrappleTargetLength,3)
-												self.GrappleAssistConstraint.length = length
-												self.GrappleAssistConstraint:Fire("SetSpringLength",length,0)
-												table.insert(self.GrappleAssist.AvgVel,1,self.GrappleAssist:GetPhysicsObject():GetVelocity())
-												if self.GrappleAssist.AvgVel[15] then
-													table.remove(self.GrappleAssist.AvgVel,15)
-												end
-											end
-										end
-										return 0.01
-								end
+					local tab = ScavData.models["models/props_wasteland/cranemagnet01a.mdl"]
+					if self.grapplenohit then
+						self.grapplenohit = nil
+						if IsValid(self.ef_grapplebeam) then
+							self.ef_grapplebeam:Kill()
+						end
+						self:SetChargeAttack()
+						tab.chargeanim = ACT_VM_IDLE
+						return 0.5
+					end
+					if not self.Owner:KeyDown(IN_ATTACK) or not self.GrappleAssist:IsValid() then --let go
+						--local eyeang = self.Owner:EyeAngles()
+						--eyeang.r = 0
+						self:SetChargeAttack()
+						tab.chargeanim = ACT_VM_PRIMARYATTACK
+						if IsValid(self.ef_grapplebeam) then
+							self.ef_grapplebeam:Kill()
+						end
+						self.Owner:SetMoveType(MOVETYPE_WALK)
+						if self.GrappleAssist:IsValid() then
+							local vel = self.GrappleAssist:GetVelocity()
+							--vel.x = vel.x*16
+							--vel.y = vel.y*16
+							if vel.z < 0 then
+								vel.z = 0
+							end
+							local length = math.max(vel:Length(),200)
+							self.Owner:SetVelocity(vel:GetNormalized()*length)
+							self.GrappleAssist:Remove()
+							self:SetNWFiremodeEnt(NULL)
+						--else
+						
+						end
+						return 0.25
+					else --grappling
+						tab.chargeanim = ACT_VM_FIDGET
+						self.Owner:SetLocalPos(vector_origin)
+						if self.Owner:KeyDown(IN_JUMP) then
+							self.GrappleTargetLength = math.min(self.GrappleTargetLength+3,1024)
+						end
+						if self.Owner.scavGoDown then
+							self.GrappleTargetLength = math.max(self.GrappleTargetLength-3,64)
+						end
+						if self.Owner:KeyDown(IN_MOVELEFT) then
+							self.GrappleAssist:GetPhysicsObject():ApplyForceCenter((self.Owner:GetAngles()):Right()*-200)
+						end
+						if self.Owner:KeyDown(IN_MOVERIGHT) then
+							self.GrappleAssist:GetPhysicsObject():ApplyForceCenter((self.Owner:GetAngles()):Right()*200)
+						end
+						if self.Owner:KeyDown(IN_FORWARD) then
+							self.GrappleAssist:GetPhysicsObject():ApplyForceCenter((self.Owner:GetAngles()):Forward()*200)
+						end
+						if self.Owner:KeyDown(IN_BACK) then
+							self.GrappleAssist:GetPhysicsObject():ApplyForceCenter((self.Owner:GetAngles()):Forward()*-200)
+						end
+						
+						if self.GrappleAssistConstraint and self.GrappleAssistConstraint:IsValid() then
+							local length = math.Approach(self.GrappleAssistConstraint.length,self.GrappleTargetLength,3)
+							self.GrappleAssistConstraint.length = length
+							self.GrappleAssistConstraint:Fire("SetSpringLength",length,0)
+							table.insert(self.GrappleAssist.AvgVel,1,self.GrappleAssist:GetPhysicsObject():GetVelocity())
+							if self.GrappleAssist.AvgVel[15] then
+								table.remove(self.GrappleAssist.AvgVel,15)
+							end
+						end
+					end
+					return 0.01
+				end
 				tab.FireFunc = function(self,item)
-									local tracep = {}
-										tracep.mask = MASK_SHOT
-										tracep.mins = Vector(-8,-8,-8)
-										tracep.maxs = Vector(8,8,8)
-										tracep.start = self.Owner:GetShootPos()
-										tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*1024
-										tracep.filter = self.Owner
-										local tr = util.TraceHull(tracep)
-									self.chargeitem = item
-									self.ChargeAttack = ScavData.models["models/props_wasteland/cranemagnet01a.mdl"].ChargeAttack
-									if tr.Hit and ((tr.MatType == MAT_METAL) or (tr.MatType == MAT_GRATE)) then
-										if not tr.Entity:IsValid() then
-											tr.Entity = game.GetWorld()
-										end
-										self.ef_grapplebeam = self:CreateToggleEffect("scav_stream_grapplebeam")
-										self.ef_grapplebeam:SetEndPoint(tr.Entity:WorldToLocal(tr.HitPos))
-										self.ef_grapplebeam:SetEndEnt(tr.Entity)
-										local eyeang = self.Owner:EyeAngles()
-										self.GrappleAssist = ents.Create("scav_grappleassist")
-										self.Owner.GrappleAssist = self.GrappleAssist
-											self.GrappleAssist:SetModel("models/props_c17/canister_propane01a.mdl")
-											self.GrappleAssist:SetPos(self.Owner:GetPos())
-											--self.GrappleAssist:SetAngles(self.Owner:GetAngles())
-											self.GrappleAssist:Spawn()
-											self:SetNWFiremodeEnt(self.GrappleAssist)
-											self.GrappleAssist:GetPhysicsObject():SetVelocity(self.Owner:GetVelocity())
-											self.GrappleAssist:GetPhysicsObject():SetDamping(0,9000)
-											self.GrappleAssist:GetPhysicsObject():SetMaterial("gmod_silent")
-											self.GrappleAssist:SetNoDraw(true)
-											self.GrappleAssist:DrawShadow(false)
-											self.GrappleAssist.NoScav = true
-											self.GrappleAssist.AvgVel = {}
-											--self.GrappleAssist:GetPhysicsObject():SetDragCoefficient(10) --keep it from going too fast
-											self.GrappleAssist:GetPhysicsObject():SetMass(85) --keep it from being wobbly
-										self.Owner:SetMoveType(MOVETYPE_VPHYSICS)
-										self.Owner:SetParent(self.GrappleAssist)
-										self.Owner:SetLocalPos(vector_origin)
-										self.Owner:SetLocalAngles(Angle(0,0,0))
-										local constr,rope = constraint.Elastic(self.GrappleAssist,tr.Entity,0,0,Vector(0,0,72),tr.HitPos-tr.Entity:GetPos(),99999,50,0,"cable/physbeam",0,false)
-										--self.GrappleTargetLength = math.min((self.GrappleAssist:GetPos()+Vector(0,0,72)):Distance(tr.HitPos),150)
-										self.GrappleTargetLength = 200
-										self.GrappleAssistConstraint = constr
-										--self.Owner:SnapEyeAngles(eyeang)
-										--print(constr:GetClass())
-									elseif tr.Hit then
-										self.grapplenohit = true
-										tr.Entity:TakeDamage(10,self.Owner,self)
-										self.ef_grapplebeam = self:CreateToggleEffect("scav_stream_grapplebeam")
-										self.ef_grapplebeam:SetEndPoint(tr.HitPos)
-									else
-										self.grapplenohit = true
-										self.GrappleAssist = NULL
-										self.GrappleTargetLength = 0
-										self.ef_grapplebeam = self:CreateToggleEffect("scav_stream_grapplebeam")
-										self.ef_grapplebeam:SetEndPoint(tr.HitPos)
-									end
-									return false
-								end
+					local tracep = {}
+						tracep.mask = MASK_SHOT
+						tracep.mins = Vector(-8,-8,-8)
+						tracep.maxs = Vector(8,8,8)
+						tracep.start = self.Owner:GetShootPos()
+						tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*1024
+						tracep.filter = self.Owner
+						local tr = util.TraceHull(tracep)
+					self:SetChargeAttack(ScavData.models["models/props_wasteland/cranemagnet01a.mdl"].ChargeAttack,item)
+					if tr.Hit and ((tr.MatType == MAT_METAL) or (tr.MatType == MAT_GRATE)) then
+						if not tr.Entity:IsValid() then
+							tr.Entity = game.GetWorld()
+						end
+						self.ef_grapplebeam = self:CreateToggleEffect("scav_stream_grapplebeam")
+						self.ef_grapplebeam:SetEndPoint(tr.Entity:WorldToLocal(tr.HitPos))
+						self.ef_grapplebeam:SetEndEnt(tr.Entity)
+						local eyeang = self.Owner:EyeAngles()
+						self.GrappleAssist = ents.Create("scav_grappleassist")
+						self.Owner.GrappleAssist = self.GrappleAssist
+							self.GrappleAssist:SetModel("models/props_c17/canister_propane01a.mdl")
+							self.GrappleAssist:SetPos(self.Owner:GetPos())
+							--self.GrappleAssist:SetAngles(self.Owner:GetAngles())
+							self.GrappleAssist:Spawn()
+							self:SetNWFiremodeEnt(self.GrappleAssist)
+							self.GrappleAssist:GetPhysicsObject():SetVelocity(self.Owner:GetVelocity())
+							self.GrappleAssist:GetPhysicsObject():SetDamping(0,9000)
+							self.GrappleAssist:GetPhysicsObject():SetMaterial("gmod_silent")
+							self.GrappleAssist:SetNoDraw(true)
+							self.GrappleAssist:DrawShadow(false)
+							self.GrappleAssist.NoScav = true
+							self.GrappleAssist.AvgVel = {}
+							--self.GrappleAssist:GetPhysicsObject():SetDragCoefficient(10) --keep it from going too fast
+							self.GrappleAssist:GetPhysicsObject():SetMass(85) --keep it from being wobbly
+						self.Owner:SetMoveType(MOVETYPE_VPHYSICS)
+						self.Owner:SetParent(self.GrappleAssist)
+						self.Owner:SetLocalPos(vector_origin)
+						self.Owner:SetLocalAngles(Angle(0,0,0))
+						local constr,rope = constraint.Elastic(self.GrappleAssist,tr.Entity,0,0,Vector(0,0,72),tr.HitPos-tr.Entity:GetPos(),99999,50,0,"cable/physbeam",0,false)
+						--self.GrappleTargetLength = math.min((self.GrappleAssist:GetPos()+Vector(0,0,72)):Distance(tr.HitPos),150)
+						self.GrappleTargetLength = 200
+						self.GrappleAssistConstraint = constr
+						--self.Owner:SnapEyeAngles(eyeang)
+						--print(constr:GetClass())
+					elseif tr.Hit then
+						self.grapplenohit = true
+						tr.Entity:TakeDamage(10,self.Owner,self)
+						self.ef_grapplebeam = self:CreateToggleEffect("scav_stream_grapplebeam")
+						self.ef_grapplebeam:SetEndPoint(tr.HitPos)
+					else
+						self.grapplenohit = true
+						self.GrappleAssist = NULL
+						self.GrappleTargetLength = 0
+						self.ef_grapplebeam = self:CreateToggleEffect("scav_stream_grapplebeam")
+						self.ef_grapplebeam:SetEndPoint(tr.HitPos)
+					end
+					return false
+				end
 			ScavData.CollectFuncs["models/props_wasteland/cranemagnet01a.mdl"] = ScavData.GiveOneOfItemInf
 			ScavData.CollectFuncs["models/infected/smoker.mdl"] = ScavData.CollectFuncs["models/props_wasteland/cranemagnet01a.mdl"]
 			ScavData.CollectFuncs["models/infected/smoker_tongue_attach.mdl"] = ScavData.CollectFuncs["models/infected/smoker.mdl"]
 			else
 				tab.ChargeAttack = function(self,item)
-									local tab = ScavData.models["models/props_wasteland/cranemagnet01a.mdl"]
-										local par = self:GetNWFiremodeEnt()
-										if not self.Owner:KeyDown(IN_ATTACK) then
-											self.Owner:SetAnimation(PLAYER_ATTACK1)
-											self.ChargeAttack = nil
-											--self.WeaponCharge = 0
-											tab.chargeanim = ACT_VM_PRIMARYATTACK
-											if par:IsValid() then
-												self:SetViewLerp(EyeAngles(),0.3)
-												local ang = self:GetAimVector():Angle()
-												ang.r = 0
-												self.Owner:SetEyeAngles(ang)
-											end
-											return 0.25
-										elseif IsValid(par) then
-											--self.WeaponCharge = self.WeaponCharge+0.2
-											tab.chargeanim = ACT_VM_FIDGET
-										else
-											tab.chargeanim = nil
-										end
-										return 0.01
-								end
+				local tab = ScavData.models["models/props_wasteland/cranemagnet01a.mdl"]
+					local par = self:GetNWFiremodeEnt()
+					if not self.Owner:KeyDown(IN_ATTACK) then
+						self.Owner:SetAnimation(PLAYER_ATTACK1)
+						self:SetChargeAttack()
+						--self.WeaponCharge = 0
+						tab.chargeanim = ACT_VM_PRIMARYATTACK
+						if par:IsValid() then
+							self:SetViewLerp(EyeAngles(),0.3)
+							local ang = self:GetAimVector():Angle()
+							ang.r = 0
+							self.Owner:SetEyeAngles(ang)
+						end
+						return 0.25
+					elseif IsValid(par) then
+						--self.WeaponCharge = self.WeaponCharge+0.2
+						tab.chargeanim = ACT_VM_FIDGET
+					else
+						tab.chargeanim = nil
+					end
+					return 0.01
+				end
 				tab.FireFunc = function(self,item)
-					self.ChargeAttack = ScavData.models["models/props_wasteland/cranemagnet01a.mdl"].ChargeAttack
-					self.chargeitem = item
+					self:SetChargeAttack(ScavData.models["models/props_wasteland/cranemagnet01a.mdl"].ChargeAttack,item)
 					return false
 				end
 			end
@@ -2338,47 +2296,47 @@ end
 			tab.Level = 4
 			if SERVER then
 				tab.FireFunc = function(self,item)
-										local proj = self:CreateEnt("scav_projectile_shockwave")
-										proj.Owner = self.Owner
-										proj:SetPos(self:GetProjectileShootPos())
-										--proj:SetPos(self.Owner:GetShootPos()-self:GetAimVector()*15+self:GetAimVector():Angle():Right()*6-self:GetAimVector():Angle():Up()*8)
-										proj:SetAngles(self:GetAimVector():Angle())
-										proj.vel = self:GetAimVector()*2500
-										proj:SetOwner(self.Owner)
-										self.Owner:SetAnimation(PLAYER_ATTACK1)
-										self.Owner:ViewPunch(Angle(math.Rand(-4,-3),math.Rand(-0.1,0.1),0))
-										if item.ammo == "models/props/food_can/food_can.mdl" then  --this one's just for you, Anya
-											local drop = self:GetProjectileShootPos()
-											drop.z = drop.z - 12
-											proj:SetPos(drop)
-											proj.vel = self:GetAimVector()*-250
-											self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-											self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-											self.Owner:EmitSound("npc/antlion_guard/shove1.wav",75,100,0.5,CHAN_WEAPONS,SND_NOFLAGS,0)
-										elseif item.ammo == "models/props/de_inferno/bell_large.mdl" or
-												item.ammo == "models/props/de_inferno/bell_largeb.mdl" or
-												item.ammo == "models/props/de_inferno/bell_small.mdl" or
-												item.ammo == "models/props/de_inferno/bell_smallb.mdl" then
-											self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-											self.Owner:EmitSound("ambient/misc/brass_bell_c.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-											self.Owner:EmitSound("npc/env_headcrabcanister/launch.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-										elseif item.ammo == "models/props_italian/anzio_bell.mdl" then
-											self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-											self.Owner:EmitSound("physics/bigbell.wav",75,100,0.66,CHAN_WEAPONS,SND_NOFLAGS,0)
-											self.Owner:EmitSound("npc/env_headcrabcanister/launch.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-										elseif item.ammo == "models/monastery/bell_large.mdl" then
-											self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-											self.Owner:EmitSound("monastery/bell.wav",75,100,0.66,CHAN_WEAPONS,SND_NOFLAGS,0)
-											self.Owner:EmitSound("npc/env_headcrabcanister/launch.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-										else
-											self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-											self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-											self.Owner:EmitSound("npc/env_headcrabcanister/launch.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
-										end
-										proj:Spawn()
-										return self:TakeSubammo(item,1)
-								end
-				ScavData.CollectFuncs["models/props_lab/citizenradio.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,0) end
+					local proj = self:CreateEnt("scav_projectile_shockwave")
+					proj.Owner = self.Owner
+					proj:SetPos(self:GetProjectileShootPos())
+					--proj:SetPos(self.Owner:GetShootPos()-self:GetAimVector()*15+self:GetAimVector():Angle():Right()*6-self:GetAimVector():Angle():Up()*8)
+					proj:SetAngles(self:GetAimVector():Angle())
+					proj.vel = self:GetAimVector()*2500
+					proj:SetOwner(self.Owner)
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self.Owner:ViewPunch(Angle(math.Rand(-4,-3),math.Rand(-0.1,0.1),0))
+					if item.ammo == "models/props/food_can/food_can.mdl" then  --this one's just for you, Anya
+						local drop = self:GetProjectileShootPos()
+						drop.z = drop.z - 12
+						proj:SetPos(drop)
+						proj.vel = self:GetAimVector()*-250
+						self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+						self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+						self.Owner:EmitSound("npc/antlion_guard/shove1.wav",75,100,0.5,CHAN_WEAPONS,SND_NOFLAGS,0)
+					elseif item.ammo == "models/props/de_inferno/bell_large.mdl" or
+							item.ammo == "models/props/de_inferno/bell_largeb.mdl" or
+							item.ammo == "models/props/de_inferno/bell_small.mdl" or
+							item.ammo == "models/props/de_inferno/bell_smallb.mdl" then
+						self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+						self.Owner:EmitSound("ambient/misc/brass_bell_c.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+						self.Owner:EmitSound("npc/env_headcrabcanister/launch.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+					elseif item.ammo == "models/props_italian/anzio_bell.mdl" then
+						self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+						self.Owner:EmitSound("physics/bigbell.wav",75,100,0.66,CHAN_WEAPONS,SND_NOFLAGS,0)
+						self.Owner:EmitSound("npc/env_headcrabcanister/launch.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+					elseif item.ammo == "models/monastery/bell_large.mdl" then
+						self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+						self.Owner:EmitSound("monastery/bell.wav",75,100,0.66,CHAN_WEAPONS,SND_NOFLAGS,0)
+						self.Owner:EmitSound("npc/env_headcrabcanister/launch.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+					else
+						self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+						self.Owner:EmitSound("ambient/explosions/explode_9.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+						self.Owner:EmitSound("npc/env_headcrabcanister/launch.wav",75,100,0.33,CHAN_WEAPONS,SND_NOFLAGS,0)
+					end
+					proj:Spawn()
+					return self:TakeSubammo(item,1)
+				end
+				ScavData.CollectFuncs["models/props_lab/citizenradio.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,ent:GetSkin()) end
 				ScavData.CollectFuncs["models/props_c17/canister01a.mdl"] = ScavData.CollectFuncs["models/props_lab/citizenradio.mdl"]
 				ScavData.CollectFuncs["models/props_c17/canister02a.mdl"] = ScavData.CollectFuncs["models/props_lab/citizenradio.mdl"]
 				ScavData.CollectFuncs["models/props_wasteland/speakercluster01a.mdl"] = ScavData.CollectFuncs["models/props_lab/citizenradio.mdl"]
@@ -2472,28 +2430,28 @@ end
 			tab.Level = 4
 			if SERVER then
 				tab.FireFunc = function(self,item)
-						local proj = self:CreateEnt("scav_projectile_bio")
-							proj.Owner = self.Owner
-							proj:SetPos(self:GetProjectileShootPos())
-							--proj:SetPos(self.Owner:GetShootPos()-self:GetAimVector()*15+self:GetAimVector():Angle():Right()*6-self:GetAimVector():Angle():Up()*8)
-							proj:SetAngles(self:GetAimVector():Angle())
-							proj.vel = self:GetAimVector()*2500
-							proj.SpeedScale = self:GetForceScale()
-							proj:SetOwner(self.Owner)
-							proj:Spawn()
-						--TODO: Eh, figure this out later
-						--if item.ammo == "models/weapons/c_models/urinejar.mdl" or item.ammo = "models/weapons/c_models/c_xms_urinejar.mdl" then
-						--	proj:SetMaterial("models/shiny")
-						--	proj:SetColor(240,220,50,255)
-						--end
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						self.Owner:ViewPunch(Angle(math.Rand(-4,-3),math.Rand(-0.1,0.1),0))
-						return self:TakeSubammo(item,1)
-					end
+					local proj = self:CreateEnt("scav_projectile_bio")
+						proj.Owner = self.Owner
+						proj:SetPos(self:GetProjectileShootPos())
+						--proj:SetPos(self.Owner:GetShootPos()-self:GetAimVector()*15+self:GetAimVector():Angle():Right()*6-self:GetAimVector():Angle():Up()*8)
+						proj:SetAngles(self:GetAimVector():Angle())
+						proj.vel = self:GetAimVector()*2500
+						proj.SpeedScale = self:GetForceScale()
+						proj:SetOwner(self.Owner)
+						proj:Spawn()
+					--TODO: Eh, figure this out later
+					--if item.ammo == "models/weapons/c_models/urinejar.mdl" or item.ammo = "models/weapons/c_models/c_xms_urinejar.mdl" then
+					--	proj:SetMaterial("models/shiny")
+					--	proj:SetColor(240,220,50,255)
+					--end
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self.Owner:ViewPunch(Angle(math.Rand(-4,-3),math.Rand(-0.1,0.1),0))
+					return self:TakeSubammo(item,1)
+				end
 				ScavData.CollectFuncs["models/zombie/poison.mdl"] = function(self,ent)
-										self:AddItem("models/headcrabblack.mdl",1,0,ent:GetBodygroup(1)+ent:GetBodygroup(2)+ent:GetBodygroup(3)+ent:GetBodygroup(4))
-										self:AddItem("models/zombie/poison.mdl",1,0,1)
-					end
+					self:AddItem("models/headcrabblack.mdl",1,0,ent:GetBodygroup(1)+ent:GetBodygroup(2)+ent:GetBodygroup(3)+ent:GetBodygroup(4))
+					self:AddItem("models/zombie/poison.mdl",1,0,1)
+				end
 				ScavData.CollectFuncs["models/player/corpse1.mdl"] = function(self,ent) self:AddItem("models/humans/corpse1.mdl",1,0,1) end --playermodel conversion
 				--CSS
 				ScavData.CollectFuncs["models/props/de_train/biohazardtank.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),5,ent:GetSkin()) end
@@ -2515,10 +2473,10 @@ end
 					if IsMounted(550) then --L4D2
 						self:AddItem("models/w_models/weapons/w_eq_bile_flask.mdl",1,0,3) --three boomer biles from a boomer/boomette
 					else
-						self:AddItem("models/infected/boomer.mdl",1,0,3)
+						self:AddItem(ScavData.FormatModelname(ent:GetModel()),1,0,3)
 					end
 				end
-				ScavData.CollectFuncs["models/props_debris/dead_cow_smallpile.mdl"] = function(self,ent) self:AddItem("models/props_debris/dead_cow.mdl",1,ent:GetSkin(),4) end --three boomer biles from a boomer/boomette
+				ScavData.CollectFuncs["models/props_debris/dead_cow_smallpile.mdl"] = function(self,ent) self:AddItem("models/props_debris/dead_cow.mdl",1,ent:GetSkin(),4) end
 				ScavData.CollectFuncs["models/infected/boomer_l4d1.mdl"] = ScavData.CollectFuncs["models/infected/boomer.mdl"]
 				ScavData.CollectFuncs["models/infected/boomette.mdl"] = ScavData.CollectFuncs["models/infected/boomer.mdl"]
 				ScavData.CollectFuncs["models/props_urban/outhouse001.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),3,ent:GetSkin()) end
@@ -2727,7 +2685,6 @@ end
 					tab.fov = 90
 				end
 				self:SetZoomed(false)
-				print(tab.fov,tostring(self:GetZoomed()))
 				hook.Remove("AdjustMouseSensitivity","ScavZoomedIn")
 			end
 			tab.Cooldown = 0.25
@@ -2953,7 +2910,7 @@ end
 						if SERVER then
 							self.soundloops.showerrun:Stop()
 							self.Owner:EmitSound("ambient/water/rain_drip"..math.floor(math.Rand(1,5))..".wav",75,100,0.5)
-							self.ChargeAttack = nil
+							self:SetChargeAttack()
 							self:SetBarrelRestSpeed(0)
 						else
 							hook.Remove( "RenderScreenspaceEffects", "ScavDrips")
@@ -2965,8 +2922,7 @@ end
 					end
 				end
 				tab.FireFunc = function(self,item)
-					self.ChargeAttack = ScavData.models["models/props_wasteland/shower_system001a.mdl"].ChargeAttack
-					self.chargeitem = item
+					self:SetChargeAttack(ScavData.models["models/props_wasteland/shower_system001a.mdl"].ChargeAttack,item)
 					if SERVER then
 						self.Owner:EmitSound("buttons/lever2.wav")
 						self.soundloops.showerrun = CreateSound(self.Owner,"ambient/water/water_run1.wav")
@@ -3290,7 +3246,11 @@ PrecacheParticleSystem("scav_exp_plasma")
 				tab.proj:SetPiercing(false)
 				tab.proj:SetGravity(vector_origin)
 				tab.proj:SetMask(MASK_SHOT)
-				tab.OnArmed = DoChargeSound
+				tab.OnArmed = function(self,item,olditemname)
+					if item.ammo ~= olditemname then
+						self.Owner:EmitSound("weapons/scav_gun/chargeup.wav")
+					end
+				end
 			end
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
@@ -3323,14 +3283,13 @@ PrecacheParticleSystem("scav_exp_plasma")
 				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
 				if not continuefiring then
 					if SERVER then
-						self.ChargeAttack = nil
+						self:SetChargeAttack()
 					end
 				end
 				return 0.1
 			end
 			tab.FireFunc = function(self,item)
-				self.ChargeAttack = ScavData.models["models/items/car_battery01.mdl"].ChargeAttack
-				self.chargeitem = item							
+				self:SetChargeAttack(ScavData.models["models/items/car_battery01.mdl"].ChargeAttack,item)
 				return false
 			end
 			if SERVER then
@@ -3453,14 +3412,13 @@ PrecacheParticleSystem("scav_exp_plasma")
 				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
 				if not continuefiring then
 					if SERVER then
-						self.ChargeAttack = nil
+						self:SetChargeAttack()
 					end
 				end
 				return 0.1
 			end
 			tab.FireFunc = function(self,item)
-				self.ChargeAttack = ScavData.models["models/weapons/w_models/w_syringegun.mdl"].ChargeAttack
-				self.chargeitem = item							
+				self:SetChargeAttack(ScavData.models["models/weapons/w_models/w_syringegun.mdl"].ChargeAttack,item)
 				return false
 			end
 			if SERVER then
@@ -3645,20 +3603,20 @@ PrecacheParticleSystem("scav_exp_plasma")
 			}
 		
 		local firecredit = function(ent,dmginfo)
-				local inflictor = dmginfo:GetInflictor()
-				local attacker = dmginfo:GetAttacker()
-				local amount = dmginfo:GetDamage()
-				if attacker:IsValid() and (attacker == inflictor) then
-					if ((attacker:GetClass() == "entityflame") and ent.ignitedby and ent.ignitedby:IsValid()) then
-						dmginfo:SetInflictor(attacker)
-						dmginfo:SetAttacker(ent.ignitedby)
-					end
-					if creditfix[attacker:GetClass()] and attacker.thrownby and attacker.thrownby:IsValid() then
-						dmginfo:SetInflictor(attacker)
-						dmginfo:SetAttacker(attacker.thrownby)
-					end
+			local inflictor = dmginfo:GetInflictor()
+			local attacker = dmginfo:GetAttacker()
+			local amount = dmginfo:GetDamage()
+			if attacker:IsValid() and (attacker == inflictor) then
+				if ((attacker:GetClass() == "entityflame") and ent.ignitedby and ent.ignitedby:IsValid()) then
+					dmginfo:SetInflictor(attacker)
+					dmginfo:SetAttacker(ent.ignitedby)
+				end
+				if creditfix[attacker:GetClass()] and attacker.thrownby and attacker.thrownby:IsValid() then
+					dmginfo:SetInflictor(attacker)
+					dmginfo:SetAttacker(attacker.thrownby)
 				end
 			end
+		end
 		hook.Add("EntityTakeDamage","GiveFireCredit",firecredit)
 		
 
@@ -3711,28 +3669,28 @@ PrecacheParticleSystem("scav_exp_plasma")
 			if SERVER then
 				local proj = GProjectile()
 				local function callback(self,tr)
-								local ent = tr.Entity
-								if ent and ent:IsValid() and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
-									ent:Ignite(5,0)
-									ent.ignitedby = self.Owner
-									local dmg = DamageInfo()
-									dmg:SetDamage((self.deathtime-CurTime())*7)
-									dmg:SetDamageForce(tr.Normal*30)
-									dmg:SetDamagePosition(tr.HitPos)
-									if self:GetOwner():IsValid() then
-										dmg:SetAttacker(self:GetOwner())
-									end
-									if self:GetInflictor():IsValid() then
-										dmg:SetInflictor(self:GetInflictor())
-									end
-									dmg:SetDamageType(DMG_DIRECT)
-									ent:TakeDamageInfo(dmg)
-								end
-								if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer") then
-									return false
-								end
-								return true
-							end
+					local ent = tr.Entity
+					if ent and ent:IsValid() and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
+						ent:Ignite(5,0)
+						ent.ignitedby = self.Owner
+						local dmg = DamageInfo()
+						dmg:SetDamage((self.deathtime-CurTime())*7)
+						dmg:SetDamageForce(tr.Normal*30)
+						dmg:SetDamagePosition(tr.HitPos)
+						if self:GetOwner():IsValid() then
+							dmg:SetAttacker(self:GetOwner())
+						end
+						if self:GetInflictor():IsValid() then
+							dmg:SetInflictor(self:GetInflictor())
+						end
+						dmg:SetDamageType(DMG_DIRECT)
+						ent:TakeDamageInfo(dmg)
+					end
+					if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer") then
+						return false
+					end
+					return true
+				end
 				proj:SetCallback(callback)
 				proj:SetBBox(Vector(-7,-7,-7),Vector(7,7,7))
 				proj:SetPiercing(true)
@@ -4974,69 +4932,68 @@ PrecacheParticleSystem("scav_exp_plasma")
 			tracep.mask = MASK_SHOT
 			tracep.mins = Vector(-2,-2,-2)
 			tracep.maxs = Vector(2,2,2)
-				tab.ChargeAttack = function(self,item)
-					local shootpos = self.Owner:GetShootPos()
-					tracep.start = shootpos
-					tracep.filter = self.Owner
-					for i=1,2 do
-						tracep.endpos = shootpos+(self:GetAimVector()+VectorRand()*0.075):GetNormalized()*400
-						local tr = util.TraceHull(tracep)
-						if tr.Hit then
-							ParticleEffect("scav_exp_phazon_1",tr.HitPos,refangle,Entity(0))
+			tab.ChargeAttack = function(self,item)
+				local shootpos = self.Owner:GetShootPos()
+				tracep.start = shootpos
+				tracep.filter = self.Owner
+				for i=1,2 do
+					tracep.endpos = shootpos+(self:GetAimVector()+VectorRand()*0.075):GetNormalized()*400
+					local tr = util.TraceHull(tracep)
+					if tr.Hit then
+						ParticleEffect("scav_exp_phazon_1",tr.HitPos,refangle,Entity(0))
+					end
+					if tr.Entity:IsValid() then
+						dmg:SetAttacker(self.Owner)
+						dmg:SetInflictor(self)
+						dmg:SetDamagePosition(tr.HitPos)
+						if string.find(tr.Entity:GetClass(),"npc_antlion") then
+							dmg:SetDamageType(bit.bor(DMG_BUCKSHOT,DMG_ALWAYSGIB)) --TODO: figure out what god damn combination of damage types make all the different types of antlions die how they're supposed to
+						else
+							dmg:SetDamageType(bit.bor(DMG_ENERGYBEAM,DMG_RADIATION,DMG_BLAST,DMG_GENERIC,DMG_ALWAYSGIB,DMG_DISSOLVE))
 						end
-						if tr.Entity:IsValid() then
-							dmg:SetAttacker(self.Owner)
-							dmg:SetInflictor(self)
-							dmg:SetDamagePosition(tr.HitPos)
-							if string.find(tr.Entity:GetClass(),"npc_antlion") then
-								dmg:SetDamageType(bit.bor(DMG_BUCKSHOT,DMG_ALWAYSGIB)) --TODO: figure out what god damn combination of damage types make all the different types of antlions die how they're supposed to
-							else
-								dmg:SetDamageType(bit.bor(DMG_ENERGYBEAM,DMG_RADIATION,DMG_BLAST,DMG_GENERIC,DMG_ALWAYSGIB,DMG_DISSOLVE))
-							end
-							dmg:SetDamage(4)
-							dmg:SetDamageForce(tr.Normal*24000)
-							if tr.Entity:IsNPC() and SERVER then
-								--tr.Entity:SetSchedule(SCHED_BIG_FLINCH)
-								tr.Entity:SetSchedule(SCHED_FLINCH_PHYSICS)
-							end
-							if tr.Entity:GetClass() == "prop_ragdoll" then
-								for i=0,tr.Entity:GetPhysicsObjectCount()-1 do
-									local phys = tr.Entity:GetPhysicsObjectNum(i)
-									if phys then
-										phys:SetVelocity(VectorRand()*math.random(3,90))
-									end
+						dmg:SetDamage(4)
+						dmg:SetDamageForce(tr.Normal*24000)
+						if tr.Entity:IsNPC() and SERVER then
+							--tr.Entity:SetSchedule(SCHED_BIG_FLINCH)
+							tr.Entity:SetSchedule(SCHED_FLINCH_PHYSICS)
+						end
+						if tr.Entity:GetClass() == "prop_ragdoll" then
+							for i=0,tr.Entity:GetPhysicsObjectCount()-1 do
+								local phys = tr.Entity:GetPhysicsObjectNum(i)
+								if phys then
+									phys:SetVelocity(VectorRand()*math.random(3,90))
 								end
 							end
-							if SERVER then tr.Entity:TakeDamageInfo(dmg) end
 						end
+						if SERVER then tr.Entity:TakeDamageInfo(dmg) end
 					end
-					
-						local edata = EffectData()
-						edata:SetOrigin(self.Owner:GetShootPos())
-						edata:SetEntity(self.Owner)
-						edata:SetNormal(self:GetAimVector())
-						util.Effect("ef_scav_phazon",edata)
-						util.Effect("ef_scav_phazon",edata)
-						if SERVER then
-							self.Owner:EmitSound("weapons/physcannon/energy_sing_flyby"..math.random(1,2)..".wav",100,255)
-							self:TakeSubammo(item,1)
-						else
-							local vmdl = self.Owner:GetViewModel()
-							if vmdl:IsValid() then
-								ParticleEffectAttach("scav_vm_phazon",PATTACH_POINT_FOLLOW,vmdl,vmdl:LookupAttachment("muzzle"))
-							end
-						end
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						self:ProcessLinking(item)
-						self:StopChargeOnRelease()
-						return 0.025		
-					end
-				tab.FireFunc = function(self,item)
-					self.chargeitem = item
-					self.ChargeAttack = ScavData.models["models/dav0r/hoverball.mdl"].ChargeAttack
-					self.Owner:EmitSound("ambient/fire/gascan_ignite1.wav",100,90)
-					return false
 				end
+				
+					local edata = EffectData()
+					edata:SetOrigin(self.Owner:GetShootPos())
+					edata:SetEntity(self.Owner)
+					edata:SetNormal(self:GetAimVector())
+					util.Effect("ef_scav_phazon",edata)
+					util.Effect("ef_scav_phazon",edata)
+					if SERVER then
+						self.Owner:EmitSound("weapons/physcannon/energy_sing_flyby"..math.random(1,2)..".wav",100,255)
+						self:TakeSubammo(item,1)
+					else
+						local vmdl = self.Owner:GetViewModel()
+						if vmdl:IsValid() then
+							ParticleEffectAttach("scav_vm_phazon",PATTACH_POINT_FOLLOW,vmdl,vmdl:LookupAttachment("muzzle"))
+						end
+					end
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:ProcessLinking(item)
+					self:StopChargeOnRelease()
+					return 0.025		
+				end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(ScavData.models["models/dav0r/hoverball.mdl"].ChargeAttack,item)
+				self.Owner:EmitSound("ambient/fire/gascan_ignite1.wav",100,90)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/dav0r/hoverball.mdl"] = ScavData.GiveOneOfItemInf
 				--ScavData.CollectFuncs["models/props_trainstation/payphone001a.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),80,ent:GetSkin(),1) end
@@ -5102,34 +5059,33 @@ PrecacheParticleSystem("scav_exp_plasma")
 					end
 				end
 				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
-							if not continuefiring then
-								if SERVER then
-									self.soundloops.minigunfire:Stop()
-									self.soundloops.minigunspin:Stop()
-									self.Owner:EmitSound("weapons/minigun_wind_down.wav")
-									self.ChargeAttack = nil
-									self:SetBarrelRestSpeed(0)
-								end
-								return 2
-							else
-								if SERVER then
-									self.soundloops.minigunfire:Play()
-									self.soundloops.minigunspin:Play()
-								end
-								return 0.05
-							end
-						end
+				if not continuefiring then
+					if SERVER then
+						self.soundloops.minigunfire:Stop()
+						self.soundloops.minigunspin:Stop()
+						self.Owner:EmitSound("weapons/minigun_wind_down.wav")
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+					return 2
+				else
+					if SERVER then
+						self.soundloops.minigunfire:Play()
+						self.soundloops.minigunspin:Play()
+					end
+					return 0.05
+				end
+			end
 			tab.FireFunc = function(self,item)
-								self.ChargeAttack = ScavData.models["models/weapons/w_models/w_minigun.mdl"].ChargeAttack
-								self.chargeitem = item
-								if SERVER then
-									self.Owner:EmitSound("weapons/minigun_wind_up.wav")
-									self.soundloops.minigunspin = CreateSound(self.Owner,"weapons/minigun_spin.wav")
-									self.soundloops.minigunfire = CreateSound(self.Owner,"weapons/minigun_shoot.wav")
-									self:SetBarrelRestSpeed(900)	
-								end								
-								return false
-							end
+				self:SetChargeAttack(ScavData.models["models/weapons/w_models/w_minigun.mdl"].ChargeAttack,item)
+				if SERVER then
+					self.Owner:EmitSound("weapons/minigun_wind_up.wav")
+					self.soundloops.minigunspin = CreateSound(self.Owner,"weapons/minigun_spin.wav")
+					self.soundloops.minigunfire = CreateSound(self.Owner,"weapons/minigun_shoot.wav")
+					self:SetBarrelRestSpeed(900)	
+				end								
+				return false
+			end
 			if SERVER then
 				--TF2
 				ScavData.CollectFuncs["models/weapons/w_models/w_minigun.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),200,ent:GetSkin()) end

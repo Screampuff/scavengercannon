@@ -107,43 +107,57 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.p90"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			local bullet = {}
-				bullet.Num = 1
-				bullet.BaseSpread = Vector(0.045,0.045,0)
-				bullet.Tracer = 1
-				bullet.Force = 5
-				bullet.Damage = 26
-				bullet.TracerName = "ef_scav_tr_b"
-			tab.FireFunc = function(self,item)
-				self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
-				bullet.Src = self.Owner:GetShootPos()
-				bullet.Dir = self:GetAimVector()
-				bullet.Spread = self:GetAccuracyModifiedCone(bullet.BaseSpread)
-				self.Owner:FireBullets(bullet)
-				self.Owner:SetAnimation(PLAYER_ATTACK1)
-				if SERVER then
-					self.Owner:EmitSound("Weapon_P90.Single")
-					self:AddBarrelSpin(300)
-				else
-					timer.Simple(.025,function() 
-						local ef = EffectData()
-						local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-						if attach then
-							ef:SetOrigin(attach.Pos)
-							ef:SetAngles(attach.Ang)
-							ef:SetFlags(75) --velocity
-							util.Effect("EjectBrass_57",ef)
-						end
-					end)
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
+						bullet.Num = 1
+						bullet.AccuracyOffset = Vector(0.045,0.045,0)
+						bullet.Tracer = 1
+						bullet.Force = 5
+						bullet.Damage = 26
+						bullet.TracerName = "ef_scav_tr_b"
+						bullet.Src = self.Owner:GetShootPos()
+						bullet.Dir = self:GetAimVector()
+						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
+					self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/175,0.1)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_P90.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_57",ef)
+							end
+						end)
+					end
 				end
-				self:AddInaccuracy(1/175,0.1)
-				self:MuzzleFlash2()
-				if SERVER then return self:TakeSubammo(item,1) end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.07
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
 			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_smg_p90.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
 			end
-			tab.Cooldown = 0.07
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_smg_p90.mdl")
 
 --[[==============================================================================================
@@ -154,46 +168,59 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.ak47"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.035,0.035,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 36
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.3,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_AK47.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_762Nato",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/200,0.125)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.3,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/200,0.125)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_AK47.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_762Nato",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.1
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_rif_ak47.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),25,0) end
 				--L4D2
 				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_ak47.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),40,0) end
 			end
-			tab.Cooldown = 0.1
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_ak47.mdl")
 		--L4D2
 		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_rifle_ak47.mdl")
@@ -206,44 +233,57 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.aug"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.03,0.03,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 32
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.3,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_AUG.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_556",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/215,0.125)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.3,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/215,0.125)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_AUG.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_556",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.09
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_rif_aug.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 			end
-			tab.Cooldown = 0.09
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_aug.mdl")
 
 --[[==============================================================================================
@@ -424,44 +464,57 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.famas"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.03,0.03,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 30
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_FAMAS.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_556",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/215,0.125)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/215,0.125)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_FAMAS.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_556",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.09
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_rif_famas.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),25,0) end
 			end
-			tab.Cooldown = 0.09
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_famas.mdl")
 
 --[[==============================================================================================
@@ -520,49 +573,58 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.galil"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.035,0.035,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 30
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_Galil.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_556",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/200,0.125)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/200,0.125)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_Galil.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_556",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.09
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_rif_galil.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),35,0) end
-				--DoD:S
-				ScavData.CollectFuncs["models/weapons/w_bar.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),20,0) end
 			end
-			tab.Cooldown = 0.09
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_galil.mdl")
-		--DoD:S
-		ScavData.RegisterFiremode(tab,"models/weapons/w_bar.mdl")
 
 --[[==============================================================================================
 	--Glock
@@ -668,46 +730,59 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m4a1"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.03,0.03,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 33
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_M4A1.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_556",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/220,0.1)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/220,0.1)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_M4A1.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_556",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.09
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_rif_m4a1.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 				--L4D
 				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_m16a2.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
 			end
-			tab.Cooldown = 0.09
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_m4a1.mdl")
 		--L4D
 		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_rifle_m16a2.mdl")
@@ -720,44 +795,57 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m4a1sil"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.03,0.03,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 33
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						--self:MuzzleFlash2() --no flash on silenced weapon!
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_M4A1.Silenced")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_556",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/220,0.1)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					self.Owner:FireBullets(bullet)
+					--self:MuzzleFlash2() --no flash on silenced weapon!
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/220,0.1)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_M4A1.Silenced")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_556",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.09
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_rif_m4a1_silencer.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 			end
-			tab.Cooldown = 0.09
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_m4a1_silencer.mdl")
 
 --[[==============================================================================================
@@ -768,48 +856,61 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m249"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.04,0.04,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 32
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_M249.Single")
-							self:AddBarrelSpin(300)
-							self:SetBlockPoseInstant(1,4)
-							self:SetPanelPoseInstant(0.25,2)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(85) --velocity
-									util.Effect("EjectBrass_556",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/175,0.09)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/175,0.09)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_M249.Single")
+						self:AddBarrelSpin(300)
+						self:SetBlockPoseInstant(1,4)
+						self:SetPanelPoseInstant(0.25,2)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(85) --velocity
+								util.Effect("EjectBrass_556",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.08
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_mach_m249para.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),100,0) end
 				--L4D2
 				ScavData.CollectFuncs["models/w_models/weapons/w_m60.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),150,0) end
 			end
-			tab.Cooldown = 0.08
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_mach_m249para.mdl")
 		--L4D2
 		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_m60.mdl")
@@ -822,47 +923,60 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.mac10"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.06,0.06,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 29
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_MAC10.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_9mm",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/200,0.165)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/200,0.165)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_MAC10.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_9mm",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.075
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_smg_mac10.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 				--L4D/2
 				ScavData.CollectFuncs["models/w_models/weapons/w_smg_uzi.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
 				ScavData.CollectFuncs["models/w_models/weapons/w_smg_a.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
 			end
-			tab.Cooldown = 0.075
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_smg_mac10.mdl")
 		--L4D/2
 		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_smg_uzi.mdl")
@@ -876,46 +990,59 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.mp5"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.045,0.045,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 26
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-1,math.Rand(-0.2,0.2),0),0.1,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_MP5Navy.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_9mm",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/220,0.075)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-1,math.Rand(-0.2,0.2),0),0.1,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/220,0.075)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_MP5Navy.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_9mm",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.08
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_smg_mp5.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 				--L4D2
 				ScavData.CollectFuncs["models/w_models/weapons/w_smg_mp5.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
 			end
-			tab.Cooldown = 0.08
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_smg_mp5.mdl")
 		--L4D2
 		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_smg_mp5.mdl")
@@ -1033,44 +1160,58 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.sg550"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
-						bullet.Spread = Vector(0.0,0.0,0)
+						bullet.AccuracyOffset = Vector(0.0,0.0,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 70
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_SG550.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_556",ef)
-								end
-							end)
-						end
-						if SERVER then return self:TakeSubammo(item,1) end
+						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
+					self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_SG550.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_556",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.25
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_snip_sg550.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 				--L4D2
 				ScavData.CollectFuncs["models/w_models/weapons/w_sniper_military.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 			end
-			tab.Cooldown = 0.25
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_snip_sg550.mdl")
 		--L4D2
 		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_sniper_military.mdl")
@@ -1083,46 +1224,59 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.sg552"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.03,0.03,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 33
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_SG552.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_556",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/220,0.1)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/220,0.1)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_SG552.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_556",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.09
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_rif_sg552.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 				--L4D2
 				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_sg552.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
 			end
-			tab.Cooldown = 0.09
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_sg552.mdl")
 		--L4D2
 		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_rifle_sg552.mdl")
@@ -1135,44 +1289,57 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.tmp"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.055,0.055,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 26
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						--self:MuzzleFlash2() --no flash on silenced weapon!
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_TMP.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_9mm",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/200,0.14)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					self.Owner:FireBullets(bullet)
+					--self:MuzzleFlash2() --no flash on silenced weapon!
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/200,0.14)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_TMP.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_9mm",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.07
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_smg_tmp.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
 			end
-			tab.Cooldown = 0.07
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_smg_tmp.mdl")
 
 --[[==============================================================================================
@@ -1183,44 +1350,57 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.ump45"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
-			
-				local bullet = {}
+			tab.ChargeAttack = function(self,item)
+				if self.Owner:KeyDown(IN_ATTACK) then
+					local bullet = {}
 						bullet.Num = 1
 						bullet.AccuracyOffset = Vector(0.055,0.055,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 26
 						bullet.TracerName = "ef_scav_tr_b"
-				tab.FireFunc = function(self,item)
-						self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-						self.Owner:FireBullets(bullet)
-						self:MuzzleFlash2()
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						if SERVER then
-							self.Owner:EmitSound("Weapon_UMP45.Single")
-							self:AddBarrelSpin(300)
-						else
-							timer.Simple(.025,function() 
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									ef:SetFlags(75) --velocity
-									util.Effect("EjectBrass_9mm",ef)
-								end
-							end)
-						end
-						self:AddInaccuracy(1/210,0.1)
-						if SERVER then return self:TakeSubammo(item,1) end
+					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
+					self.Owner:FireBullets(bullet)
+					self:MuzzleFlash2()
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self:AddInaccuracy(1/210,0.1)
+					if SERVER then
+						self.Owner:EmitSound("Weapon_UMP45.Single")
+						self:AddBarrelSpin(300)
+						self:TakeSubammo(item,1)
+					else
+						timer.Simple(.025,function()
+							local ef = EffectData()
+							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+							if attach then
+								ef:SetOrigin(attach.Pos)
+								ef:SetAngles(attach.Ang)
+								ef:SetFlags(75) --velocity
+								util.Effect("EjectBrass_9mm",ef)
+							end
+						end)
 					end
+				end
+				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
+				if not continuefiring then
+					if SERVER then
+						self:SetChargeAttack()
+						self:SetBarrelRestSpeed(0)
+					end
+				end
+				return 0.105
+			end
+			tab.FireFunc = function(self,item)
+				self:SetChargeAttack(tab.ChargeAttack,item)
+				return false
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_smg_ump45.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),25,0) end
 			end
-			tab.Cooldown = 0.105
+			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_smg_ump45.mdl")
 
 --[[==============================================================================================
@@ -1427,7 +1607,7 @@ local eject = "brass"
 					
 
 					if (item.subammo <= 0) or (item.shotsleft <= 0) then
-						self.ChargeAttack = nil
+						self:SetChargeAttack()
 						if item.subammo <= 0 then
 							item:Remove()
 						end
@@ -1437,8 +1617,7 @@ local eject = "brass"
 				end
 				tab.FireFunc = function(self,item)
 					item.shotsleft = 3
-					self.ChargeAttack = ScavData.models["models/w_models/weapons/w_desert_rifle.mdl"].ChargeAttack
-					self.chargeitem = item
+					self:SetChargeAttack(ScavData.models["models/w_models/weapons/w_desert_rifle.mdl"].ChargeAttack,item)
 					return false
 				end
 			if SERVER then
