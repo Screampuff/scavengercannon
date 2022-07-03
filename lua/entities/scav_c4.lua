@@ -13,12 +13,12 @@ function ENT:Arm(seconds)
 	self:SetArmTime(CurTime())
 	self:SetDetonateTime(self:GetArmTime()+seconds)
 	self:SetArmed(true)
-	self:SetNoScav(true)
+	self.NoScav = true
 end
 
 function ENT:Disarm()
 	self:SetArmed(false)
-	self:SetNoScav(false)
+	self.NoScav = false
 end
 
 if SERVER then

@@ -85,11 +85,11 @@ function SWEP:DetachFromWaypointPath()
 end
 
 function SWEP:AddAmmo(amt)
-	self:SetAmmo(math.min(self:GetAmmo()+amt,self:GetMaxAmmo()))
+	self:SetNWAmmo(math.min(self:GetNWAmmo()+amt,self:GetNWMaxAmmo()))
 end
 
 function SWEP:CheckCanScav(ent)
-	if (self:GetAmmo() < self:GetMaxAmmo()) and self.Owner:CanScavPickup(ent) then
+	if (self:GetNWAmmo() < self:GetNWMaxAmmo()) and self.Owner:CanScavPickup(ent) then
 		return true
 	end
 	return false

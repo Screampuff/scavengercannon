@@ -251,7 +251,7 @@ if CLIENT then
 		
 		local item = self:GetCurrentItem() --the item we're going to use to fire
 		
-		if item and ScavData.models[item.ammo] and ScavData.models[item.ammo].Level > self:GetLevel() then
+		if item and ScavData.models[item.ammo] and ScavData.models[item.ammo].Level > self:GetNWLevel() then
 			self:SendWeaponAnim(ACT_VM_FIDGET)
 			self:SetNextPrimaryFire(shoottime + 2)
 			self:SetSeqEndTime(shoottime + 1)

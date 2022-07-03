@@ -16,7 +16,7 @@ PrecacheParticleSystem("scav_proxmine_red")
 PrecacheParticleSystem("scav_proxmine_red_colorblind")
 
 function ENT:SetupDataTables()
-	self:NetworkVar("Int",0,"State")
+	self:NetworkVar("Int",0,"AlertState")
 	self:NetworkVar("Bool",0,"Sticky")
 	self:NetworkVar("Bool",1,"Silent")
 	self:NetworkVar("Bool",2,"ShowRings")
@@ -150,10 +150,10 @@ if SERVER then
 
 	function ENT:SetState(state)
 
-		if state ~= self:GetState() then
+		if state ~= self:GetAlertState() then
 		
 			self:StopParticles()
-			self:SetState(state)
+			self:SetAlertState(state)
 			
 			if state == 1 then --friendly
 			

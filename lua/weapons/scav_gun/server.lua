@@ -59,7 +59,7 @@ if SERVER then
 	function SWEP:EquipAmmo(pl)
 		local wep = pl:GetWeapon("scav_gun")
 		if wep:IsValid() then
-			wep:SetLevel(math.max(self:GetLevel(),wep:GetLevel()))
+			wep:SetNWLevel(math.max(self:GetNWLevel(),wep:GetNWLevel()))
 		end
 	end
 
@@ -76,7 +76,7 @@ if SERVER then
 	
 	function SWEP:OwnerChanged()
 		if IsValid(self.Owner) then
-			self:SetLevel(math.max(self.Owner:GetPlayerScavLevel(), self:GetLevel()))
+			self:SetNWLevel(math.max(self.Owner:GetPlayerScavLevel(), self:GetNWLevel()))
 			self:AssignInventory()
 		end
 	end
@@ -629,7 +629,7 @@ if SERVER then
 			
 			local item = self:GetCurrentItem()
 			
-			if ScavData.models[item.ammo] and ScavData.models[item.ammo].Level > self:GetLevel() then
+			if ScavData.models[item.ammo] and ScavData.models[item.ammo].Level > self:GetNWLevel() then
 				self.Owner:EmitSound("vehicles/APC/apc_shutdown.wav",80)
 				self:SendWeaponAnim(ACT_VM_FIDGET)
 				self:SetNextPrimaryFire(shoottime + 2)

@@ -66,7 +66,7 @@ function SWEP:SetupDataTables()
 
 	self:NetworkVar("Int", 0, 	"Capacity")
 	self:NetworkVar("Int", 1, 	"MaxExplosives")
-	self:NetworkVar("Int", 2, 	"Level")
+	self:NetworkVar("Int", 2, 	"NWLevel")
 	self:NetworkVar("Float", 0, 	"CooldownScale")
 	self:NetworkVar("Float", 1, 	"ForceScale")
 	self:NetworkVar("Float", 2, 	"BarrelSpinSpeed")
@@ -83,7 +83,7 @@ function SWEP:SetupDataTables()
 	self:SetForceScale(1)
 	
 	if SERVER then
-		self:SetLevel(self.StartLevel or 9)
+		self:SetNWLevel(self.StartLevel or 9)
 		SWEP.StartLevel = nil
 	end
 	
