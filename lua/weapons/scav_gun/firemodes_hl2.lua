@@ -415,26 +415,26 @@ local eject = "brass"
 			tab.Level = 1
 			if SERVER then
 				tab.antlionfriend =	function(ent) 
-										if ent:IsValid() and (ent:GetClass() == "npc_antlion") then
-											for k,v in ipairs(player.GetAll()) do
-												if v:GetWeapon("scav_gun"):IsValid() then
-													local hate = true
-													for i,j in ipairs(v:GetWeapon("scav_gun").inv.items) do													
-														if j.ammo == "models/weapons/w_bugbait.mdl" then
-															ent:AddEntityRelationship(v,D_LI,999)
-															--print(ent.." should like "..v.."...")
-															hate = false
-															break
-														end
-													end
-													if hate then
-														--print(ent.." should hate "..v.."...")
-														ent:AddEntityRelationship(v,D_HT,99)
-													end
-												end
-											end
-										end
+					if ent:IsValid() and (ent:GetClass() == "npc_antlion") then
+						for k,v in ipairs(player.GetAll()) do
+							if v:GetWeapon("scav_gun"):IsValid() then
+								local hate = true
+								for i,j in ipairs(v:GetWeapon("scav_gun").inv.items) do
+									if j.ammo == "models/weapons/w_bugbait.mdl" then
+										ent:AddEntityRelationship(v,D_LI,999)
+										--print(ent.." should like "..v.."...")
+										hate = false
+										break
 									end
+								end
+								if hate then
+									--print(ent.." should hate "..v.."...")
+									ent:AddEntityRelationship(v,D_HT,99)
+								end
+							end
+						end
+					end
+				end
 				tab.allantlions = function() for l,m in ipairs(ents.FindByClass("npc_antlion")) do ScavData.models["models/weapons/w_bugbait.mdl"].antlionfriend(m) end end
 				tab.PostRemove = tab.allantlions
 				tab.FireFunc = function(self,item)
@@ -474,90 +474,89 @@ local eject = "brass"
 			tab.vmax = Vector(8,8,8)
 			if SERVER then
 				tab.FireFunc = function(self,item)
-				
-										local tr = self.Owner:GetEyeTraceNoCursor()
-										local tab = ScavData.models[item.ammo]
-										if not tr.Entity or not tr.Entity:IsValid() then
-											local tracep = {}
-												tracep.start = self.Owner:GetShootPos()
-												tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*850
-												tracep.filter = self.Owner
-												tracep.mask = MASK_SHOT
-												tracep.mins = tab.vmin
-												tracep.maxs = tab.vmax
-											self.Owner:LagCompensation(true)
-											tr = util.TraceHull(tracep)
-											self.Owner:LagCompensation(false)
-										end
-										if tr.Entity:IsValid() and tr.Entity:GetPhysicsObject():IsValid() and ((tr.HitPos-tr.StartPos):Length() < 250+600*item.data) then
-											self.Owner:ViewPunch(Angle(-5,math.Rand(-5,5),0))
-											local ef = EffectData()
-											ef:SetStart(self.Owner:GetShootPos())
-											ef:SetOrigin(tr.HitPos)
-											ef:SetEntity(self)
-											local dmg = tab.dmginfo
-											if item.data == 0 then
-												util.Effect("ef_scav_tr3",ef)
-												tr.Entity:GetPhysicsObject():ApplyForceOffset(tr.Normal*200000,tr.HitPos)
-												dmg:SetDamage(1)
-												dmg:SetDamageForce(tr.Normal*200000)
-												dmg:SetAttacker(self.Owner)
-												dmg:SetInflictor(self)
-												dmg:SetDamagePosition(tr.HitPos)
-												dmg:SetDamageType(DMG_PHYSGUN)
-												tr.Entity:TakeDamageInfo(dmg)
-											else
-												util.Effect("ef_scav_tr4",ef) --TO DO: Merge into ef_scav_tr3
-												tr.Entity:GetPhysicsObject():ApplyForceOffset(tr.Normal*3000000,tr.HitPos)
-												if tr.Entity:IsPlayer() then
-													tr.Entity:SetVelocity(tr.Normal*3000)
-												end
-												dmg:SetDamage(75)
-												dmg:SetDamageForce(tr.Normal*3000000)
-												dmg:SetAttacker(self.Owner)
-												dmg:SetInflictor(self)
-												dmg:SetDamagePosition(tr.HitPos)
-												dmg:SetDamageType(DMG_PHYSGUN)
-												tr.Entity:TakeDamageInfo(dmg)
-											end
-											tr.Entity:SetPhysicsAttacker(self.Owner)
-										else
-											self.Owner:EmitToAllButSelf("weapons/physcannon/physcannon_dryfire.wav")
-										end
-										return false
+						local tr = self.Owner:GetEyeTraceNoCursor()
+						local tab = ScavData.models[item.ammo]
+						if not tr.Entity or not tr.Entity:IsValid() then
+							local tracep = {}
+								tracep.start = self.Owner:GetShootPos()
+								tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*850
+								tracep.filter = self.Owner
+								tracep.mask = MASK_SHOT
+								tracep.mins = tab.vmin
+								tracep.maxs = tab.vmax
+							self.Owner:LagCompensation(true)
+							tr = util.TraceHull(tracep)
+							self.Owner:LagCompensation(false)
+						end
+						if tr.Entity:IsValid() and tr.Entity:GetPhysicsObject():IsValid() and ((tr.HitPos-tr.StartPos):Length() < 250+600*item.data) then
+							self.Owner:ViewPunch(Angle(-5,math.Rand(-5,5),0))
+							local ef = EffectData()
+							ef:SetStart(self.Owner:GetShootPos())
+							ef:SetOrigin(tr.HitPos)
+							ef:SetEntity(self)
+							local dmg = tab.dmginfo
+							if item.data == 0 then
+								util.Effect("ef_scav_tr3",ef)
+								tr.Entity:GetPhysicsObject():ApplyForceOffset(tr.Normal*200000,tr.HitPos)
+								dmg:SetDamage(1)
+								dmg:SetDamageForce(tr.Normal*200000)
+								dmg:SetAttacker(self.Owner)
+								dmg:SetInflictor(self)
+								dmg:SetDamagePosition(tr.HitPos)
+								dmg:SetDamageType(DMG_PHYSGUN)
+								tr.Entity:TakeDamageInfo(dmg)
+							else
+								util.Effect("ef_scav_tr4",ef) --TO DO: Merge into ef_scav_tr3
+								tr.Entity:GetPhysicsObject():ApplyForceOffset(tr.Normal*3000000,tr.HitPos)
+								if tr.Entity:IsPlayer() then
+									tr.Entity:SetVelocity(tr.Normal*3000)
 								end
+								dmg:SetDamage(75)
+								dmg:SetDamageForce(tr.Normal*3000000)
+								dmg:SetAttacker(self.Owner)
+								dmg:SetInflictor(self)
+								dmg:SetDamagePosition(tr.HitPos)
+								dmg:SetDamageType(DMG_PHYSGUN)
+								tr.Entity:TakeDamageInfo(dmg)
+							end
+							tr.Entity:SetPhysicsAttacker(self.Owner)
+						else
+							self.Owner:EmitToAllButSelf("weapons/physcannon/physcannon_dryfire.wav")
+						end
+						return false
+				end
 				ScavData.CollectFuncs["models/weapons/w_physics.mdl"] = ScavData.GiveOneOfItemInf
 				ScavData.CollectFuncs["models/dog.mdl"] = ScavData.GiveOneOfItemInf
 			else
 				tab.FireFunc = function(self,item)
-						local tr = self.Owner:GetEyeTraceNoCursor()
-						local tab = ScavData.models[item.ammo]
-							if not tr.Entity or not tr.Entity:IsValid() then
-								local tracep = {}
-									tracep.start = self.Owner:GetShootPos()
-									tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*850
-									tracep.filter = self.Owner
-									tracep.mask = MASK_SHOT
-									tracep.mins = tab.vmin
-									tracep.maxs = tab.vmax
-								tr = util.TraceHull(tracep)
-							end
-						
-						if tr.Entity:IsValid() and tr.Entity:GetPhysicsObject() and ((tr.HitPos-tr.StartPos):Length() < 250+600*item.data) then
-								local ef = EffectData()
-								ef:SetStart(self.Owner:GetShootPos())
-								ef:SetOrigin(tr.HitPos)
-								ef:SetEntity(self)
-								local dmg = tab.dmginfo
-								if item.data == 0 then
-									util.Effect("ef_scav_tr3",ef)
-
-								else
-									util.Effect("ef_scav_tr4",ef)
-								end
-						else
-							self.Owner:EmitSound("weapons/physcannon/physcannon_dryfire.wav")
+					local tr = self.Owner:GetEyeTraceNoCursor()
+					local tab = ScavData.models[item.ammo]
+						if not tr.Entity or not tr.Entity:IsValid() then
+							local tracep = {}
+								tracep.start = self.Owner:GetShootPos()
+								tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*850
+								tracep.filter = self.Owner
+								tracep.mask = MASK_SHOT
+								tracep.mins = tab.vmin
+								tracep.maxs = tab.vmax
+							tr = util.TraceHull(tracep)
 						end
+					
+					if tr.Entity:IsValid() and tr.Entity:GetPhysicsObject() and ((tr.HitPos-tr.StartPos):Length() < 250+600*item.data) then
+							local ef = EffectData()
+							ef:SetStart(self.Owner:GetShootPos())
+							ef:SetOrigin(tr.HitPos)
+							ef:SetEntity(self)
+							local dmg = tab.dmginfo
+							if item.data == 0 then
+								util.Effect("ef_scav_tr3",ef)
+
+							else
+								util.Effect("ef_scav_tr4",ef)
+							end
+					else
+						self.Owner:EmitSound("weapons/physcannon/physcannon_dryfire.wav")
+					end
 					return false
 				end
 			end
@@ -575,22 +574,22 @@ local eject = "brass"
 			tab.Level = 4
 			if SERVER then
 				tab.FireFunc = function(self,item)
-						self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
-						local proj = self:CreateEnt("npc_grenade_frag")
-						proj.Owner = self.Owner
-						proj:SetOwner(self.Owner)
-						proj:SetPos(self:GetProjectileShootPos())
-						proj:SetAngles((self:GetAimVector():Angle():Right()):Angle())
-						proj:Spawn()
-						proj:SetModel(item.ammo)
-						proj:GetPhysicsObject():ApplyForceOffset((self:GetAimVector())*5000,Vector(0,0,3)) --+Vector(0,0,0.1)
-						timer.Simple(0, function() proj:GetPhysicsObject():AddAngleVelocity(Vector(-5000,5000,0)) end)
-						proj:Fire("SetTimer",2,"0")
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						self.Owner:EmitSound(self.shootsound)
-						--gamemode.Call("ScavFired",self.Owner,proj)
-						return true
-					end
+					self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
+					local proj = self:CreateEnt("npc_grenade_frag")
+					proj.Owner = self.Owner
+					proj:SetOwner(self.Owner)
+					proj:SetPos(self:GetProjectileShootPos())
+					proj:SetAngles((self:GetAimVector():Angle():Right()):Angle())
+					proj:Spawn()
+					proj:SetModel(item.ammo)
+					proj:GetPhysicsObject():ApplyForceOffset((self:GetAimVector())*5000,Vector(0,0,3)) --+Vector(0,0,0.1)
+					timer.Simple(0, function() proj:GetPhysicsObject():AddAngleVelocity(Vector(-5000,5000,0)) end)
+					proj:Fire("SetTimer",2,"0")
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self.Owner:EmitSound(self.shootsound)
+					--gamemode.Call("ScavFired",self.Owner,proj)
+					return true
+				end
 				ScavData.CollectFuncs["models/items/ammocrate_grenade.mdl"] = function(self,ent) self:AddItem("models/weapons/w_grenade.mdl",1,0,5) end --5 frag grenades from a grenade crate
 				ScavData.CollectFuncs["models/items/grenadeammo.mdl"] = function(self,ent) self:AddItem("models/weapons/w_grenade.mdl",1,0,1) end --convert to grenade w_model
 				--Ep2
@@ -626,20 +625,20 @@ local eject = "brass"
 			tab.Level = 4
 			if SERVER then
 				tab.FireFunc = function(self,item)
-						self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
-						local proj = self:CreateEnt("grenade_helicopter")
-						proj.Owner = self.Owner
-						proj:SetOwner(self.Owner)
-						proj.Inflictor = proj
-						proj:SetPos(self:GetProjectileShootPos())
-						proj:SetAngles((self:GetAimVector():Angle():Right()):Angle())
-						proj:Spawn()
-						proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*5000)
-						proj:SetPhysicsAttacker(self.Owner)
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						self.Owner:EmitSound(self.shootsound)				
-						return true
-					end
+					self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
+					local proj = self:CreateEnt("grenade_helicopter")
+					proj.Owner = self.Owner
+					proj:SetOwner(self.Owner)
+					proj.Inflictor = proj
+					proj:SetPos(self:GetProjectileShootPos())
+					proj:SetAngles((self:GetAimVector():Angle():Right()):Angle())
+					proj:Spawn()
+					proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*5000)
+					proj:SetPhysicsAttacker(self.Owner)
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self.Owner:EmitSound(self.shootsound)
+					return true
+				end
 			end
 			tab.Cooldown = 1
 		ScavData.RegisterFiremode(tab,"models/combine_helicopter/helicopter_bomb01.mdl")
@@ -654,26 +653,26 @@ local eject = "brass"
 			tab.Level = 1
 			if SERVER then
 				tab.FireFunc = function(self,item)
-									if self.Owner:Armor() >= self.Owner:GetMaxArmor() then
-										self.Owner:EmitSound("buttons/button11.wav")
-										return false
-									end
-									self.Owner:SetArmor(math.min(self.Owner:GetMaxArmor(),self.Owner:Armor()+15))
-									if item.ammo == "models/pickups/pickup_powerup_defense.mdl" or
-										item.ammo == "models/weapons/c_models/c_battalion_buffpack/c_batt_buffpack.mdl" or
-										item.ammo == "models/workshop/weapons/c_models/c_battalion_buffpack/c_battalion_buffpack.mdl" or
-										item.ammo == "models/pickups/pickup_powerup_resistance.mdl" then
-										self.Owner:SetArmor(math.min(self.Owner:GetMaxArmor(),self.Owner:Armor()+35)) --50 total armor for Defense Powerup
-										self.Owner:EmitSound("items/powerup_pickup_reduced_damage.wav")
-									end
-									if item.ammo == "models/helmets/helmet_american.mdl" or
-										item.ammo == "models/helmets/helmet_german.mdl" then
-										self.Owner:SetArmor(math.min(self.Owner:GetMaxArmor(),self.Owner:Armor()+10)) --25 total armor for helmets
-									end
-									self.Owner:EmitSound("items/battery_pickup.wav")
-									self.Owner:SendHUDOverlay(Color(0,100,255,100),0.25)
-						return true
+					if self.Owner:Armor() >= self.Owner:GetMaxArmor() then
+						self.Owner:EmitSound("buttons/button11.wav")
+						return false
 					end
+					self.Owner:SetArmor(math.min(self.Owner:GetMaxArmor(),self.Owner:Armor()+15))
+					if item.ammo == "models/pickups/pickup_powerup_defense.mdl" or
+						item.ammo == "models/weapons/c_models/c_battalion_buffpack/c_batt_buffpack.mdl" or
+						item.ammo == "models/workshop/weapons/c_models/c_battalion_buffpack/c_battalion_buffpack.mdl" or
+						item.ammo == "models/pickups/pickup_powerup_resistance.mdl" then
+						self.Owner:SetArmor(math.min(self.Owner:GetMaxArmor(),self.Owner:Armor()+35)) --50 total armor for Defense Powerup
+						self.Owner:EmitSound("items/powerup_pickup_reduced_damage.wav")
+					end
+					if item.ammo == "models/helmets/helmet_american.mdl" or
+						item.ammo == "models/helmets/helmet_german.mdl" then
+						self.Owner:SetArmor(math.min(self.Owner:GetMaxArmor(),self.Owner:Armor()+10)) --25 total armor for helmets
+					end
+					self.Owner:EmitSound("items/battery_pickup.wav")
+					self.Owner:SendHUDOverlay(Color(0,100,255,100),0.25)
+					return true
+				end
 				ScavData.CollectFuncs["models/player/american_assault.mdl"] = function(self,ent) self:AddItem("models/helmets/helmet_american.mdl",1,0,1) end
 				ScavData.CollectFuncs["models/player/american_mg.mdl"] = ScavData.CollectFuncs["models/player/american_assault.mdl"]
 				ScavData.CollectFuncs["models/player/american_rifleman.mdl"] = ScavData.CollectFuncs["models/player/american_assault.mdl"]

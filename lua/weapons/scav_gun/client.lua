@@ -1052,6 +1052,17 @@ if CLIENT then
 		self.iconids = {}
 		self.Initialized = true
 	end
+
+	--allow mouse scrolling to move inventory while menu is open
+	function PANEL:OnMouseWheeled(delta)
+		if delta > 0 then
+			RunConsoleCommand("scv_itm_shft",1)
+			return true
+		elseif delta < 0 then
+			RunConsoleCommand("scv_itm_shft",-1)
+			return true
+		end
+	end
 		
 	function PANEL:InvalidateLayout()
 		if not self.Initialized then
