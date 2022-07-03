@@ -85,7 +85,7 @@ end
 				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
 				if not continuefiring then
 					if SERVER then
-						self.ChargeAttack = nil
+						self:SetChargeAttack()
 						self:SetBarrelRestSpeed(0)
 					end
 				end
@@ -93,7 +93,6 @@ end
 			end
 			tab.FireFunc = function(self,item)
 				self:SetChargeAttack(tab.ChargeAttack,item)
-				self.chargeitem = item
 				if SERVER then
 					self:SetBarrelRestSpeed(1000)	
 				end								
@@ -151,7 +150,7 @@ end
 				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
 				if not continuefiring then
 					if SERVER then
-						self.ChargeAttack = nil
+						self:SetChargeAttack()
 						self:SetBarrelRestSpeed(0)
 					end
 				end
@@ -159,7 +158,6 @@ end
 			end
 			tab.FireFunc = function(self,item)
 				self:SetChargeAttack(tab.ChargeAttack,item)
-				self.chargeitem = item
 				if SERVER then
 					self:SetBarrelRestSpeed(500)	
 				end								
@@ -210,7 +208,7 @@ end
 				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
 				if not continuefiring then
 					if SERVER then
-						self.ChargeAttack = nil
+						self:SetChargeAttack()
 						self:SetBarrelRestSpeed(0)
 					end
 				end
@@ -218,7 +216,6 @@ end
 			end
 			tab.FireFunc = function(self,item)
 				self:SetChargeAttack(tab.ChargeAttack,item)
-				self.chargeitem = item
 				if SERVER then
 					self:SetBarrelRestSpeed(250)	
 				end								
@@ -618,7 +615,7 @@ end
 				if not continuefiring then
 					timer.Simple(0.25, function() mgcooloff(self,item) end)
 					if SERVER then
-						self.ChargeAttack = nil
+						self:SetChargeAttack()
 						self:SetBarrelRestSpeed(0)
 					end
 				end
@@ -626,7 +623,6 @@ end
 			end
 			tab.FireFunc = function(self,item)
 				self:SetChargeAttack(tab.ChargeAttack,item)
-				self.chargeitem = item
 				if SERVER then
 					self:SetBarrelRestSpeed(1000)	
 				end								
@@ -686,7 +682,7 @@ end
 				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
 				if not continuefiring then
 					if SERVER then
-						self.ChargeAttack = nil
+						self:SetChargeAttack()
 						self:SetBarrelRestSpeed(0)
 					end
 				end
@@ -694,7 +690,6 @@ end
 			end
 			tab.FireFunc = function(self,item)
 				self:SetChargeAttack(tab.ChargeAttack,item)
-				self.chargeitem = item
 				if SERVER then
 					self:SetBarrelRestSpeed(250)	
 				end								
@@ -745,7 +740,7 @@ end
 				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
 				if not continuefiring then
 					if SERVER then
-						self.ChargeAttack = nil
+						self:SetChargeAttack()
 						self:SetBarrelRestSpeed(0)
 					end
 				end
@@ -753,7 +748,6 @@ end
 			end
 			tab.FireFunc = function(self,item)
 				self:SetChargeAttack(tab.ChargeAttack,item)
-				self.chargeitem = item
 				if SERVER then
 					self:SetBarrelRestSpeed(250)	
 				end								
@@ -843,7 +837,7 @@ end
 				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
 				if not continuefiring then
 					if SERVER then
-						self.ChargeAttack = nil
+						self:SetChargeAttack()
 						self:SetBarrelRestSpeed(0)
 					end
 				end
@@ -851,7 +845,6 @@ end
 			end
 			tab.FireFunc = function(self,item)
 				self:SetChargeAttack(tab.ChargeAttack,item)
-				self.chargeitem = item
 				if SERVER then
 					self:SetBarrelRestSpeed(500)	
 				end								
