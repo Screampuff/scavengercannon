@@ -130,6 +130,9 @@ function SWEP:Think()
 		self:ViewmodelAnimation(ACT_VM_IDLE)
 		--self.BeginIdle = 0
 	end	
+	if game.SinglePlayer() then
+		self:CallOnClient("Think")
+	end
 end
 
 function SWEP:Reload()
@@ -155,6 +158,9 @@ function SWEP:PrimaryAttack()
 		self.ChargeTime = CurTime()
 		self.LastCharge = 0
 		
+	end
+	if game.SinglePlayer() then
+		self:CallOnClient("PrimaryAttack")
 	end
 end
 
@@ -235,6 +241,9 @@ function SWEP:SecondaryAttack()
 	elseif self:CheckCanScav(ent) then
 		self:Scavenge(ent)
 	end
+	if game.SinglePlayer() then
+		self:CallOnClient("SecondaryAttack")
+	end
 end
 
 local screenresetondeploy
@@ -260,6 +269,9 @@ function SWEP:Deploy()
 	if CLIENT then
 		self.DeployedTime = CurTime()
 	end
+	if game.SinglePlayer() then
+		self:CallOnClient("Deploy")
+	end
 end
 
 function SWEP:OnRemove()
@@ -277,6 +289,9 @@ function SWEP:Holster()
 	if SERVER then
 		self.SoundRattle:Stop()
 		self.SoundCharge:Stop()
+	end
+	if game.SinglePlayer() then
+		self:CallOnClient("Holster")
 	end
 	return true
 end

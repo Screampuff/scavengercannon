@@ -6,47 +6,47 @@ local SKIN = {}
 
 CreateClientConVar("scav_skin_plain","0",true,false)
 
-local l = surface.GetTextureID("vgui/sgskin/l")
-local r = surface.GetTextureID("vgui/sgskin/r")
-local t = surface.GetTextureID("vgui/sgskin/t")
-local b = surface.GetTextureID("vgui/sgskin/b")
+local l = Material("vgui/sgskin/l")
+local r = Material("vgui/sgskin/r")
+local t = Material("vgui/sgskin/t")
+local b = Material("vgui/sgskin/b")
 
-local tl = surface.GetTextureID("vgui/sgskin/tl")
-local tr = surface.GetTextureID("vgui/sgskin/tr")
-local bl = surface.GetTextureID("vgui/sgskin/bl")
-local br = surface.GetTextureID("vgui/sgskin/br")
+local tl = Material("vgui/sgskin/tl")
+local tr = Material("vgui/sgskin/tr")
+local bl = Material("vgui/sgskin/bl")
+local br = Material("vgui/sgskin/br")
 
-local l_holo = surface.GetTextureID("vgui/sgskin/l_holo")
-local r_holo = surface.GetTextureID("vgui/sgskin/r_holo")
-local t_holo = surface.GetTextureID("vgui/sgskin/t_holo")
-local b_holo = surface.GetTextureID("vgui/sgskin/b_holo")
-local c_holo = surface.GetTextureID("vgui/sgskin/c_holo")
+local l_holo = Material("vgui/sgskin/l_holo")
+local r_holo = Material("vgui/sgskin/r_holo")
+local t_holo = Material("vgui/sgskin/t_holo")
+local b_holo = Material("vgui/sgskin/b_holo")
+local c_holo = Material("vgui/sgskin/c_holo")
 
-local tl_holo = surface.GetTextureID("vgui/sgskin/tl_holo")
-local tr_holo = surface.GetTextureID("vgui/sgskin/tr_holo")
-local bl_holo = surface.GetTextureID("vgui/sgskin/bl_holo")
-local br_holo = surface.GetTextureID("vgui/sgskin/br_holo")
+local tl_holo = Material("vgui/sgskin/tl_holo")
+local tr_holo = Material("vgui/sgskin/tr_holo")
+local bl_holo = Material("vgui/sgskin/bl_holo")
+local br_holo = Material("vgui/sgskin/br_holo")
 
-local board = surface.GetTextureID("vgui/sgskin/c_holo")
+local board = Material("vgui/sgskin/c_holo")
 local boardmat = Material("vgui/sgskin/c_holo")
 
 local function getscavmenucolor()
 	if IsValid(LocalPlayer()) then
-		local col = Color(LocalPlayer():GetPlayerColor().x * 255, LocalPlayer():GetPlayerColor().y * 255, LocalPlayer():GetPlayerColor().z * 255, 255) or Color(255,255,255,255)
+		local col = LocalPlayer():GetWeaponColor()
 		if col then
 			return col.r,col.g,col.b,col.a
 		else
 			return 255,255,255,255
 		end
-		return 255,255,255,255
 	else
 		return 0,255,0,math.sin(CurTime())*20+210
 	end
 end
 
-local FrameVertex = function()
+local function FrameVertex()
 	return {x=0,y=0,u=0,v=0}
 end
+
 local VERTEX_L_TOP = 1
 local VERTEX_T_LEFT = 2
 local VERTEX_T_RIGHT = 3
@@ -55,12 +55,13 @@ local VERTEX_R_BOTTOM = 5
 local VERTEX_B_RIGHT = 6
 local VERTEX_B_LEFT = 7
 local VERTEX_L_BOTTOM = 8
+
 local framevertices = {FrameVertex(),FrameVertex(),FrameVertex(),FrameVertex(),FrameVertex(),FrameVertex(),FrameVertex(),FrameVertex()}
 
 local colvec = Vector()
 local vector_white = Vector(1,1,1)
 
-function SKIN:DrawGenericBackgroundPlain( x, y, w, h, color )
+function SKIN:DrawGenericBackgroundPlain( x, y, w, h, col )
 	--local cw = math.min(16,w/2)
 	--local ch = math.min(16,h/2)
 	local cw = math.min(16,w/2,h/2)
@@ -75,60 +76,60 @@ function SKIN:DrawGenericBackgroundPlain( x, y, w, h, color )
 	local y4 = y1+math.floor(h)
 	
 	local cr,cg,cb,ca
-	if color then
-		cr,cg,cb,ca = color.r,color.g,color.b,color.a
+	if col then
+		cr,cg,cb,ca = col.r,col.g,col.b,col.a
 	else
 		cr,cg,cb,ca = getscavmenucolor()
 	end
 	--holo
 		surface.SetDrawColor(cr,cg,cb,ca)
-		surface.SetTexture(tl_holo)
+		surface.SetMaterial(tl_holo)
 		surface.DrawTexturedRect(x1,y1,x2-x1,y2-y1)
-		surface.SetTexture(tr_holo)
+		surface.SetMaterial(tr_holo)
 		surface.DrawTexturedRect(x3,y1,x4-x3,y2-y1)
-		surface.SetTexture(bl_holo)
+		surface.SetMaterial(bl_holo)
 		surface.DrawTexturedRect(x1,y3,x2-x1,y4-y3)
-		surface.SetTexture(br_holo)
+		surface.SetMaterial(br_holo)
 		surface.DrawTexturedRect(x3,y3,x4-x3,y4-y3)
 		
-		surface.SetTexture(t_holo)
+		surface.SetMaterial(t_holo)
 		surface.DrawTexturedRect(x2,y1,x3-x2,y2-y1)
-		surface.SetTexture(r_holo)
+		surface.SetMaterial(r_holo)
 		surface.DrawTexturedRect(x3,y2,x4-x3,y3-y2)
-		surface.SetTexture(b_holo)
+		surface.SetMaterial(b_holo)
 		surface.DrawTexturedRect(x2,y3,x3-x2,y4-y3)
-		surface.SetTexture(l_holo)
+		surface.SetMaterial(l_holo)
 		surface.DrawTexturedRect(x1,y2,x2-x1,y3-y2)
 		
-		surface.SetTexture(c_holo)
+		surface.SetMaterial(c_holo)
 		surface.DrawTexturedRect(x2,y2,x3-x2,y3-y2)
 	
 	--border
 		surface.SetDrawColor(255,255,255,255)
 		
-		surface.SetTexture(tl)
+		surface.SetMaterial(tl)
 		surface.DrawTexturedRect(x,y,cw,ch)
-		surface.SetTexture(tr)
+		surface.SetMaterial(tr)
 		surface.DrawTexturedRect(x+w-cw,y,cw,ch)
-		surface.SetTexture(bl)
+		surface.SetMaterial(bl)
 		surface.DrawTexturedRect(x,y+h-ch,cw,ch)
-		surface.SetTexture(br)
+		surface.SetMaterial(br)
 		surface.DrawTexturedRect(x+w-cw,y+h-ch,cw,ch)
 		
-		surface.SetTexture(t)
+		surface.SetMaterial(t)
 		surface.DrawTexturedRect(x+cw,y,w-cw*2,ch)
-		surface.SetTexture(r)
+		surface.SetMaterial(r)
 		surface.DrawTexturedRect(x+w-cw,y+ch,cw,h-ch*2)
-		surface.SetTexture(b)
+		surface.SetMaterial(b)
 		surface.DrawTexturedRect(x+cw,y+h-ch,w-cw*2,ch)
-		surface.SetTexture(l)
+		surface.SetMaterial(l)
 		surface.DrawTexturedRect(x,y+cw,ch,h-ch*2)
 
 end
 
-function SKIN:DrawGenericBackground( x, y, w, h, color )
+function SKIN:DrawGenericBackground( x, y, w, h, col )
 	if GetConVar("scav_skin_plain"):GetBool() then
-		self:DrawGenericBackgroundPlain(x,y,w,h,color)
+		self:DrawGenericBackgroundPlain(x,y,w,h,col)
 		return
 	end
 	--local cw = math.min(16,w/2)
@@ -136,8 +137,8 @@ function SKIN:DrawGenericBackground( x, y, w, h, color )
 	local cw = math.min(16,w/2,h/2)
 	local ch = cw
 	local cr,cg,cb,ca
-	if color then
-		cr,cg,cb,ca = color.r,color.g,color.b,color.a
+	if col then
+		cr,cg,cb,ca = col.r,col.g,col.b,col.a
 	else
 		cr,cg,cb,ca = getscavmenucolor()
 	end
@@ -195,7 +196,7 @@ function SKIN:DrawGenericBackground( x, y, w, h, color )
 		framevertices[VERTEX_R_TOP].u = 1
 		framevertices[VERTEX_R_BOTTOM].u = 1
 		
-		surface.SetTexture(board)
+		surface.SetMaterial(board)
 		colvec.r = cr/255
 		colvec.g = cg/255
 		colvec.b = cb/255
@@ -204,7 +205,7 @@ function SKIN:DrawGenericBackground( x, y, w, h, color )
 		render.SetStencilReferenceValue(1.0)
 		render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
 		render.SetStencilPassOperation(STENCILOPERATION_REPLACE)
-			surface.SetTexture(board)
+			surface.SetMaterial(board)
 			surface.DrawTexturedRect(x,y,ScrW(),ScrH())
 		render.SetStencilFailOperation(STENCILOPERATION_KEEP)
 		render.SetStencilZFailOperation(STENCILOPERATION_KEEP)
@@ -216,22 +217,22 @@ function SKIN:DrawGenericBackground( x, y, w, h, color )
 	--border
 		surface.SetDrawColor(255,255,255,255)
 		
-		surface.SetTexture(tl)
+		surface.SetMaterial(tl)
 		surface.DrawTexturedRect(x,y,cw,ch)
-		surface.SetTexture(tr)
+		surface.SetMaterial(tr)
 		surface.DrawTexturedRect(x+w-cw,y,cw,ch)
-		surface.SetTexture(bl)
+		surface.SetMaterial(bl)
 		surface.DrawTexturedRect(x,y+h-ch,cw,ch)
-		surface.SetTexture(br)
+		surface.SetMaterial(br)
 		surface.DrawTexturedRect(x+w-cw,y+h-ch,cw,ch)
 		
-		surface.SetTexture(t)
+		surface.SetMaterial(t)
 		surface.DrawTexturedRect(x+cw,y,w-cw*2,ch)
-		surface.SetTexture(r)
+		surface.SetMaterial(r)
 		surface.DrawTexturedRect(x+w-cw,y+ch,cw,h-ch*2)
-		surface.SetTexture(b)
+		surface.SetMaterial(b)
 		surface.DrawTexturedRect(x+cw,y+h-ch,w-cw*2,ch)
-		surface.SetTexture(l)
+		surface.SetMaterial(l)
 		surface.DrawTexturedRect(x,y+cw,ch,h-ch*2)
 
 end
@@ -257,28 +258,28 @@ function SKIN:PaintTab( panel )
 		cb = math.min(255,cb+100)
 	end
 		surface.SetDrawColor(cr,cg,cb,ca)
-		surface.SetTexture(tl_holo)
+		surface.SetMaterial(tl_holo)
 		surface.DrawTexturedRect(0,0,cw,ch)
-		surface.SetTexture(tr_holo)
+		surface.SetMaterial(tr_holo)
 		surface.DrawTexturedRect(w-cw,0,cw,ch)
-		surface.SetTexture(t_holo)
+		surface.SetMaterial(t_holo)
 		surface.DrawTexturedRect(cw,0,w-cw*2,ch)
-		surface.SetTexture(l_holo)
+		surface.SetMaterial(l_holo)
 		surface.DrawTexturedRect(0,ch,cw,ch)
-		surface.SetTexture(r_holo)
+		surface.SetMaterial(r_holo)
 		surface.DrawTexturedRect(w-cw,ch,cw,ch)
-		surface.SetTexture(c_holo)
+		surface.SetMaterial(c_holo)
 		surface.DrawTexturedRect(cw,ch,w-cw*2,h-ch)
 	surface.SetDrawColor(255,255,255,255)
-		surface.SetTexture(tl)
+		surface.SetMaterial(tl)
 		surface.DrawTexturedRect(0,0,cw,ch)
-		surface.SetTexture(tr)
+		surface.SetMaterial(tr)
 		surface.DrawTexturedRect(w-cw,0,cw,ch)
-		surface.SetTexture(t)
+		surface.SetMaterial(t)
 		surface.DrawTexturedRect(cw,0,w-cw*2,ch)
-		surface.SetTexture(l)
+		surface.SetMaterial(l)
 		surface.DrawTexturedRect(0,ch,cw,ch)
-		surface.SetTexture(r)
+		surface.SetMaterial(r)
 		surface.DrawTexturedRect(w-cw,ch,cw,ch)
 end
 
@@ -313,9 +314,5 @@ function SKIN:PaintPanel( panel )
 		end
 	end	
 end
-
-	--draw.RoundedBox( 4, 0, 0, panel:GetWide(), panel:GetTall(), self.frame_border )
-	--draw.RoundedBox( 4, 1, 1, panel:GetWide()-2, panel:GetTall()-2, self.frame_title )
-	--draw.RoundedBoxEx( 4, 2, 21, panel:GetWide()-4, panel:GetTall()-23, self.bg_color, false, false, true, true )
 
 derma.DefineSkin("sg_menu","Scavenger Cannon Menu",SKIN)

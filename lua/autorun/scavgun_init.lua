@@ -863,5 +863,11 @@ function ENTITY:IsFriendlyToPlayer(pl)
 		else
 			return false
 		end
+	elseif self:GetClass() == "npc_zetaplayer" and _ZetasInstalled then
+		if (self.Friend and self.Friend == pl) or (self.IsInTeam and self:IsInTeam(pl)) then
+			return true
+		else
+			return false
+		end
 	end
 end

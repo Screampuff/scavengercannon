@@ -540,6 +540,10 @@ local STATUS = {}
 				self.Owner:SetNPCState(NPC_STATE_NONE)
 			elseif self.Owner:IsNPC() then
 				self.Owner:SetSchedule(SCHED_NONE)
+			elseif _ZetasInstalled and self.Owner:GetClass() == "npc_zetaplayer" then
+				self.Owner:CancelMove()
+				self.Owner:StopLooking()
+				self.Owner:SetState('jailed/held')
 			elseif IsValid(self.Owner:GetPhysicsObject()) and self.Owner:GetMoveType() == MOVETYPE_VPHYSICS then
 				local phys = self.Owner:GetPhysicsObject()
 				if IsValid(phys) then
@@ -567,8 +571,10 @@ local STATUS = {}
 			if ent.Status_frozen and (dmginfo:GetDamageType() == DMG_FREEZE) then
 				return true
 			end
-			if ent.Status_frozen and ent:IsNPC() and (dmginfo:GetDamage() > ent:Health()) then
-				ent:SetSchedule(SCHED_NONE)
+			if ent.Status_frozen and (ent:IsNPC() or (_ZetasInstalled and ent:GetClass() == "npc_zetaplayer")) and (dmginfo:GetDamage() > ent:Health()) then
+				if ent:IsNPC() then
+					ent:SetSchedule(SCHED_NONE)
+				end
 				local self = ent.Status_frozen
 				local rag = ents.Create("prop_ragdoll")
 				rag:SetModel(ent:GetModel())
@@ -605,7 +611,9 @@ local STATUS = {}
 						end
 					end
 				end
-				gamemode.Call("OnNPCKilled",ent,attacker,inflictor)
+				if ent:IsNPC() then
+					gamemode.Call("OnNPCKilled",ent,attacker,inflictor)
+				end
 				ent:Remove()
 				rag:Remove()
 				ent:EmitSound("physics/glass/glass_sheet_break1.wav")
@@ -669,6 +677,9 @@ local STATUS = {}
 				dmg:SetDamagePosition(self.Owner:GetPos())
 				dmg:SetDamageType(DMG_DIRECT)
 				self.Owner:TakeDamageInfo(dmg)
+			end
+			if _ZetasInstalled and self.Owner:GetClass() == "npc_zetaplayer" then
+				self.Owner:SetState('idle')
 			end
 			if not self.Owner:IsPlayer() then
 				self.Owner:SetMaterial(self.mat)

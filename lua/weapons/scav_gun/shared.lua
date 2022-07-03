@@ -105,6 +105,10 @@ function SWEP:Initialize()
 		self.Effects = {}
 		self.soundloops = {}
 	end
+
+	if game.SinglePlayer() then
+		self:CallOnClient("Initialize")
+	end
 	
 end
 

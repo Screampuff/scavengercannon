@@ -71,7 +71,7 @@ function ENT:Think()
         end
         if SERVER then
             self.laststuckentity = self:GetStickEntity()
-            if (ent:IsNPC() and (ent:Health() <= 0)) or (ent:IsPlayer() and not ent:Alive()) then
+            if ((ent:IsNPC() or (_ZetasInstalled and ent:GetClass() == "npc_zetaplayer")) and (ent:Health() <= 0)) or (ent:IsPlayer() and not ent:Alive()) then
                 self:SetParent()
                 self:SetStickEntity(NULL)
                 self:SetMoveType(MOVETYPE_VPHYSICS)

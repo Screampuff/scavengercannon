@@ -46,7 +46,7 @@ function ENT:OnImpact(hitent)
 	ParticleEffect("scav_exp_disease_1",pos,Angle(0,0,0),game.GetWorld())
 	for k,v in ipairs(ent) do
 		local intensity = (300-pos:Distance(v:GetPos()+v:OBBCenter()))/15
-		if (v:IsPlayer() or v:IsNPC()) and not v:IsFriendlyToPlayer(self.Owner) then
+		if (v:IsPlayer() or v:IsNPC() or (_ZetasInstalled and v:GetClass() == "npc_zetaplayer")) and not v:IsFriendlyToPlayer(self.Owner) then
 			v:InflictStatusEffect("Disease",intensity,2)
 		end
 	end

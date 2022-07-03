@@ -347,7 +347,7 @@ if CLIENT then
 --------------------------------------------------------------------------------
 
 	local PANEL 	= {}
-	PANEL.BGColor 	= Color(50,50,50,150)
+	PANEL.BGColor 	= Color(255,255,255,255)
 	PANEL.wep 		= NULL
 
 	function PANEL:Init()

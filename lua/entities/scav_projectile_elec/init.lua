@@ -16,12 +16,12 @@ function ENT:OnImpact(hitent)
 	local nextent
 	local dist
 	for k,v in ipairs(ent) do
-		if ((v:IsPlayer() and v:Alive()) or v:IsNPC()) and (v ~= self.Owner) and (v ~= hitent) and (not nextent or (dist > v:GetPos():Distance(pos))) and not table.HasValue(self.filter,v) then
+		if ((v:IsPlayer() and v:Alive()) or v:IsNPC() or (_ZetasInstalled and v:GetClass() == "npc_zetaplayer")) and (v ~= self.Owner) and (v ~= hitent) and (not nextent or (dist > v:GetPos():Distance(pos))) and not table.HasValue(self.filter,v) then
 			nextent = v
 			dist = v:GetPos():Distance(self:GetPos())
 		end
 	end
-	if nextent and (nextent:IsNPC() or nextent:IsPlayer()) then
+	if nextent and (nextent:IsNPC() or nextent:IsPlayer() or (_ZetasInstalled and nextent:GetClass() == "npc_zetaplayer")) then
 		local entpos = nextent:GetPos()+nextent:OBBCenter()
 		self:GetPhysicsObject():SetVelocity((entpos-pos):GetNormalized()*1500)
 	end

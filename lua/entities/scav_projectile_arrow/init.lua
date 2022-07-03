@@ -179,7 +179,7 @@ function ENT:Think()
 						self:Remove()
 						return
 					end
-					if (tr.Entity:IsNPC() or tr.Entity:IsPlayer()) and (tr.Entity:GetMoveType() ~= MOVETYPE_VPHYSICS) then
+					if (tr.Entity:IsNPC() or tr.Entity:IsPlayer() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer")) and (tr.Entity:GetMoveType() ~= MOVETYPE_VPHYSICS) then
 						
 						
 						--Make Ragdoll

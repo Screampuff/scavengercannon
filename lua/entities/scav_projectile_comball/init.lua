@@ -18,7 +18,7 @@ function ENT:PhysicsCollide(data,physobj)
 			tracep.mins = self.trmin
 			tracep.maxs = self.trmax
 			local tr = util.TraceHull(tracep)		
-		if tr.Entity and tr.Entity:IsNPC() or tr.Entity:IsPlayer() and (tr.HitPos() ~= self:GetPos()) then
+		if tr.Entity and (tr.Entity:IsNPC() or tr.Entity:IsPlayer() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer")) and (tr.HitPos() ~= self:GetPos()) then
 			local mins = tr.Entity:OBBMaxs()
 			local maxs = tr.Entity:OBBMins()
 			pos = tr.Entity:GetPos()+Vector(math.Rand(mins.x,maxs.x),math.Rand(mins.y,maxs.y),math.Rand(mins.z,maxs.z))
@@ -38,7 +38,7 @@ function ENT:PhysicsCollide(data,physobj)
 			dmg:SetDamageType(DMG_DISSOLVE)
 			dmg:SetDamage(1000)
 			data.HitEntity:TakeDamageInfo(dmg)
-			if data.HitEntity:IsPlayer() or data.HitEntity:IsNPC() then
+			if data.HitEntity:IsPlayer() or data.HitEntity:IsNPC() or (_ZetasInstalled and data.HitEntity:GetClass() == "npc_zetaplayer") then
 				data.HitEntity:EmitSound("weapons/physcannon/energy_disintegrate"..math.random(4,5)..".wav")
 			end
 		end

@@ -42,7 +42,7 @@ end
 function ENT:PhysicsCollide(data,physobj)
 	self.drag = self.drag+1
 	self:GetPhysicsObject():SetDragCoefficient(self.drag)
-	if not self.bounce and data.HitEntity and data.HitEntity:IsValid() and (data.HitEntity:IsPlayer() or data.HitEntity:IsNPC()) then
+	if not self.bounce and data.HitEntity and data.HitEntity:IsValid() and (data.HitEntity:IsPlayer() or data.HitEntity:IsNPC() or (_ZetasInstalled and data.HitEntity:GetClass() == "npc_zetaplayer")) then
 		self:SetMoveType(MOVETYPE_NONE)
 		self.shouldexplode = data.HitEntity
 	end

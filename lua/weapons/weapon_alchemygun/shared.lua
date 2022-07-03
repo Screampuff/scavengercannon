@@ -72,6 +72,9 @@ function SWEP:Initialize()
 	elseif LocalPlayer () == self.Owner then
 		self:Deploy()
 	end
+	if game.SinglePlayer() then
+		self:CallOnClient("Initialize")
+	end
 end
 
 function SWEP:Think()
@@ -95,6 +98,9 @@ function SWEP:Think()
 	else
 		self.HUD:SetVisible(true)
 		self.HUD:SetWeapon(self)
+	end
+	if game.SinglePlayer() then
+		self:CallOnClient("Think")
 	end
 end
 
@@ -197,6 +203,9 @@ function SWEP:PrimaryAttack()
 			end
 		end
 		self.HoldSound:Play()
+	end
+	if game.SinglePlayer() then
+		self:CallOnClient("PrimaryAttack")
 	end
 end
 
@@ -325,6 +334,9 @@ function SWEP:Holster()
 		self:DestroyWModel()
 		self:CloseMenu()
 		self.HUD:SetVisible(false)
+	end
+	if game.SinglePlayer() then
+		self:CallOnClient("Holster")
 	end
 	return true
 end

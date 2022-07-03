@@ -69,7 +69,7 @@ function ENT:Think()
 			local ownerless = not IsValid(self.Owner)
 			
 			for i=1,table.getn(tab),1 do
-				if (tab[i]:IsPlayer() or tab[i]:IsNPC()) and (ownerless or not tab[i]:IsFriendlyToPlayer(self.Owner)) then
+				if (tab[i]:IsPlayer() or tab[i]:IsNPC() or (_ZetasInstalled and tab[i]:GetClass() == "npc_zetaplayer")) and (ownerless or not tab[i]:IsFriendlyToPlayer(self.Owner)) then
 					if tab[i]:GetPos():Distance(self:GetPos()) < self.DetonationRange then
 						self.Explode = true
 						break
@@ -101,7 +101,7 @@ function ENT:Think()
 		local tab = ents.FindInSphere(self:GetPos(),250)
 		
 		for i=1,table.getn(tab),1 do
-			if tab[i]:IsPlayer() or tab[i]:IsNPC() then
+			if tab[i]:IsPlayer() or tab[i]:IsNPC() or (_ZetasInstalled and tab[i]:GetClass() == "npc_zetaplayer") then
 				self.inrange = true
 			end
 		end
@@ -136,7 +136,7 @@ if SERVER then
 	function ENT:PhysicsCollide(data,physobj)
 		if not self:GetSticky() then return end
 		local ent = data.HitEntity
-		if not IsValid(self.constraint) and ((ent:GetPhysicsObjectCount() == 1 and not (ent:IsPlayer() or ent:IsNPC())) or ent:IsWorld()) then
+		if not IsValid(self.constraint) and ((ent:GetPhysicsObjectCount() == 1 and not (ent:IsPlayer() or ent:IsNPC() or (_ZetasInstalled and ent:GetClass() == "npc_zetaplayer"))) or ent:IsWorld()) then
 			timer.Simple(0, function() self:Constrain(ent, data.HitPos - self:OBBCenter()) end)
 		end
 	end

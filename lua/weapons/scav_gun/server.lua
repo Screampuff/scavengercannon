@@ -430,6 +430,10 @@ if SERVER then
 			self:KillEffect()
 			self.mousepressed = false
 		end
+
+		if game.SinglePlayer() then
+			self:CallOnClient("Think")
+		end
 		
 		self.LastThink = CurTime()
 		return true
@@ -506,6 +510,10 @@ if SERVER then
 		self.BarrelRestSpeed = 0
 		self.BarrelRotation = 0
 
+		if game.SinglePlayer() then
+			self:CallOnClient("Deploy")
+		end
+
 		return true
 		
 	end
@@ -535,6 +543,10 @@ if SERVER then
 			
 			return true
 			
+		end
+
+		if game.SinglePlayer() then
+			self:CallOnClient("Holster")
 		end
 		
 	end
@@ -576,6 +588,10 @@ if SERVER then
 			end
 		elseif self:CheckCanScav(ent) then
 			self:Scavenge(ent)
+		end
+
+		if game.SinglePlayer() then
+			self:CallOnClient("SecondaryAttack")
 		end
 		
 	end
@@ -720,6 +736,10 @@ if SERVER then
 		else
 			self:KillEffect()
 			self.mousepressed = false
+		end
+
+		if game.SinglePlayer() then
+			self:CallOnClient("PrimaryAttack")
 		end
 		
 	end

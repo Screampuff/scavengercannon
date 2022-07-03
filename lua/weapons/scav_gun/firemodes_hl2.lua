@@ -1429,7 +1429,7 @@ local eject = "brass"
 					tracep.mins = tab.vmin
 					tracep.maxs = tab.vmax
 					local tr = util.TraceHull(tracep)
-					if (tr.Entity:IsPlayer() or tr.Entity:IsNPC()) and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
+					if (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer")) and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
 						target = tr.Entity
 					end
 				if target:GetMaxHealth() <= target:Health() then
