@@ -61,7 +61,7 @@ function SWEP:DrawCharging()
 	draw.DrawText(language.GetPhrase("scav.bhg.startup1")
 				.."\n"..ScavLocalize("scav.bhg.user",LocalPlayer():Nick())
 				.."\n-------------------------------\n"
-				..ScavLocalize("scav.bhg.ammo",self:GetAmmo(),self:GetMaxAmmo())
+				..ScavLocalize("scav.bhg.ammo",self:GetNWAmmo(),self:GetNWMaxAmmo())
 				.."\n"..ScavLocalize("scav.bhg.charge",math.floor(self.Charge))
 				.."\n"..ScavLocalize("scav.bhg.waypoints",self:GetWaypointCount(),self:GetMaxWaypoints()),
 				"BHG10",5,5,col_textcol,0)

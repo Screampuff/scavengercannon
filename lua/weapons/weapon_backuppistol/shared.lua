@@ -90,7 +90,7 @@ function SWEP:Think()
 			self.ForcedShots = self.ForcedShots+1
 			self:SetCharges(self.ForcedShots)
 			if IsValid(self.BPChargeEffect) then
-				self.BPChargeEffect:Setlevel(self.ForcedShots)
+				self.BPChargeEffect:SetChargeLevel(self.ForcedShots)
 			end
 		end
 		if not self.Owner:KeyDown(IN_ATTACK2) then

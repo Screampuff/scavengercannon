@@ -52,12 +52,12 @@ function SWEP.WaypointIterate(startent)
 end
 
 function SWEP:SetupDataTables()
-	self:NetworkVar("Int",0,"Ammo")
-	self:NetworkVar("Int",1,"MaxAmmo")
+	self:NetworkVar("Int",0,"NWAmmo")
+	self:NetworkVar("Int",1,"NWMaxAmmo")
 	self:NetworkVar("Int",2,"WaypointCount")
 	self:NetworkVar("Int",3,"MaxWaypoints")
 	self:NetworkVar("Entity",0,"waypointNext")
-	self:SetMaxAmmo(1000)
+	self:SetNWMaxAmmo(1000)
 	self:SetMaxWaypoints(4)
 end
 
@@ -75,24 +75,24 @@ end
 
 function SWEP:GetAmmo(predicted)
 	if CLIENT then
-		if self.LastDTAmmo < self:GetAmmo() then
-			self.Ammo = self:GetAmmo()
+		if self.LastDTAmmo < self:GetNWAmmo() then
+			self.Ammo = self:GetNWAmmo()
 		end
-		self.LastDTAmmo = self:GetAmmo()
+		self.LastDTAmmo = self:GetNWAmmo()
 		return self.Ammo
 	end
-	return self:GetAmmo()
+	return self:GetNWAmmo()
 end
 
 function SWEP:GetMaxAmmo()
-	return self:GetMaxAmmo()
+	return self:GetNWMaxAmmo()
 end
 
 function SWEP:TakeAmmo(amt)
 	if CLIENT then
 		self.Ammo = math.max(self.Ammo-amt,0)
 	else
-		self:SetAmmo(math.max(self:GetAmmo()-amt,0))
+		self:SetNWAmmo(math.max(self:GetNWAmmo()-amt,0))
 	end
 end
 
