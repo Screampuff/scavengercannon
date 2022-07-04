@@ -2717,7 +2717,7 @@ end
 					tracep.mins = tab.vmin
 					tracep.maxs = tab.vmax
 					local tr = util.TraceHull(tracep)
-					if (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer")) and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
+					if IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer")) and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
 						healent = tr.Entity
 					end
 					if healent:Health() >= healent:GetMaxHealth() then
