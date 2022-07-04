@@ -45,7 +45,7 @@ function EFFECT:Think()
 	if tr.Hit then
 		util.Decal("fadingscorch",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
 		sound.Play("ambient/levels/canals/toxic_slime_sizzle3.wav",self:GetPos(),75)
-		if tr.Entity:IsValid() then
+		if IsValid(tr.Entity) then
 			sound.Play("physics/cardboard/cardboard_box_strain2.wav",self:GetPos(),100)
 		end
 		ParticleEffect("scav_exp_plasma",tr.HitPos,Angle(0,0,0),Entity(0))

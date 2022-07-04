@@ -8,7 +8,7 @@ EFFECT.em = ParticleEmitter(vector_origin)
 function EFFECT:Init(data)
 	self.Created = CurTime()
 	self.Weapon = data:GetEntity()
-	if not self.Weapon or not self.Weapon:IsValid() then
+	if not IsValid(self.Weapon) then
 		return false
 	end
 	self.Owner = self.Weapon:GetOwner()
@@ -43,7 +43,7 @@ function EFFECT:Init(data)
 end
 
 function EFFECT:Think()
-	if not self.Weapon or not self.Weapon:IsValid() then
+	if not IsValid(self.Weapon) then
 		return false
 	end
 	if self.Created+0.5 < CurTime() then
@@ -53,7 +53,7 @@ function EFFECT:Think()
 end
 
 function EFFECT:GetTracerShootPos2(start)
-	if not self.Weapon:IsValid() then
+	if not IsValid(self.Weapon) then
 		return start
 	end
 	if (self.Owner == GetViewEntity()) then

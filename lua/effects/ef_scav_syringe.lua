@@ -24,7 +24,7 @@ function EFFECT:Think()
 			tracep.mask = MASK_SHOT
 			tr = util.TraceLine(tracep)
 			if tr.Hit then
-				if tr.Entity and tr.Entity:IsValid() then
+				if IsValid(tr.Entity) then
 					local ef = EffectData()
 					ef:SetStart(self.vel:GetNormalized()*-1)
 					ef:SetOrigin(tr.HitPos)

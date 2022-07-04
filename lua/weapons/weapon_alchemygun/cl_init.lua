@@ -34,7 +34,7 @@ end
 function SWEP:ViewModelDrawn()
 	local tr = self.Owner:GetEyeTraceNoCursor()
 	local ent = tr.Entity
-	if not ent:IsValid() or (ent:GetMoveType() ~= MOVETYPE_VPHYSICS) then
+	if not IsValid(ent) or (ent:GetMoveType() ~= MOVETYPE_VPHYSICS) then
 		return
 	end
 	
@@ -64,9 +64,9 @@ local vec_col = Vector(1,1,1)
 
 function SWEP:DrawWorldModel()
 	if IsValid(self.wmodel) then
-		if self:GetOwner():IsValid() and (self.wmodel.parent ~= self:GetOwner()) then
+		if IsValid(self:GetOwner()) and (self.wmodel.parent ~= self:GetOwner()) then
 			timer.Simple(0, function() self:BuildWModel(self:GetOwner()) end)
-		elseif not self:GetOwner():IsValid() and (self.wmodel.parent ~= self) then
+		elseif not IsValid(self:GetOwner()) and (self.wmodel.parent ~= self) then
 			timer.Simple(0, function() self:BuildWModel(self) end)
 		end
 		if self:GetGhosting() then
@@ -90,7 +90,7 @@ function SWEP:DrawWorldModel()
 		render.MaterialOverride()
 	else
 		local parent = self:GetOwner()
-		if not parent:IsValid() then
+		if not IsValid(parent) then
 			parent = self
 		end
 		timer.Simple(0, function() self.BuildWModel(self,parent) end)

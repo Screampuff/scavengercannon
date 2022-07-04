@@ -6,7 +6,7 @@ ENT.trmax = Vector(72,72,72)
 ENT.lifetime = 4
 
 function ENT:PhysicsCollide(data,physobj)
-	if data.HitEntity and data.HitEntity:IsValid() then
+	if IsValid(data.HitEntity) then
 		local dir = physobj:GetVelocity():GetNormalized()
 		physobj:SetVelocity((dir-(-2*data.HitNormal*dir:Dot(-1*data.HitNormal)))*1500)
 		
@@ -24,7 +24,7 @@ function ENT:PhysicsCollide(data,physobj)
 			pos = tr.Entity:GetPos()+Vector(math.Rand(mins.x,maxs.x),math.Rand(mins.y,maxs.y),math.Rand(mins.z,maxs.z))
 			physobj:SetVelocity((pos-self:GetPos()):GetNormalized()*1500)
 		end
-		if data.HitObject:IsValid() then
+		if IsValid(data.HitObject) then
 			data.HitObject:ApplyForceOffset(data.OurOldVelocity*100,data.HitPos)
 		end
 		
@@ -43,7 +43,7 @@ function ENT:PhysicsCollide(data,physobj)
 			end
 		end
 		--[[
-		if (data.HitEntity:Health() <= 1000) and data.HitEntity:IsPlayer() and data.HitEntity:GetRagdollEntity() and data.HitEntity:GetRagdollEntity():IsValid() then
+		if (data.HitEntity:Health() <= 1000) and data.HitEntity:IsPlayer() and IsValid(data.HitEntity:GetRagdollEntity()) then
 
 		end
 		
@@ -77,7 +77,7 @@ end
 --[[
 hook.Add("PlayerDeath","scavcomballkill",
 	function(pl,inflictor,attacker)
-		if inflictor:IsValid() and (inflictor:GetClass() == "scav_projectile_comball") then
+		if IsValid(inflictor) and (inflictor:GetClass() == "scav_projectile_comball") then
 			local dissolver = ents.Create("env_entity_dissolver")
 			dissolver:SetPos(pl:GetPos())
 			dissolver:SetKeyValue("magnitude",0)

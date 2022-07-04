@@ -35,7 +35,7 @@ function EFFECT:Init(data)
 end
 
 function EFFECT:GetTracerShootPos2(start)
-	if not self.Weapon:IsValid() then
+	if not IsValid(self.Weapon) then
 		return start
 	end
 	if (self.Owner == GetViewEntity()) then

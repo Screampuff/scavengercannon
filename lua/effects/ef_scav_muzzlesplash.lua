@@ -15,7 +15,7 @@ function EFFECT:Init(data)
 	else
 		self.Owner = self.Weapon
 	end
-	if not self.Weapon or not self.Weapon:IsValid() then
+	if not IsValid(self.Weapon) then
 		return false
 	end
 	self:SetPos(self:GetTracerShootPos(self.Owner:GetShootPos(),self.Weapon,1))

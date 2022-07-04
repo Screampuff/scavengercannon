@@ -16,7 +16,7 @@ function EFFECT:Init(data)
 end
 
 function EFFECT:Think()
-	if (CurTime()-self.Created > 0.2) or not self.Weapon:IsValid() then
+	if (CurTime()-self.Created > 0.2) or not IsValid(self.Weapon) then
 		return false
 	end
 	return true

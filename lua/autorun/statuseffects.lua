@@ -193,7 +193,7 @@ function Status2.PurgeEnt(self)
 			net.WriteEntity(self)
 		net.Send(self)
 	end
-	if not self:IsValid() or not self.StatusTable then
+	if not IsValid(self) or not self.StatusTable then
 		return
 	end
 	for i=1,#self.StatusTable do
@@ -656,7 +656,7 @@ local STATUS = {}
 	end
 	
 	function STATUS:Finish()
-		if not self.Owner:IsValid() then
+		if not IsValid(self.Owner) then
 			return
 		end
 		self.Owner.Status_frozen = false
@@ -864,7 +864,7 @@ local STATUS = {}
 	function STATUS:Think()
 		if SERVER then
 			local dmg = DamageInfo()
-			if self.Inflictor:IsValid() then
+			if IsValid(self.Inflictor) then
 				dmg:SetAttacker(self.Inflictor)
 			else
 				dmg:SetAttacker(game.GetWorld())
@@ -906,7 +906,7 @@ local STATUS = {}
 	
 
 	function STATUS:Finish()
-		if self.acideffect:IsValid() then
+		if IsValid(self.acideffect) then
 			self.acideffect:Remove()
 		end
 	end
@@ -945,7 +945,7 @@ local STATUS = {}
 	function STATUS:Finish()
 		if SERVER and self.Owner:IsPlayer() then
 			self.Owner:SetDSP(1)
-		elseif SERVER and self.Owner:IsNPC() and self.Owner:IsValid() then
+		elseif SERVER and IsValid(self.Owner) and self.Owner:IsNPC() then
 			if CAP_HEAR then
 				self.Owner:CapabilitiesAdd(CAP_HEAR)
 			end
@@ -1053,7 +1053,7 @@ local STATUS = {}
 				else
 					ent = self.Owner:GetViewModel()
 				end
-				if not ent:IsValid() then
+				if not IsValid(ent) then
 					return true
 				end
 				local att = ent:LookupAttachment("muzzle")

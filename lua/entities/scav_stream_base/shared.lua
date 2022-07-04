@@ -145,7 +145,7 @@ end
 
 function ENT:Think()
 	local pl = self:GetPlayer()
-	if not pl:IsValid() then
+	if not IsValid(pl) then
 		return
 	end
 	if SERVER then

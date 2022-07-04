@@ -122,7 +122,7 @@ function ENT:Think()
 
 			local tr = self:ProcessMovement()
 			if tr.Hit or tr.HitSky  then
-				if tr.Entity and tr.Entity:IsValid() then
+				if IsValid(tr.Entity) then
 					self:EntityImpactEffects(tr)
 				end
 				if tr.HitWorld then
@@ -151,7 +151,7 @@ function ENT:Think()
 					self:Remove()
 					return
 				end
-				if tr.Entity:IsValid() then
+				if IsValid(tr.Entity) then
 					if tr.Entity:IsPlayer() and GetConVar("mp_teamplay"):GetBool() and (tr.Entity:Team() == self.Owner:Team()) then
 						table.insert(self.filter,tr.Entity)
 						self:NextThink(CurTime()+0.01)
@@ -205,7 +205,7 @@ function ENT:Think()
 						local arrow = self:CreateArrowProp() --create arrow physics prop or w/e
 						--arrow:Spawn()
 						
-						if tr.Entity:IsValid() and arrow:GetPhysicsObject():IsValid() then
+						if IsValid(tr.Entity) and arrow:GetPhysicsObject():IsValid() then
 							constraint.Weld(arrow,tr.Entity,0,tr.PhysicsBone,0,true)
 							local offset = arrow:GetPhysicsObject():GetPos()-tr.Entity:GetPhysicsObjectNum(tr.PhysicsBone):GetPos()
 							

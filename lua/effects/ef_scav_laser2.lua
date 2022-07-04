@@ -10,11 +10,11 @@ EFFECT.WarpSize = 48
 function EFFECT:Init(data)
 	self.Created = CurTime()
 	self.Weapon = data:GetEntity()
-	if not self.Weapon:IsValid() then
+	if not IsValid(self.Weapon) then
 		return false
 	end
 	self.Owner = self.Weapon:GetOwner()
-	if not self.Owner:GetActiveWeapon() or not self.Owner:GetActiveWeapon():IsValid() or (self.Owner:GetActiveWeapon():GetClass() ~= "scav_gun") then
+	if not IsValid(self.Owner:GetActiveWeapon()) or (self.Owner:GetActiveWeapon():GetClass() ~= "scav_gun") then
 		return false
 	end
 	local tracep = {}
@@ -33,7 +33,7 @@ function EFFECT:Init(data)
 end
 
 function EFFECT:Think()
-	if not self.Owner:GetActiveWeapon() or not self.Owner:GetActiveWeapon():IsValid() or (self.Owner:GetActiveWeapon():GetClass() ~= "scav_gun") then
+	if not IsValid(self.Owner:GetActiveWeapon()) or (self.Owner:GetActiveWeapon():GetClass() ~= "scav_gun") then
 		return false
 	end
 	if self.Created+4.5 < CurTime() then

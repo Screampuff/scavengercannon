@@ -22,7 +22,7 @@ local eject = "brass"
 					tab.tracep.filter = self.Owner
 					local tr = util.TraceHull(tab.tracep)
 					local dir
-					if tr.Entity:IsValid() then
+					if IsValid(tr.Entity) then
 						dir = (tr.Entity:GetPos()+tr.Entity:OBBCenter()-self.Owner:GetShootPos()):GetNormalized()
 					else
 						dir = self:GetAimVector()
@@ -255,7 +255,7 @@ local eject = "brass"
 				tracep.maxs = Vector(4,4,4)
 				
 				function ScavData.PostDissolveDamage(ent,attacker,inflictor,impactpos)
-					if not ent:IsValid() then
+					if not IsValid(ent) then
 						return
 					end
 					local dmg = DamageInfo()
@@ -268,7 +268,7 @@ local eject = "brass"
 					--ent:DispatchTraceAttack(dmg,impactpos,ent:GetPos())
 					ent:TakeDamageInfo(dmg)
 					--[[
-					if ent:IsPlayer() and ent:GetRagdollEntity() and ent:GetRagdollEntity():IsValid() then
+					if ent:IsPlayer() and IsValid(ent:GetRagdollEntity()) then
 						local dis = self:CreateEnt("env_entity_dissolver")
 						dis:SetPos(impactpos)
 						dis:SetKeyValue("magnitude",0)
@@ -286,7 +286,7 @@ local eject = "brass"
 					tracep.filter = self.Owner
 					local tr = util.TraceHull(tracep)
 					local tabents
-					if tr.Hit and tr.Entity:IsValid() then
+					if tr.Hit and IsValid(tr.Entity) then
 						local ent = tr.Entity
 						if ent:GetPhysicsObject():IsValid() then
 							local phys = ent:GetPhysicsObjectNum(tr.PhysicsBone)
@@ -415,9 +415,9 @@ local eject = "brass"
 			tab.Level = 1
 			if SERVER then
 				tab.antlionfriend =	function(ent) 
-					if ent:IsValid() and (ent:GetClass() == "npc_antlion") then
+					if IsValid(ent) and (ent:GetClass() == "npc_antlion") then
 						for k,v in ipairs(player.GetAll()) do
-							if v:GetWeapon("scav_gun"):IsValid() then
+							if IsValid(v:GetWeapon("scav_gun")) then
 								local hate = true
 								for i,j in ipairs(v:GetWeapon("scav_gun").inv.items) do
 									if j.ammo == "models/weapons/w_bugbait.mdl" then
@@ -476,7 +476,7 @@ local eject = "brass"
 				tab.FireFunc = function(self,item)
 						local tr = self.Owner:GetEyeTraceNoCursor()
 						local tab = ScavData.models[item.ammo]
-						if not tr.Entity or not tr.Entity:IsValid() then
+						if not IsValid(tr.Entity) then
 							local tracep = {}
 								tracep.start = self.Owner:GetShootPos()
 								tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*850
@@ -488,7 +488,7 @@ local eject = "brass"
 							tr = util.TraceHull(tracep)
 							self.Owner:LagCompensation(false)
 						end
-						if tr.Entity:IsValid() and tr.Entity:GetPhysicsObject():IsValid() and ((tr.HitPos-tr.StartPos):Length() < 250+600*item.data) then
+						if IsValid(tr.Entity) and tr.Entity:GetPhysicsObject():IsValid() and ((tr.HitPos-tr.StartPos):Length() < 250+600*item.data) then
 							self.Owner:ViewPunch(Angle(-5,math.Rand(-5,5),0))
 							local ef = EffectData()
 							ef:SetStart(self.Owner:GetShootPos())
@@ -531,29 +531,26 @@ local eject = "brass"
 				tab.FireFunc = function(self,item)
 					local tr = self.Owner:GetEyeTraceNoCursor()
 					local tab = ScavData.models[item.ammo]
-						if not tr.Entity or not tr.Entity:IsValid() then
-							local tracep = {}
-								tracep.start = self.Owner:GetShootPos()
-								tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*850
-								tracep.filter = self.Owner
-								tracep.mask = MASK_SHOT
-								tracep.mins = tab.vmin
-								tracep.maxs = tab.vmax
-							tr = util.TraceHull(tracep)
-						end
-					
-					if tr.Entity:IsValid() and tr.Entity:GetPhysicsObject() and ((tr.HitPos-tr.StartPos):Length() < 250+600*item.data) then
-							local ef = EffectData()
+					if not IsValid(tr.Entity) then
+						local tracep = {}
+							tracep.start = self.Owner:GetShootPos()
+							tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*850
+							tracep.filter = self.Owner
+							tracep.mask = MASK_SHOT
+							tracep.mins = tab.vmin
+							tracep.maxs = tab.vmax
+						tr = util.TraceHull(tracep)
+					elseif tr.Entity:GetPhysicsObject():IsValid() and ((tr.HitPos-tr.StartPos):Length() < 250+600*item.data) then
+						local ef = EffectData()
 							ef:SetStart(self.Owner:GetShootPos())
 							ef:SetOrigin(tr.HitPos)
 							ef:SetEntity(self)
-							local dmg = tab.dmginfo
-							if item.data == 0 then
-								util.Effect("ef_scav_tr3",ef)
-
-							else
-								util.Effect("ef_scav_tr4",ef)
-							end
+						local dmg = tab.dmginfo
+						if item.data == 0 then
+							util.Effect("ef_scav_tr3",ef)
+						else
+							util.Effect("ef_scav_tr4",ef)
+						end
 					else
 						self.Owner:EmitSound("weapons/physcannon/physcannon_dryfire.wav")
 					end
@@ -1140,7 +1137,7 @@ local eject = "brass"
 			tab.Level = 9
 			local returnval = {false,true}
 			local function rechargeairboatgun(self,item)
-				if item:IsValid() then
+				if IsValid(item) then
 					if not item.isfiring then
 						if item:GetSubammo() < 100 then
 							if SERVER then
@@ -1990,7 +1987,7 @@ local eject = "brass"
 				local tr = util.TraceHull(tracep)
 				if SERVER then
 					util.ParticleTracerEx("vortigaunt_beam",self:GetAttachment(self:LookupAttachment("muzzle")).Pos,tr.HitPos,false,self:EntIndex(),1)
-					if tr.Entity:IsValid() then
+					if IsValid(tr.Entity) then
 						dmg:SetAttacker(self.Owner)
 						dmg:SetInflictor(self)
 						dmg:SetDamagePosition(tr.HitPos)

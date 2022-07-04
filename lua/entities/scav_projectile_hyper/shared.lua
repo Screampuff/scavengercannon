@@ -73,7 +73,7 @@ local DMG_HYPER = bit.bor(DMG_ENERGYBEAM,DMG_GENERIC,DMG_DIRECT,DMG_BLAST,DMG_PL
 
 function ENT:OnHit(tr)
 	local hitent = tr.Entity
-	if hitent and hitent:IsValid() then
+	if IsValid(hitent) then
 		if tr.Entity:IsNPC() then
 			tr.Entity:SetSchedule(SCHED_BIG_FLINCH)
 		end

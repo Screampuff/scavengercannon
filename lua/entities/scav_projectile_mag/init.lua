@@ -50,7 +50,7 @@ function ENT:PhysicsCollide(data,physobj)
 		timer.Simple(0, function() self:ExplodeDud() end)
 		return
 	end
-	if (data.Speed > 500) and (not self.attachedent:IsValid() or not self.constraint:IsValid()) and (ent:GetSolid() == SOLID_VPHYSICS) then
+	if (data.Speed > 500) and (not IsValid(self.attachedent) or not self.constraint:IsValid()) and (ent:GetSolid() == SOLID_VPHYSICS) then
 		local bone
 		for i=0,ent:GetPhysicsObjectCount()-1 do
 			if ent:GetPhysicsObjectNum(i) == hitobj then
@@ -98,7 +98,7 @@ function ENT:Gib()
 end
 
 function ENT:Explode(activator)
-	if not self.expl and self.attachedent:IsValid() then
+	if not self.expl and IsValid(self.attachedent) then
 		self.expl = true
 		local constrainedents = constraint.GetAllConstrainedEntities(self.attachedent)
 		for k,v in pairs(constrainedents) do

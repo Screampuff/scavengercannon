@@ -269,7 +269,7 @@ function SWEP:SecondaryAttack()
 	end
 	local tr = self.Owner:GetEyeTraceNoCursor()
 	local ent = tr.Entity
-	if not tr.Entity:IsValid() or tr.HitWorld then
+	if not IsValid(tr.Entity) or tr.HitWorld then
 		local tracep = {}
 			tracep.start = self.Owner:GetShootPos()
 			tracep.endpos = self.Owner:GetShootPos()+self.Owner:GetAimVector()*56100*FrameTime()
@@ -280,7 +280,7 @@ function SWEP:SecondaryAttack()
 		tr = util.TraceHull(tracep)
 		ent = tr.Entity
 	end
-	if not ent or not ent:IsValid() then
+	if not IsValid(ent) then
 		return false
 	end
 	local phys = ent:GetPhysicsObject()

@@ -667,7 +667,7 @@ if SERVER then
 		local explosives = self:GetScavExplosives()
 		
 		for k,v in ipairs(explosives) do
-			if v:IsValid() then
+			if IsValid(v) then
 				v:Explode()
 			end
 		end
