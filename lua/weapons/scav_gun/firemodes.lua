@@ -684,30 +684,34 @@ end
 			tab.Level = 9
 			if SERVER then
 				tab.FireFunc = function(self,item)
-						self.Owner:ViewPunch(Angle(-20,math.Rand(-0.1,0.1),0))
-						local proj = self:CreateEnt("scav_projectile_payload")
-						proj:SetModel(item.ammo)
-						proj.Owner = self.Owner
-						proj:SetOwner(self.Owner)
-						proj:SetPos(self.Owner:GetShootPos())
-						--proj:SetAngles((self:GetAimVector():Angle():Up()*-1):Angle())
-						proj:Spawn()
-						proj:SetSkin(item.data)
-						proj:GetPhysicsObject():Wake()
-						proj:GetPhysicsObject():EnableDrag(true)
-						proj:GetPhysicsObject():SetDragCoefficient(-10000)
-						proj:GetPhysicsObject():EnableGravity(true)
-						proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*2500)
-						self.Owner:SetAnimation(PLAYER_ATTACK1)
-						self.Owner:EmitSound(self.shootsound)
-						--gamemode.Call("ScavFired",self.Owner,proj)
-						return true
-					end
-				ScavData.CollectFuncs["models/props_trainyard/bomb_cart.mdl"]		= function(self,ent) self:AddItem("models/props_trainyard/cart_bomb_separate.mdl",1,0,1) end
-				ScavData.CollectFuncs["models/props_trainyard/bomb_cart_red.mdl"]	= ScavData.CollectFuncs["models/props_trainyard/bomb_cart.mdl"]
+					self.Owner:ViewPunch(Angle(-20,math.Rand(-0.1,0.1),0))
+					local proj = self:CreateEnt("scav_projectile_payload")
+					proj:SetModel(item.ammo)
+					proj.Owner = self.Owner
+					proj:SetOwner(self.Owner)
+					proj:SetPos(self.Owner:GetShootPos())
+					--proj:SetAngles((self:GetAimVector():Angle():Up()*-1):Angle())
+					proj:Spawn()
+					proj:SetSkin(item.data)
+					proj:GetPhysicsObject():Wake()
+					proj:GetPhysicsObject():EnableDrag(true)
+					proj:GetPhysicsObject():SetDragCoefficient(-10000)
+					proj:GetPhysicsObject():EnableGravity(true)
+					proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*2500)
+					self.Owner:SetAnimation(PLAYER_ATTACK1)
+					self.Owner:EmitSound(self.shootsound)
+					--gamemode.Call("ScavFired",self.Owner,proj)
+					return true
+				end
+				ScavData.CollectFuncs["models/props_trainyard/bomb_cart.mdl"] = function(self,ent) self:AddItem("models/props_trainyard/cart_bomb_separate.mdl",1,0,1) end
+				ScavData.CollectFuncs["models/props_trainyard/bomb_cart_red.mdl"] = ScavData.CollectFuncs["models/props_trainyard/bomb_cart.mdl"]
 			end
 			tab.Cooldown = 5
-			ScavData.RegisterFiremode(tab,"models/props_phx/misc/flakshell_big.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_phx/misc/flakshell_big.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_phx/mk-82.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_phx/torpedo.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_phx/ww2bomb.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_phx/amraam.mdl")
 		--TF2
 		ScavData.RegisterFiremode(tab,"models/props_trainyard/cart_bomb_separate.mdl")
 
@@ -1674,6 +1678,7 @@ end
 					return self:TakeSubammo(item,1)
 				end
 				ScavData.CollectFuncs["models/metroid.mdl"] = ScavData.GiveOneOfItemInf
+				ScavData.CollectFuncs["models/props_combine/introomarea.mdl"] = ScavData.GiveOneOfItemInf
 			else
 				tab.FireFunc = function(self,item)
 					return false

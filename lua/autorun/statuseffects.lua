@@ -323,7 +323,7 @@ local STATUS = {}
 	end
 	
 	if SERVER then
-		hook.Add("EntityTakeDamage","Speed",function(ent,dmginfo)
+		hook.Add("EntityTakeDamage","ScavSpeed",function(ent,dmginfo)
 			if ent:GetStatusEffect("Speed") and dmginfo:IsDamageType(DMG_FALL) then
 				local reduced = math.max(1,dmginfo:GetDamage() * 0.25) --take only 25% fall damage (at least 1)
 				dmginfo:SetDamage(reduced)
@@ -333,6 +333,10 @@ local STATUS = {}
 	end
 
 	function STATUS:Think()
+		if SERVER and not self.NextStaminaHeal or (self.NextStaminaHeal and self.NextStaminaHeal < CurTime()) and self.Owner:IsPlayer() and self.Owner:GetSuitPower() < 100 then
+			self.Owner:SetSuitPower(math.Clamp(self.Owner:GetSuitPower()+5,0,100))
+			self.NextStaminaHeal = CurTime() + 0.5
+		end
 	end
 	
 	function STATUS:Finish()
@@ -355,9 +359,18 @@ local STATUS = {}
 		if self.Owner:IsPlayer() then
 		end
 		self.Owner.Status_slow = self
+		self.NextStaminaHeal = CurTime()
 	end
 	
 	function STATUS:Think()
+		if SERVER and GetConVar("gmod_suit"):GetBool() and self.NextStaminaHeal < CurTime() and self.Owner:IsPlayer() then
+			if self.Owner:IsSprinting() then
+				self.Owner:SetSuitPower(math.Clamp(self.Owner:GetSuitPower()-5,0,100))
+			elseif self.Owner:GetSuitPower() < 100 then
+				self.Owner:SetSuitPower(math.Clamp(self.Owner:GetSuitPower()-2.5,0,100))
+			end
+			self.NextStaminaHeal = CurTime() + 0.5
+		end
 	end
 	
 	function STATUS:Finish()
