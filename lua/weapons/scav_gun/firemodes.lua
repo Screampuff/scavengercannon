@@ -440,7 +440,7 @@ end
 							proj.Trail = util.SpriteTrail(proj,0,Color(255,255,255,255),true,2,0,0.3,0.25,"trails/smoke.vmt")
 							proj.DmgAmt = 100
 							proj.NoPin = true
-							proj.HasNoDrop = true
+							proj.Drop = vector_origin
 							proj:SetAngles(self.Owner:EyeAngles())
 							self.Owner:EmitSound("ambient/machines/catapult_throw.wav")
 						end
@@ -1293,7 +1293,7 @@ end
 					--proj.Penetration = 2
 					proj.DmgAmt = 12
 					proj.NoPin = true
-					proj.HasNoDrop = true
+					proj.Drop = vector_origin
 					if item.ammo == "models/scav/nail.mdl" or models/scav/nailsmall.mdl then
 						proj.Trail = util.SpriteTrail(proj,0,Color(255,255,255,255),true,1,0,0.1,0.25,"trails/smoke.vmt")
 					end
@@ -1348,7 +1348,7 @@ end
 					end
 					proj:SetAngles(ang)
 					proj.NoPin = true
-					proj.HasNoDrop = true
+					proj.Drop = vector_origin
 					proj:Spawn()
 					--proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*3000)
 					self.Owner:SetAnimation(PLAYER_ATTACK1)

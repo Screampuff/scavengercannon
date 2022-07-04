@@ -8,18 +8,14 @@ ENT.Author = "Anya O'Quinn"
 local ClassName = "scav_projectile_impaler"
 
 function ENT:SetupDataTables()
-	self:NetworkVar("Entity", 	0, "AOwner")
-	self:NetworkVar("Entity",	1, "AHitEnt")
-	self:NetworkVar("Bool", 	0, "Grappled")
-	self:NetworkVar("Bool", 	1, "Hit")
-	self:NetworkVar("Int", 		1, "AHitBone")
+	self:NetworkVar("Entity",	0, "AHitEnt")
+	self:NetworkVar("Bool", 	0, "Hit")
+	self:NetworkVar("Int", 		0, "AHitBone")
 	self:NetworkVar("Vector", 	0, "AHitPos")
 	self:NetworkVar("Angle", 	0, "AHitAng")
 end
 
 if CLIENT then
-
-	ENT.Mat = Material("sprites/light_glow02_add")
 
 	function ENT:Draw()
 
@@ -83,10 +79,8 @@ if SERVER then
             self.DmgAmt = 50
         end
 
-        if not self.Drop and not self.HasNoDrop then
+        if not self.Drop then
             self.Drop = Vector(0,0,-200)
-        else
-            self.Drop = Vector(0,0,0)
         end
 
         if not self.Vel then
