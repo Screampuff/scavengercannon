@@ -1,0 +1,38 @@
+"scavenger"
+{
+	"base"				"base"
+	"title"				"Scavenger"
+	"maps"				"^scav_|^sdm_|^sctf_|^sg_"
+	"menusystem"		"1"
+	//"workshopid"		"0"
+
+	"author_name"		"Ghor"
+
+	"settings"
+	{
+		1
+		{
+			"name"		"timelimit"
+			"text"		"Time Limit"
+			"help"		"How long each game is in seconds"
+			"type"		"Numeric"
+			"default"	"1200"
+		}
+		2
+		{
+			"name"		"pointlimit"
+			"text"		"Point Limit"
+			"help"		"How many points until a team wins"
+			"type"		"Numeric"
+			"default"	"30"
+		}
+		3
+		{
+			"name"		"sdm_main_mod_falldmg"
+			"text"		"Fall Damage"
+			"help"		"Enable Fall Damage"
+			"type"		"CheckBox"
+			"default"	"1"
+		}
+	}
+}
