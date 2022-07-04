@@ -119,7 +119,7 @@ function ENT:Think()
 			local removes = {} --create the table for entities that are no longer in range
 			
 			for k,v in ipairs(self.enemies) do
-				if not v:IsValid() or v:GetPos():Distance(self:GetPos()) > 512 then
+				if not IsValid(v) or v:GetPos():Distance(self:GetPos()) > 512 then
 					table.insert(removes,k)
 				else --do damage to entities in the enemies table that are still in range
 					dmg:SetDamagePosition(v:GetPos()+v:OBBCenter())

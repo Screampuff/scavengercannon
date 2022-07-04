@@ -488,7 +488,7 @@ end
 			local heat = heat or tab.Heat
 			local overheated = overheat or tab.Overheated
 			local function mgcooloff(self,item)
-				if item:IsValid() then
+				if IsValid(item) then
 					--local tab = ScavData.models[item.ammo]
 					if not (self:ProcessLinking(item) and self:StopChargeOnRelease()) then
 						if heat > 0 then

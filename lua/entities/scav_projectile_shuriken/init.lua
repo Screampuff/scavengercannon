@@ -131,7 +131,7 @@ function ENT:PhysicsCollide(data,phys)
             local dmg = DamageInfo()
             dmg:SetDamageType(DMG_SLASH)
             dmg:SetDamagePosition(tr.HitPos)
-            if self:GetOwner():IsValid() then
+            if IsValid(self:GetOwner()) then
                 dmg:SetAttacker(self:GetOwner())
             else
                 dmg:SetAttacker(self)

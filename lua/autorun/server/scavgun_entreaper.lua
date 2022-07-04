@@ -23,7 +23,7 @@ if not EntReaper then --To ensure that the system isn't already loaded..
 	function EntReaper.RunEntCleanup() -- The Entity Reaper. This is run on a regular interval to kill entites at a scheduled time.
 		local deadents = {}
 		for _,v in ipairs(EntReaper.dyingents) do
-			if not v:IsValid() or v.deathtime < CurTime() then
+			if not IsValid(v) or v.deathtime < CurTime() then
 				table.insert(deadents,v)
 			end
 		end
@@ -72,7 +72,7 @@ if not EntReaper then --To ensure that the system isn't already loaded..
 		end
 		if key then
 			table.remove(EntReaper.dyingents, key)
-			if ent:IsValid() then
+			if IsValid(ent) then
 				ent.deathtime = ent.deathtime - CurTime()
 				return ent.deathtime
 			end
@@ -122,7 +122,7 @@ if not EntReaper then --To ensure that the system isn't already loaded..
 	function EntReaper.RefreshPriorities() -- Regenerates the system's priority list.
 		EntReaper.prioritydeaths = {}
 		for k,v in ipairs(EntReaper.dyingents) do
-			if v:IsValid() and (v.deathtime < CurTime() + EntReaper.next_pri_refresh) then
+			if IsValid(v) and (v.deathtime < CurTime() + EntReaper.next_pri_refresh) then
 				table.insert(EntReaper.prioritydeaths, v)
 			end
 		end

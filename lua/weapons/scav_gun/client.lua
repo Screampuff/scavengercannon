@@ -381,7 +381,7 @@ if CLIENT then
 			if isscav then
 				if self.wep.ChargeAttack then
 					self.item = self.wep.chargeitem
-				elseif self.wep:IsValid() and self.wep.GetCurrentItem and self.wep:GetCurrentItem() then
+				elseif IsValid(self.wep) and self.wep.GetCurrentItem and self.wep:GetCurrentItem() then
 					self.item = self.wep:GetCurrentItem()
 				end
 			end

@@ -64,7 +64,7 @@ local eject = "brass"
 			tab.Level = 7
 			if SERVER then
 				tab.FireFunc = function(self,item)
-						if not self.smokegrenade or not self.smokegrenade:IsValid() then
+						if not IsValid(self.smokegrenade) then
 							self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
 							local proj = ents.Create("scav_projectile_smoke")
 							self.smokegrenade = proj

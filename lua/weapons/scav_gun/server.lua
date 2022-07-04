@@ -58,7 +58,7 @@ if SERVER then
 
 	function SWEP:EquipAmmo(pl)
 		local wep = pl:GetWeapon("scav_gun")
-		if wep:IsValid() then
+		if IsValid(wep) then
 			wep:SetNWLevel(math.max(self:GetNWLevel(),wep:GetNWLevel()))
 		end
 	end
@@ -567,7 +567,7 @@ if SERVER then
 		local tr = self.Owner:GetEyeTraceNoCursor()
 		local ent = tr.Entity
 		
-		if not tr.Entity:IsValid() or tr.HitWorld then
+		if not IsValid(tr.Entity) or tr.HitWorld then
 			local tracep = {}
 			tracep.start = self.Owner:GetShootPos()
 			tracep.endpos = self.Owner:GetShootPos() + self.Owner:GetAimVector() * 56100 * FrameTime()

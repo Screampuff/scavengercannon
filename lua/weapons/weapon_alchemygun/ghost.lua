@@ -86,7 +86,7 @@ if SERVER then
 			dmginfo:SetAttacker(game.GetWorld())
 		end
 		dmginfo:SetDamageForce(force)
-		if hitent:GetPhysicsObject():IsValid() then
+		if IsValid(hitent:GetPhysicsObject()) then
 			hitent:GetPhysicsObject():SetVelocity(hitent:GetPhysicsObject():GetVelocity()*-1+force/hitent:GetPhysicsObject():GetMass())
 			--hitent:GetPhysicsObject():ApplyForceCenter(force)
 		end

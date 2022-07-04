@@ -22,7 +22,7 @@ end
 
 
 function EFFECT:GetTracerShootPos2(start,wep)
-	if not wep:IsValid() then
+	if not IsValid(wep) then
 		return start
 	end
 	if (self.Owner == GetViewEntity()) and not (wep.zoomed) then

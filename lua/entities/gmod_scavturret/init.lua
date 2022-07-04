@@ -99,7 +99,7 @@ ENT.Firefuncs = {}
 			tracep.endpos = shootOrigin+shootDir*20000
 			tracep.filter = self.Owner
 			local tr = util.TraceHull(tracep)
-			if tr.Entity:IsValid() then
+			if IsValid(tr.Entity) then
 				proj.target = tr.Entity
 			end
 		proj.Owner = self.pl
@@ -177,7 +177,7 @@ ENT.Firefuncs = {}
 			tracep.endpos = shootOrigin+shootDir*20000
 			tracep.filter = self
 			local tr = util.TraceHull(tracep)
-			if tr.Entity and tr.Entity:IsValid() then
+			if IsValid(tr.Entity) then
 				dmg = DamageInfo()
 				dmg:SetDamage(5)
 				dmg:SetDamageForce(vector_origin)
@@ -247,7 +247,7 @@ ENT.Firefuncs = {}
 				end
 			end
 			local ent = tr.Entity
-			if ent and ent:IsValid() and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) and (self:WaterLevel() < 2) then
+			if IsValid(ent) and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) and (self:WaterLevel() < 2) then
 					local proj = ScavData.models["models/props_junk/propanecanister001a.mdl"].proj
 					proj:SetOwner(self.Owner)
 						proj:SetInflictor(self)
@@ -261,10 +261,10 @@ ENT.Firefuncs = {}
 		
 		local freezecb = function(self,tr)
 			local ent = tr.Entity
-			if ent and ent:IsValid() and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
+			if IsValid(ent) and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
 				local dmg = DamageInfo()
 				dmg:SetAttacker(self.Owner)
-				if self.inflictor:IsValid() then
+				if IsValid(self.inflictor) then
 					dmg:SetInflictor(self.inflictor)
 				else
 					dmg:SetInflictor(self.Owner)
@@ -292,7 +292,7 @@ ENT.Firefuncs = {}
 						break
 					end
 				end
-				if not ice:IsValid() then
+				if not IsValid(ice) then
 					local ice = ents.Create("prop_physics")
 					ice:SetModel(model)
 					ice:SetPos(tr.HitPos-Vector(0,0,30))
@@ -355,7 +355,7 @@ ENT.Firefuncs = {}
 	end
 	
 	function ENT:BFGShoot()
-		if self:IsValid() then
+		if IsValid(self) then
 			local proj = ents.Create("scav_projectile_bigshot")
 			proj.Owner = self.Owner
 			proj:SetPos(self:GetProjectileShootPos())
@@ -495,7 +495,7 @@ function MakeScavTurret( ply, Pos, Ang, mode, frozen, nocollide )
 	if not ply:CheckLimit( "scav_turrets" ) then return nil end
 	
 	local turret = ents.Create( "gmod_scavturret")
-	if not turret:IsValid() then return false end
+	if not IsValid(turret) then return false end
 	
 	turret:SetPos( Pos )
 	turret.Owner = ply

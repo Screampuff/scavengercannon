@@ -64,7 +64,7 @@ if CLIENT then
 		self:SetPos(angpos.Pos)
 		self:SetAngles(angpos.Ang)
 		local forcescale = 1
-		if self.Weapon and self.Weapon:IsValid() and (self.Weapon:GetClass() == "scav_gun") then
+		if IsValid(self.Weapon) and (self.Weapon:GetClass() == "scav_gun") then
 			forcescale = self.Weapon:GetForceScale()
 		end
 		local pos = angpos.Pos

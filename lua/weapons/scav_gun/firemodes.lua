@@ -96,7 +96,7 @@ end
 							tab.tracep.filter = self.Owner
 							local tr = util.TraceHull(tab.tracep)
 							--print(tr.Entity)
-							if tr.Entity:IsValid() then
+							if IsValid(tr.Entity) then
 								proj.target = tr.Entity
 							end
 						end
@@ -441,15 +441,15 @@ end
 				PLAYER.GetRagdollEntityOld = PLAYER.GetRagdollEntity
 				ENTITY.ArrowRagdoll = NULL
 				function PLAYER:GetRagdollEntity()
-					if self.ArrowRagdoll:IsValid() then
+					if IsValid(self.ArrowRagdoll) then
 						return self.ArrowRagdoll
 					else
 						return self:GetRagdollEntityOld()
 					end
 				end
 				hook.Add("PlayerSpawn","ResetArrowRagdoll",function(pl) pl.ArrowRagdoll = NULL end)
-				hook.Add("PlayerDeath","NoArrowRagdoll",function(pl) if pl.ArrowRagdoll:IsValid() and pl:GetRagdollEntityOld() then pl:GetRagdollEntityOld():Remove() end end)
-				hook.Add("CreateEntityRagdoll","NoArrowRagdoll2",function(ent,rag) if ent.ArrowRagdoll:IsValid() then rag:Remove() end end)
+				hook.Add("PlayerDeath","NoArrowRagdoll",function(pl) if IsValid(pl.ArrowRagdoll) and pl:GetRagdollEntityOld() then pl:GetRagdollEntityOld():Remove() end end)
+				hook.Add("CreateEntityRagdoll","NoArrowRagdoll2",function(ent,rag) if IsValid(ent.ArrowRagdoll) then rag:Remove() end end)
 
 				ScavData.CollectFuncs["models/items/crossbowrounds.mdl"] = function(self,ent) self:AddItem("models/crossbow_bolt.mdl",1,ent:GetSkin(),6) end --6 crossbow bolts from a bundle of bolts
 				ScavData.CollectFuncs["models/weapons/w_crossbow.mdl"] = function(self,ent) self:AddItem("models/crossbow_bolt.mdl",1,ent:GetSkin(),1) end --1 bolt from the crossbow
@@ -1028,7 +1028,7 @@ end
 						tracep.mask = MASK_SOLID --MASK_SOLID_BRUSHONLY
 						local tr = util.TraceHull(tracep)
 						--print(tr.Entity)
-					if ((tr.HitPos-tr.StartPos):Length() > 48) or not tr.Entity:IsValid() or not (string.find(tr.Entity:GetClass(),"_door",0,true)) then
+					if ((tr.HitPos-tr.StartPos):Length() > 48) or not IsValid(tr.Entity) or not (string.find(tr.Entity:GetClass(),"_door",0,true)) then
 						self.Owner:EmitSound("buttons/button11.wav")
 						return false
 					end
@@ -2101,7 +2101,7 @@ end
 			tab.RemoveOnCharge = false
 			tab.Cooldown = 0.1
 			if SERVER then
-				hook.Add("PlayerDeath","scv_cleargrapple",function(pl) if pl.GrappleAssist and pl.GrappleAssist:IsValid() then pl.GrappleAssist:Remove() end end)
+				hook.Add("PlayerDeath","scv_cleargrapple",function(pl) if pl.GrappleAssist and IsValid(pl.GrappleAssist) then pl.GrappleAssist:Remove() end end)
 				tab.ChargeAttack = function(self,item)
 					local tab = ScavData.models["models/props_wasteland/cranemagnet01a.mdl"]
 					if self.grapplenohit then
@@ -2113,7 +2113,7 @@ end
 						tab.chargeanim = ACT_VM_IDLE
 						return 0.5
 					end
-					if not self.Owner:KeyDown(IN_ATTACK) or not self.GrappleAssist:IsValid() then --let go
+					if not self.Owner:KeyDown(IN_ATTACK) or not IsValid(self.GrappleAssist) then --let go
 						--local eyeang = self.Owner:EyeAngles()
 						--eyeang.r = 0
 						self:SetChargeAttack()
@@ -2122,7 +2122,7 @@ end
 							self.ef_grapplebeam:Kill()
 						end
 						self.Owner:SetMoveType(MOVETYPE_WALK)
-						if self.GrappleAssist:IsValid() then
+						if IsValid(self.GrappleAssist) then
 							local vel = self.GrappleAssist:GetVelocity()
 							--vel.x = vel.x*16
 							--vel.y = vel.y*16
@@ -2159,7 +2159,7 @@ end
 							self.GrappleAssist:GetPhysicsObject():ApplyForceCenter((self.Owner:GetAngles()):Forward()*-200)
 						end
 						
-						if self.GrappleAssistConstraint and self.GrappleAssistConstraint:IsValid() then
+						if self.GrappleAssistConstraint and IsValid(self.GrappleAssistConstraint) then
 							local length = math.Approach(self.GrappleAssistConstraint.length,self.GrappleTargetLength,3)
 							self.GrappleAssistConstraint.length = length
 							self.GrappleAssistConstraint:Fire("SetSpringLength",length,0)
@@ -2182,7 +2182,7 @@ end
 						local tr = util.TraceHull(tracep)
 					self:SetChargeAttack(ScavData.models["models/props_wasteland/cranemagnet01a.mdl"].ChargeAttack,item)
 					if tr.Hit and ((tr.MatType == MAT_METAL) or (tr.MatType == MAT_GRATE)) then
-						if not tr.Entity:IsValid() then
+						if not IsValid(tr.Entity) then
 							tr.Entity = game.GetWorld()
 						end
 						self.ef_grapplebeam = self:CreateToggleEffect("scav_stream_grapplebeam")
@@ -2241,7 +2241,7 @@ end
 						self:SetChargeAttack()
 						--self.WeaponCharge = 0
 						tab.chargeanim = ACT_VM_PRIMARYATTACK
-						if par:IsValid() then
+						if IsValid(par) then
 							self:SetViewLerp(EyeAngles(),0.3)
 							local ang = self:GetAimVector():Angle()
 							ang.r = 0
@@ -3224,15 +3224,15 @@ PrecacheParticleSystem("scav_exp_plasma")
 			tab.Level = 4
 			if SERVER then
 				tab.Callback = function(self,tr)	
-					if tr.Entity and tr.Entity:IsValid() then
+					if IsValid(tr.Entity) then
 						local dmg = DamageInfo()
 						dmg:SetDamage(15)
 						dmg:SetDamageForce(vector_origin)
 						dmg:SetDamagePosition(tr.HitPos)
-						if self:GetOwner():IsValid() then
+						if IsValid(self:GetOwner()) then
 							dmg:SetAttacker(self:GetOwner())
 						end
-						if self:GetInflictor():IsValid() then
+						if IsValid(self:GetInflictor()) then
 							dmg:SetInflictor(self:GetInflictor())
 						end
 						dmg:SetDamageType(DMG_PLASMA)
@@ -3357,7 +3357,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 			tab.Level = 4
 			tab.dmginfo = DamageInfo()
 			tab.Callback = function(self,tr)
-				if tr.Entity and tr.Entity:IsValid() then
+				if IsValid(tr.Entity) then
 					if tr.Entity:IsPlayer() or tr.Entity:IsNPC() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer") then
 						tr.Entity:InflictStatusEffect("Disease",5,1)
 					end
@@ -3366,10 +3366,10 @@ PrecacheParticleSystem("scav_exp_plasma")
 						dmg:SetDamageForce(vector_origin)
 						dmg:SetDamagePosition(tr.HitPos)
 						dmg:SetDamageType(DMG_BULLET)
-					if self:GetOwner():IsValid() then
+					if IsValid(self:GetOwner()) then
 						dmg:SetAttacker(self:GetOwner())
 					end
-					if self:GetInflictor():IsValid() then
+					if IsValid(self:GetInflictor()) then
 						dmg:SetInflictor(self:GetInflictor())
 					end
 					tr.Entity:TakeDamageInfo(dmg)
@@ -3606,12 +3606,12 @@ PrecacheParticleSystem("scav_exp_plasma")
 			local inflictor = dmginfo:GetInflictor()
 			local attacker = dmginfo:GetAttacker()
 			local amount = dmginfo:GetDamage()
-			if attacker:IsValid() and (attacker == inflictor) then
-				if ((attacker:GetClass() == "entityflame") and ent.ignitedby and ent.ignitedby:IsValid()) then
+			if IsValid(attacker) and (attacker == inflictor) then
+				if ((attacker:GetClass() == "entityflame") and IsValid(ent.ignitedby)) then
 					dmginfo:SetInflictor(attacker)
 					dmginfo:SetAttacker(ent.ignitedby)
 				end
-				if creditfix[attacker:GetClass()] and attacker.thrownby and attacker.thrownby:IsValid() then
+				if creditfix[attacker:GetClass()] and IsValid(attacker.thrownby) then
 					dmginfo:SetInflictor(attacker)
 					dmginfo:SetAttacker(attacker.thrownby)
 				end
@@ -3670,17 +3670,17 @@ PrecacheParticleSystem("scav_exp_plasma")
 				local proj = GProjectile()
 				local function callback(self,tr)
 					local ent = tr.Entity
-					if ent and ent:IsValid() and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
+					if IsValid(ent) and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
 						ent:Ignite(5,0)
 						ent.ignitedby = self.Owner
 						local dmg = DamageInfo()
 						dmg:SetDamage((self.deathtime-CurTime())*7)
 						dmg:SetDamageForce(tr.Normal*30)
 						dmg:SetDamagePosition(tr.HitPos)
-						if self:GetOwner():IsValid() then
+						if IsValid(self:GetOwner()) then
 							dmg:SetAttacker(self:GetOwner())
 						end
-						if self:GetInflictor():IsValid() then
+						if IsValid(self:GetInflictor()) then
 							dmg:SetInflictor(self:GetInflictor())
 						end
 						dmg:SetDamageType(DMG_DIRECT)
@@ -3782,7 +3782,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 			if SERVER then
 				tab.Callback = function(self,tr)
 					local ent = tr.Entity
-					if ent and ent:IsValid() and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
+					if IsValid(ent) and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
 						local dmg = DamageInfo()
 							local multiplier = 1
 							if ent:IsOnFire() then multiplier = 3 end --TODO: triple damage should only count on center of projectile
@@ -3790,10 +3790,10 @@ PrecacheParticleSystem("scav_exp_plasma")
 							dmg:SetDamage((15 + (self.deathtime-CurTime())*5)*multiplier) -- 15-20 damage per shot, tripled if the target is on fire
 							dmg:SetDamageForce(tr.Normal*30)
 							dmg:SetDamagePosition(tr.HitPos)
-							if self:GetOwner():IsValid() then
+							if IsValid(self:GetOwner()) then
 								dmg:SetAttacker(self:GetOwner())
 							end
-							if self:GetInflictor():IsValid() then
+							if IsValid(self:GetInflictor()) then
 								dmg:SetInflictor(self:GetInflictor())
 							end
 						local reduced = self.Owner:GetWeapon("scav_gun").nextfire - tab.Cooldown / 3
@@ -4057,7 +4057,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					local proj = GProjectile()
 					local function callback(self,tr)
 						local ent = tr.Entity
-						if ent and ent:IsValid() and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
+						if IsValid(ent) and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
 							ent:InflictStatusEffect("Acid",100,(self.deathtime-CurTime())/2,self:GetOwner())
 							ent:EmitSound("ambient/levels/canals/toxic_slime_sizzle"..math.random(2,4)..".wav")
 						end
@@ -4148,13 +4148,13 @@ PrecacheParticleSystem("scav_exp_plasma")
 					local proj = GProjectile()
 					local function callback(self,tr)
 						local ent = tr.Entity
-						if ent and ent:IsValid() and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self:GetOwner())) then
+						if IsValid(ent) and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self:GetOwner())) then
 							local dmg = DamageInfo()
 							dmg:SetAttacker(self:GetOwner())
-							if self:GetOwner():IsValid() then
+							if IsValid(self:GetOwner()) then
 								dmg:SetAttacker(self:GetOwner())
 							end
-							if self:GetInflictor():IsValid() then
+							if IsValid(self:GetInflictor()) then
 								dmg:SetInflictor(self:GetInflictor())
 							end
 							dmg:SetDamage(1)
@@ -4187,7 +4187,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 									break
 								end
 							end
-							if not ice:IsValid() then
+							if not IsValid(ice) then
 								ice = ents.Create("scav_iceplatform")
 								ice:SetModel(model)
 								ice:SetPos(pos)
@@ -4845,7 +4845,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					for i=1,32 do
 						tr = util.TraceHull(tracep)
 						local ent = tr.Entity
-						if ent and ent:IsValid() and not ent:IsWorld() then
+						if IsValid(ent) and not ent:IsWorld() then
 							if not ent:IsFriendlyToPlayer(self.Owner) then
 								ent:InflictStatusEffect("Radiation",10,3,self.Owner)
 								local dmg = tab.dmginfo
@@ -4871,7 +4871,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					while (true) do
 						tr = util.TraceHull(tracep)
 						local ent = tr.Entity
-						if ent and ent:IsValid() and not ent:IsWorld() then
+						if IsValid(ent) and not ent:IsWorld() then
 							ParticleEffect("scav_exp_rad",tr.HitPos,Angle(0,0,0),Entity(0))
 							table.insert(filter,ent)
 							if (tr.Entity:GetClass() == "npc_strider") then
@@ -4942,7 +4942,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					if tr.Hit then
 						ParticleEffect("scav_exp_phazon_1",tr.HitPos,refangle,Entity(0))
 					end
-					if tr.Entity:IsValid() then
+					if IsValid(tr.Entity) then
 						dmg:SetAttacker(self.Owner)
 						dmg:SetInflictor(self)
 						dmg:SetDamagePosition(tr.HitPos)
@@ -4980,7 +4980,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						self:TakeSubammo(item,1)
 					else
 						local vmdl = self.Owner:GetViewModel()
-						if vmdl:IsValid() then
+						if IsValid(vmdl) then
 							ParticleEffectAttach("scav_vm_phazon",PATTACH_POINT_FOLLOW,vmdl,vmdl:LookupAttachment("muzzle"))
 						end
 					end
@@ -5028,7 +5028,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					self.Owner:FireBullets(bullet)
 					self:MuzzleFlash2()
 					-- if CLIENT then
-					-- 	if not self.Owner:Crouching() or not (self.Owner:GetGroundEntity():IsValid() or self.Owner:GetGroundEntity():IsWorld()) then
+					-- 	if not self.Owner:Crouching() or not (IsValid(self.Owner:GetGroundEntity()) or self.Owner:GetGroundEntity():IsWorld()) then
 					-- 		self.Owner:SetEyeAngles((VectorRand()*0.1+self:GetAimVector()):Angle()) --BUG TODO: Very choppy in multiplayer
 					-- 	else
 					-- 		self.Owner:SetEyeAngles((VectorRand()*0.02+self:GetAimVector()):Angle())
