@@ -7,7 +7,7 @@ function EFFECT:Init(data)
 	self:SetModel("models/weapons/w_models/w_syringe_proj.mdl")
 	self.lasttrace = UnPredictedCurTime()
 	self.Gravity = Vector(0,0,-96)
-	self:SetSkin(1)
+	self:SetSkin(math.fmod(data:GetScale(),2) or 0)
 	self.didhit = false
 	self.Owner:EmitSound("weapons/syringegun_shoot.wav")
 end

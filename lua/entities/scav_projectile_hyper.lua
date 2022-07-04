@@ -1,3 +1,5 @@
+AddCSLuaFile()
+
 ENT.Type = "anim"
 ENT.Base = "base_entity"
 ENT.PrintName = "hyper beam"
@@ -116,4 +118,32 @@ function ENT:OnRemove()
 end
 
 function ENT:PhysicsUpdate()
+end
+
+if CLIENT then
+	function ENT:Draw()
+	end
+end
+
+if SERVER then
+	ENT.trmin = Vector(-24,-24,-24)
+	ENT.trmax = Vector(24,24,24)
+
+	function ENT:PhysicsCollide(data,physobj)
+	end
+
+	function ENT:StartTouch()
+	end
+
+	function ENT:EndTouch()
+	end
+
+	function ENT:Touch(hitent)
+	end
+
+	function ENT:OnTakeDamage()
+	end
+
+	function ENT:OnRemove()
+	end
 end

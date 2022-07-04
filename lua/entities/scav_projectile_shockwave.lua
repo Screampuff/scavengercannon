@@ -1,3 +1,5 @@
+AddCSLuaFile()
+
 ENT.Type = "anim"
 ENT.Base = "scav_vprojectile_base"
 ENT.PrintName = ""
@@ -62,4 +64,17 @@ function ENT:OnImpact(hitent)
 	end
 	ParticleEffect("scav_exp_shockwave",pos,Angle(0,0,0),Entity(0))
 	return true
+end
+
+if CLIENT then
+	ENT.mat = Material("sprites/heatwave")
+
+	function ENT:Draw()
+		--render.SetMaterial(self.mat)
+		--render.DrawSprite(self:GetPos(),32,32,color_white)
+	end
+end
+
+if SERVER then
+	ENT.PhysType = 1
 end

@@ -412,7 +412,7 @@ end
 		ScavData.RegisterFiremode(tab,"models/swarmprops/miscdeco/greenflare.mdl")
 		
 --[[==============================================================================================
-	--Arrows and Bolts
+	--Arrows and Bolts (Impaler)
 ==============================================================================================]]--
 	
 		local tab = {}
@@ -421,23 +421,40 @@ end
 			tab.Level = 8
 			if SERVER then
 				tab.FireFunc = function(self,item)
-						local proj = self:CreateEnt("scav_projectile_arrow")
+						local proj = self:CreateEnt("scav_projectile_impaler")
 						proj.Owner = self.Owner
 						proj:SetModel(item.ammo)
 						proj:SetPos(self.Owner:GetShootPos()-self:GetAimVector()*15+self:GetAimVector():Angle():Right()*2-self:GetAimVector():Angle():Up()*2)
 						proj.angoffset = ScavData.GetEntityFiringAngleOffset(proj)
 						proj:SetAngles(self:GetAimVector():Angle()+proj.angoffset)
 						proj:SetOwner(self.Owner)
-						proj:SetSkin(item.data) --not working?
-						proj:Spawn()				
+						proj:SetSkin(item.data)
+						proj:Spawn()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
+
 						if item.ammo == "models/props_mining/railroad_spike01.mdl" then --yes this is in recognition of the railway rifle from Fallout 3
 							self.Owner:EmitSound("ambient/machines/train_horn_1.wav")
 						end
+
+						if item.ammo == "models/props_c17/trappropeller_blade.mdl" then
+							proj.Trail = util.SpriteTrail(proj,0,Color(255,255,255,255),true,2,0,0.3,0.25,"trails/smoke.vmt")
+							proj.DmgAmt = 100
+							proj.NoPin = true
+							proj.HasNoDrop = true
+							proj:SetAngles(self.Owner:EyeAngles())
+							self.Owner:EmitSound("ambient/machines/catapult_throw.wav")
+						end
+
+						if item.ammo == "models/props_junk/harpoon002a.mdl" then
+							self.Owner:EmitSound("ambient/machines/catapult_throw.wav")
+							proj.DmgAmt = 100
+						end
+
 						self.Owner:EmitSound(self.shootsound)
 						self.Owner:ViewPunch(Angle(math.Rand(-1,0),math.Rand(-0.1,0.1),0))
 						return true
 					end
+				--[[
 				PLAYER.GetRagdollEntityOld = PLAYER.GetRagdollEntity
 				ENTITY.ArrowRagdoll = NULL
 				function PLAYER:GetRagdollEntity()
@@ -450,6 +467,7 @@ end
 				hook.Add("PlayerSpawn","ResetArrowRagdoll",function(pl) pl.ArrowRagdoll = NULL end)
 				hook.Add("PlayerDeath","NoArrowRagdoll",function(pl) if IsValid(pl.ArrowRagdoll) and pl:GetRagdollEntityOld() then pl:GetRagdollEntityOld():Remove() end end)
 				hook.Add("CreateEntityRagdoll","NoArrowRagdoll2",function(ent,rag) if IsValid(ent.ArrowRagdoll) then rag:Remove() end end)
+				--]]
 
 				ScavData.CollectFuncs["models/items/crossbowrounds.mdl"] = function(self,ent) self:AddItem("models/crossbow_bolt.mdl",1,ent:GetSkin(),6) end --6 crossbow bolts from a bundle of bolts
 				ScavData.CollectFuncs["models/weapons/w_crossbow.mdl"] = function(self,ent) self:AddItem("models/crossbow_bolt.mdl",1,ent:GetSkin(),1) end --1 bolt from the crossbow
@@ -504,7 +522,6 @@ end
 				ScavData.CollectFuncs["models/weapons/w_bow.mdl"] = function(self,ent) self:AddItem("models/weapons/bowarrow_bolt.mdl",1,0,1) end --1 arrow from bows
 				ScavData.CollectFuncs["models/weapons/w_bow_black.mdl"] = ScavData.CollectFuncs["models/weapons/w_bow.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_xbow.mdl"] = ScavData.CollectFuncs["models/weapons/w_bow.mdl"]
-				
 			else
 				tab.fov = 10
 			end
@@ -515,6 +532,7 @@ end
 		ScavData.RegisterFiremode(tab,"models/crossbow_bolt.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_junk/harpoon002a.mdl")
 		ScavData.RegisterFiremode(tab,"models/mixerman3d/other/arrow.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_c17/trappropeller_blade.mdl")
 		--Ep2
 		ScavData.RegisterFiremode(tab,"models/props_mining/railroad_spike01.mdl")
 		--CSS
@@ -1262,7 +1280,7 @@ end
 			tab.Level = 4
 			if SERVER then
 				tab.FireFunc = function(self,item)
-					local proj = self:CreateEnt("scav_projectile_shuriken")
+					local proj = self:CreateEnt("scav_projectile_impaler")
 					proj.Owner = self.Owner
 					proj:SetOwner(self.Owner)
 					proj:SetPos(self:GetProjectileShootPos())
@@ -1270,11 +1288,18 @@ end
 					ang:RotateAroundAxis(self.Owner:GetAimVector(),90)
 					proj:SetAngles(ang)
 					proj:SetModel(item.ammo)
-					proj.Damage = 8
-					proj.Penetration = 2
+					proj:SetSkin(item.data)
+					--proj.Damage = 8
+					--proj.Penetration = 2
+					proj.DmgAmt = 12
+					proj.NoPin = true
+					proj.HasNoDrop = true
+					if item.ammo == "models/scav/nail.mdl" or models/scav/nailsmall.mdl then
+						proj.Trail = util.SpriteTrail(proj,0,Color(255,255,255,255),true,1,0,0.1,0.25,"trails/smoke.vmt")
+					end
 					proj:Spawn()
-					proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*3000)
-					proj:GetPhysicsObject():EnableGravity(false)
+					--proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*3000)
+					--proj:GetPhysicsObject():EnableGravity(false)
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("physics/metal/weapon_impact_hard3.wav",75,70,1)
 					return self:TakeSubammo(item,1)
@@ -1307,25 +1332,25 @@ end
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					--self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
-					local proj = self:CreateEnt("scav_projectile_shuriken")
+					local proj = self:CreateEnt("scav_projectile_impaler")
 					proj:SetModel(item.ammo)
 					proj.Owner = self.Owner
 					proj:SetOwner(self.Owner)
+					proj:SetSkin(item.data)
 					proj:SetPos(self:GetProjectileShootPos())
 					local ang = self.Owner:EyeAngles()
 					ang:RotateAroundAxis(self.Owner:GetAimVector(),90)
 					if item.ammo == "models/scav/shuriken.mdl" or
 						item.ammo == "models/weapons/scav/shuriken.mdl" then
 						proj.Trail = util.SpriteTrail(proj,0,Color(255,255,255,255),true,2,0,0.3,0.25,"trails/smoke.vmt")
+						proj.DmgAmt = 8
 						self.Owner:EmitSound("weapons/ar2/fire1.wav")
-					elseif item.ammo == "models/props_c17/trappropeller_blade.mdl" then
-						proj.Trail = util.SpriteTrail(proj,0,Color(255,255,255,255),true,2,0,0.3,0.25,"trails/smoke.vmt")
-						ang = self.Owner:EyeAngles()
-						self.Owner:EmitSound("ambient/machines/catapult_throw.wav")
 					end
 					proj:SetAngles(ang)
+					proj.NoPin = true
+					proj.HasNoDrop = true
 					proj:Spawn()
-					proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*3000)
+					--proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*3000)
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					--gamemode.Call("ScavFired",self.Owner,proj)
 					return true
@@ -1334,7 +1359,6 @@ end
 			tab.Cooldown = 0.2
 		ScavData.RegisterFiremode(tab,"models/scav/shuriken.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/scav/shuriken.mdl")
-		ScavData.RegisterFiremode(tab,"models/props_c17/trappropeller_blade.mdl")
 		
 		
 --[[==============================================================================================
@@ -1664,6 +1688,7 @@ end
 			tab.Cooldown = 0.3
 			
 		ScavData.RegisterFiremode(tab,"models/metroid.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_combine/introomarea.mdl")
 		
 --[[==============================================================================================
 	--I just couldn't resist: The BFG9000
@@ -3401,13 +3426,13 @@ PrecacheParticleSystem("scav_exp_plasma")
 							self:EmitSound("weapons/syringegun_reload_air1.wav")
 							timer.Simple(0.25,function() self.Owner:EmitSound("weapons/syringegun_reload_air2.wav") end)
 						end
+						local ef = EffectData()
+							ef:SetOrigin(pos)
+							ef:SetStart(vel)
+							ef:SetEntity(self.Owner)
+							ef:SetScale(item.data)
+						util.Effect("ef_scav_syringe",ef)
 					end
-					local ef = EffectData()
-						ef:SetOrigin(pos)
-						ef:SetStart(vel)
-						ef:SetEntity(self.Owner)
-						ef:SetScale(item.data)
-					util.Effect("ef_scav_syringe",ef)
 				end
 				local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
 				if not continuefiring then

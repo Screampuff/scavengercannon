@@ -1,3 +1,5 @@
+AddCSLuaFile()
+
 ENT.Type = "anim"
 ENT.Base = "scav_vprojectile_base"
 ENT.PrintName = ""
