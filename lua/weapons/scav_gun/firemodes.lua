@@ -1291,17 +1291,11 @@ end
 					proj:SetAngles(ang)
 					proj:SetModel(item.ammo)
 					proj:SetSkin(item.data)
-					--proj.Damage = 8
-					--proj.Penetration = 2
 					proj.DmgAmt = 12
 					proj.NoPin = true
 					proj.Drop = vector_origin
-					if item.ammo == "models/scav/nail.mdl" or item.ammo == "models/scav/nailsmall.mdl" then
-						proj.Trail = util.SpriteTrail(proj,0,Color(255,255,255,255),true,1,0,0.1,0.25,"trails/smoke.vmt")
-					end
+					proj.Trail = util.SpriteTrail(proj,0,Color(255,255,255,255),true,1,0,0.1,0.25,"trails/smoke.vmt")
 					proj:Spawn()
-					--proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*3000)
-					--proj:GetPhysicsObject():EnableGravity(false)
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("physics/metal/weapon_impact_hard3.wav",75,70,1)
 					return self:TakeSubammo(item,1)
@@ -1321,7 +1315,7 @@ end
 		ScavData.RegisterFiremode(tab,"models/scav/nail.mdl")
 		ScavData.RegisterFiremode(tab,"models/scav/nailsmall.mdl")
 		--TF2
-		ScavData.RegisterFiremode(tab,"models/props_2fort/nail001.mdl") --TODO: needs to be flipped around
+		--ScavData.RegisterFiremode(tab,"models/props_2fort/nail001.mdl") --TODO: needs to be flipped around
 		
 --[[==============================================================================================
 	--Shurikens
@@ -1352,9 +1346,7 @@ end
 					proj.NoPin = true
 					proj.Drop = vector_origin
 					proj:Spawn()
-					--proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*3000)
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
-					--gamemode.Call("ScavFired",self.Owner,proj)
 					return true
 				end
 			end
