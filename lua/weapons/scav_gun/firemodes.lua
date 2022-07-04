@@ -1296,7 +1296,7 @@ end
 					proj.DmgAmt = 12
 					proj.NoPin = true
 					proj.Drop = vector_origin
-					if item.ammo == "models/scav/nail.mdl" or models/scav/nailsmall.mdl then
+					if item.ammo == "models/scav/nail.mdl" or item.ammo == "models/scav/nailsmall.mdl" then
 						proj.Trail = util.SpriteTrail(proj,0,Color(255,255,255,255),true,1,0,0.1,0.25,"trails/smoke.vmt")
 					end
 					proj:Spawn()
@@ -3970,6 +3970,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 							for index,ent in pairs(extents) do
 								if ent then
 									ent:Extinguish()
+									if vFireInstalled and ent.SoftExtinguish then ent:SoftExtinguish(10) end
 									if ent:GetMoveType() ~= MOVETYPE_VPHYSICS and (not ent:IsPlayer() or ent ~= self.Owner) then
 										if ent:IsPlayer() then
 											ent:SendHUDOverlay(color_white,2)
