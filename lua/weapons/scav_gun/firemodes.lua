@@ -869,9 +869,11 @@ end
 						elseif item.ammo == "models/items/powerup_speed.mdl" or
 								item.ammo == "models/props_junk/shoe001a.mdl" then
 							self.Owner:InflictStatusEffect("Speed",20,3)
+							self.Owner:EmitSound("npc/metropolice/gear"..math.random(1,6)..".wav")
 						else
 							self.Owner:InflictStatusEffect("Shock",30,40)
 							self.Owner:InflictStatusEffect("Speed",20,3)
+							self.Owner:EmitSound("npc/scanner/scanner_nearmiss1.wav")
 						end
 						return true
 					end
