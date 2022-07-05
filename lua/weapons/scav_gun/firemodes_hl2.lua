@@ -713,7 +713,7 @@ local eject = "brass"
 				bullet.TracerName = "ef_scav_tr_b"
 			function tab.OnArmed(self,item,olditemname)
 				if SERVER then
-					if olditemname == "" or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
+					if olditemname == "" or not ScavData.models[olditemname] or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
 						if item.ammo == "models/weapons/shells/shell_shotgun.mdl" then
 							self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
 							timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
@@ -938,7 +938,7 @@ local eject = "brass"
 			end
 			function tab.OnArmed(self,item,olditemname)
 				if SERVER then
-					if olditemname == "" or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
+					if olditemname == "" or not ScavData.models[olditemname] or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
 						self.Owner:EmitSound("physics/metal/weapon_impact_soft3.wav") --TODO: nice slide sound
 					end
 				end
@@ -1041,9 +1041,9 @@ local eject = "brass"
 			end
 			function tab.OnArmed(self,item,olditemname)
 				if SERVER then
-					--if item.ammo == "models/weapons/w_irifle.mdl" then
+					if olditemname == "" or not ScavData.models[olditemname] or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
 						self.Owner:EmitSound("weapons/ar2/ar2_reload_push.wav")
-					--end
+					end
 				end
 			end
 			if SERVER then
@@ -1637,10 +1637,12 @@ local eject = "brass"
 			end
 			function tab.OnArmed(self,item,olditemname)
 				if SERVER then
-					if item.ammo == "models/weapons/w_357.mdl"
-					or item.ammo == "models/items/357ammo.mdl"
-					or item.ammo == "models/items/357ammobox.mdl" then
-						self.Owner:EmitSound("weapons/357/357_spin1.wav")
+					if olditemname == "" or not ScavData.models[olditemname] or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
+						if item.ammo == "models/weapons/w_357.mdl"
+						or item.ammo == "models/items/357ammo.mdl"
+						or item.ammo == "models/items/357ammobox.mdl" then
+							self.Owner:EmitSound("weapons/357/357_spin1.wav")
+						end
 					end
 				end
 			end
@@ -1821,9 +1823,9 @@ local eject = "brass"
 			end
 			function tab.OnArmed(self,item,olditemname)
 				if SERVER then
-					--if item.ammo == "models/weapons/w_smg1.mdl" then
+					if olditemname == "" or not ScavData.models[olditemname] or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
 						self.Owner:EmitSound("weapons/smg1/switch_burst.wav")
-					--end
+					end
 				end
 			end
 			if SERVER then

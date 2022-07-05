@@ -49,7 +49,8 @@ local eject = "brass"
 				end
 			end
 			tab.Cooldown = 5
-		--ScavData.RegisterFiremode(tab,"models/weapons/w_c4.mdl")
+		ScavData.RegisterFiremode(tab,"models/dav0r/tnt/tnt.mdl")
+		ScavData.RegisterFiremode(tab,"models/dav0r/tnt/tnttimed.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/w_suitcase_passenger.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_c17/briefcase001a.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_c17/suitcase001a.mdl")
@@ -452,7 +453,9 @@ local eject = "brass"
 				end
 			tab.OnArmed = function(self,item,olditemname)
 					if IsMounted(240) and SERVER then
-						self.Owner:EmitSound("weapons/elite/elite_deploy.wav")
+						if olditemname == "" or not ScavData.models[olditemname] or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
+							self.Owner:EmitSound("weapons/elite/elite_deploy.wav")
+						end
 					end
 				end
 			if SERVER then
