@@ -40,6 +40,13 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/props_crates/tnt_crate1.mdl"] = function(self,ent) self:AddItem("models/weapons/w_tnt.mdl",1,0,3) end
 				ScavData.CollectFuncs["models/props_crates/tnt_crate2.mdl"] = function(self,ent) self:AddItem("models/weapons/w_tnt.mdl",1,0,3) end
 				ScavData.CollectFuncs["models/props_crates/tnt_dump.mdl"] = function(self,ent) self:AddItem("models/weapons/w_tnt.mdl",1,0,6) end
+				--L4D/2
+				ScavData.CollectFuncs["models/props_waterfront/suitcase_open.mdl"] = function(self,ent) self:AddItem("models/props_unique/airport/luggage2.mdl",1,1,1) end
+				ScavData.CollectFuncs["models/props_unique/airport/luggage_pile1.mdl"] = function(self,ent)
+					for i=1,5 do
+						self:AddItem("models/props_unique/airport/luggage".. tostring(math.Round(math.random(4))) ..".mdl",1,math.Round(math.random()),1)
+					end
+				end
 			end
 			tab.Cooldown = 5
 		--ScavData.RegisterFiremode(tab,"models/weapons/w_c4.mdl")
@@ -49,8 +56,19 @@ local eject = "brass"
 		ScavData.RegisterFiremode(tab,"models/props_c17/suitcase_passenger_physics.mdl")
 		--CSS
 		ScavData.RegisterFiremode(tab,"models/weapons/w_c4_planted.mdl")
+		--TF2
+		ScavData.RegisterFiremode(tab,"models/flag/briefcase.mdl")
 		--DoD:S
 		ScavData.RegisterFiremode(tab,"models/weapons/w_tnt.mdl")
+		--L4D/2
+		ScavData.RegisterFiremode(tab,"models/props_unique/airport/luggage1.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_unique/airport/luggage1_floating.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_unique/airport/luggage2.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_unique/airport/luggage2_floating.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_unique/airport/luggage3.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_unique/airport/luggage3_floating.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_unique/airport/luggage4.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_unique/airport/luggage4_floating.mdl")
 		
 
 --[[==============================================================================================

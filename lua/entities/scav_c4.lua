@@ -2,6 +2,7 @@ AddCSLuaFile()
 
 ENT.Type = "anim"
 ENT.Base = "base_anim"
+ENT.screen = false
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Float",0,"ArmTime")
@@ -36,7 +37,7 @@ if SERVER then
 		
 		self.Created = CurTime()
 		self.nextbeep = self.Created
-		
+
 	end
 	
 	function ENT:Think()
@@ -50,7 +51,11 @@ if SERVER then
 		if self.nextbeep < CurTime() then
 			local time = self:GetDetonateTime() - CurTime()
 			if time < 30 then
-				self:EmitSound("weapons/c4/c4_beep1.wav")
+				if IsMounted(240) then --CSS
+					self:EmitSound("weapons/c4/c4_beep1.wav")
+				else
+					self:EmitSound("hl1/fvox/beep.wav")
+				end
 				self.nextbeep = self.nextbeep + math.Clamp(math.pow(time / 10,2),0.1,5)
 			end
 		end
@@ -63,7 +68,11 @@ if SERVER then
 				local rf = RecipientFilter()
 				rf:AddAllPlayers()
 				net.WriteVector(self:GetPos())
-				net.WriteString("weapons/c4/c4_explode1.wav")
+				if IsMounted(240) then --CSS
+					net.WriteString("weapons/c4/c4_explode1.wav")
+				else
+					net.WriteString("npc/env_headcrabcanister/explosion.wav")
+				end
 			net.Send(rf)
 			
 			ParticleEffect("scav_exp_fireball3",self:GetPos(),Angle(0,0,0),Entity(0))
@@ -83,53 +92,59 @@ else
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self.Created = CurTime()
+		
+		if self:GetModel() == "models/weapons/w_c4_planted.mdl" then
+			self.screen = true
+		end
 	end
 	
 	local color_red = Color(255,0,0,255)
 	local color_green = Color(0,255,0,255)
 	
 	function ENT:Draw()
-		local time = nil
-		
-		if self:GetArmed() then
-			time = self:GetDetonateTime() - CurTime()
-			self.lasttimeremaining = nil
-		else
-		
-			if not self.lasttimeremaining then
-				self.lasttimeremaining = self:GetDetonateTime() - CurTime()
-			end
-			
-			time = self.lasttimeremaining
-			
-		end
 		
 		self:DrawModel()
 		
 		local ang = self:GetAngles()
 		ang:RotateAroundAxis(ang:Up(),-90)
 		
-		cam.Start3D2D(self:LocalToWorld(screenrefvec),ang,0.1)
-		
-		surface.SetFont("Scav_ConsoleText")
-		
-		if self:GetArmed() then
-			surface.SetTextColor(color_red)
-			if (time%3 < 1) then
-				surface.SetTextPos(13,0)
-				surface.DrawText("#scav.c4.armed")
+		if self.screen then
+			local time = nil
+			
+			if self:GetArmed() then
+				time = self:GetDetonateTime() - CurTime()
+				self.lasttimeremaining = nil
+			else
+				if not self.lasttimeremaining then
+					self.lasttimeremaining = self:GetDetonateTime() - CurTime()
+				end
+				
+				time = self.lasttimeremaining
+				
 			end
-		else
-			surface.SetTextColor(color_green)
-			surface.SetTextPos(4,0)
-			surface.DrawText("#scav.c4.disarmed")
+
+			cam.Start3D2D(self:LocalToWorld(screenrefvec),ang,0.1)
+			
+			surface.SetFont("Scav_ConsoleText")
+			
+			if self:GetArmed() then
+				surface.SetTextColor(color_red)
+				if (time%3 < 1) then
+					surface.SetTextPos(13,0)
+					surface.DrawText("#scav.c4.armed")
+				end
+			else
+				surface.SetTextColor(color_green)
+				surface.SetTextPos(4,0)
+				surface.DrawText("#scav.c4.disarmed")
+			end
+			
+			surface.SetTextPos(4,9)
+			
+			time = string.FormattedTime(time,"%02i:%02i:%02i")
+			surface.DrawText(time)
+			cam.End3D2D()
 		end
-		
-		surface.SetTextPos(4,9)
-		
-		time = string.FormattedTime(time,"%02i:%02i:%02i")
-		surface.DrawText(time)
-		cam.End3D2D()
 		
 	end
 	
