@@ -6,6 +6,7 @@ util.PrecacheModel("models/scav/shells/shell_medium.mdl")
 util.PrecacheModel("models/scav/shells/shell_small.mdl")
 
 local dodsshelleject = function(self,shellsize)
+	if not self.Owner:GetViewModel() then return end
 	local size = shellsize or "large"
 	local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 	if attach == nil then

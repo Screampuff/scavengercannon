@@ -149,6 +149,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -210,6 +211,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -275,6 +277,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -387,7 +390,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_Deagle.Single")
 						self:AddBarrelSpin(300)
 					else
-						timer.Simple(.025,function() 
+						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -436,7 +440,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_Elite.Single")
 						self:AddBarrelSpin(300)
 					else
-						timer.Simple(.025,function() 
+						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -508,6 +513,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -565,7 +571,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_FiveSeven.Single")
 						self:AddBarrelSpin(300)
 					else
-						timer.Simple(.025,function() 
+						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -617,6 +624,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -674,7 +682,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_Glock.Single")
 						self:AddBarrelSpin(300)
 					else
-						timer.Simple(.025,function() 
+						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -774,6 +783,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -839,6 +849,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -902,6 +913,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -967,6 +979,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -1034,6 +1047,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -1095,7 +1109,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_P228.Single")
 						self:AddBarrelSpin(300)
 					else
-						timer.Simple(.025,function() 
+						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -1203,6 +1218,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -1268,6 +1284,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -1333,6 +1350,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -1394,6 +1412,7 @@ local eject = "brass"
 						self:TakeSubammo(item,1)
 					else
 						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -1451,7 +1470,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_USP.Single")
 						self:AddBarrelSpin(300)
 					else
-						timer.Simple(.025,function() 
+						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -1504,7 +1524,8 @@ local eject = "brass"
 						self:AddBarrelSpin(300)
 					else
 						if item.ammo == "models/w_silencer.mdl" then --HL:S
-							timer.Simple(.025,function() 
+							timer.Simple(.025,function()
+								if not self.Owner:GetViewModel() then return end
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 								if attach then
@@ -1523,7 +1544,8 @@ local eject = "brass"
 								end
 							end)
 						else
-							timer.Simple(.025,function() 
+							timer.Simple(.025,function()
+								if not self.Owner:GetViewModel() then return end
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 								if attach then
@@ -1574,7 +1596,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_XM1014.Single")
 					else
-						timer.Simple(.025,function() 
+						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then

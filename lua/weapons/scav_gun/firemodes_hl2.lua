@@ -884,7 +884,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_Pistol.Single")
 					else
-						timer.Simple(.025,function() 
+						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -898,7 +899,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("weapons/pl_gun3.wav")
 					else
-						timer.Simple(.025,function() 
+						timer.Simple(.025,function()
+							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach == nil then
@@ -928,7 +930,7 @@ local eject = "brass"
 							self.Owner:EmitSound("weapons/pistol_shoot.wav",75,100)
 						end
 					else
-						timer.Simple(.025,function() 
+						timer.Simple(.025,function()
 							tf2shelleject(self)
 						end)
 					end
@@ -1755,7 +1757,8 @@ local eject = "brass"
 							if SERVER then
 								self.Owner:EmitSound("weapons/hks"..math.floor(math.Rand(1,4))..".wav")
 							else
-								timer.Simple(.025,function() 
+								timer.Simple(.025,function()
+									if not self.Owner:GetViewModel() then return end
 									local ef = EffectData()
 									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 									if attach then
@@ -1778,7 +1781,8 @@ local eject = "brass"
 							if SERVER then
 								self.Owner:EmitSound("Weapon_Alyx_Gun.Single")
 							else
-								timer.Simple(.025,function() 
+								timer.Simple(.025,function()
+									if not self.Owner:GetViewModel() then return end
 									local ef = EffectData()
 									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 									if attach then
@@ -1792,7 +1796,8 @@ local eject = "brass"
 							if SERVER then
 								self.Owner:EmitSound("Weapon_SMG1.Single")
 							else
-								timer.Simple(.025,function() 
+								timer.Simple(.025,function()
+									if not self.Owner:GetViewModel() then return end
 									local ef = EffectData()
 									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 									if attach then

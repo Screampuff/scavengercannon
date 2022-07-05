@@ -23,6 +23,7 @@ util.PrecacheModel("models/scav/shells/shell_shotgun_tf2.mdl")
 util.PrecacheModel("models/scav/shells/shell_sniperrifle_tf2.mdl")
 util.PrecacheModel("models/scav/shells/shell_minigun_tf2.mdl")
 tf2shelleject = function(self,shelltype)
+	if not self.Owner:GetViewModel() then return end
 	local shell = shelltype or "pistol"
 	local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 	if attach == nil then
@@ -5064,7 +5065,8 @@ PrecacheParticleSystem("scav_exp_plasma")
 					-- 	end
 					-- end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
-					timer.Simple(.025,function() 
+					timer.Simple(.025,function()
+						if not self.Owner:GetViewModel() then return end
 						local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 						if attach then
 							if item.ammo == "models/w_models/weapons/50cal.mdl"
