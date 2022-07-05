@@ -5291,16 +5291,16 @@ PrecacheParticleSystem("scav_exp_plasma")
 				ScavData.CollectFuncs["models/props_vehicles/van001a_nodoor_physics.mdl"] = ScavData.CollectFuncs["models/props_vehicles/car001b_hatchback.mdl"]
 				--Ep2
 				ScavData.CollectFuncs["models/vehicle.mdl"] = function(self,ent)
-																			self:AddItem("models/vehicle/vehicle_engine_block.mdl",1,0)
-																			self:AddItem("models/props_vehicles/carparts_tire01a.mdl",1,0)
-																			self:AddItem("models/props_vehicles/carparts_axel01a.mdl",1,0)
-																			self:AddItem("models/props_vehicles/carparts_muffler01a.mdl",1,0)
-																			self:AddItem("models/props_vehicles/carparts_wheel01a.mdl",1,0)
-																			self:AddItem("models/props_vehicles/carparts_wheel01a.mdl",1,0)
-																			self:AddItem("models/props_vehicles/carparts_tire01a.mdl",1,0)
-																			self:AddItem("models/props_vehicles/carparts_axel01a.mdl",1,0)
-																			self:AddItem("models/items/car_battery01.mdl",20,0)
-																		end
+					self:AddItem("models/vehicle/vehicle_engine_block.mdl",1,0)
+					self:AddItem("models/props_vehicles/carparts_tire01a.mdl",1,0)
+					self:AddItem("models/props_vehicles/carparts_axel01a.mdl",1,0)
+					self:AddItem("models/props_vehicles/carparts_muffler01a.mdl",1,0)
+					self:AddItem("models/props_vehicles/carparts_wheel01a.mdl",1,0)
+					self:AddItem("models/props_vehicles/carparts_wheel01a.mdl",1,0)
+					self:AddItem("models/props_vehicles/carparts_tire01a.mdl",1,0)
+					self:AddItem("models/props_vehicles/carparts_axel01a.mdl",1,0)
+					self:AddItem("models/items/car_battery01.mdl",20,0)
+				end
 				--Breaking up big cluster props into smaller ones
 				ScavData.CollectFuncs["models/zombie/classic.mdl"] = function(self,ent)
 					self:AddItem("models/zombie/classic_legs.mdl",1,0,1)
@@ -5332,21 +5332,30 @@ PrecacheParticleSystem("scav_exp_plasma")
 				ScavData.CollectFuncs["models/props_junk/ibeam01a_cluster01.mdl"] = function(self,ent) self:AddItem("models/props_junk/ibeam01a.mdl",1,0,4) end
 				--Ep2
 				ScavData.CollectFuncs["models/props_silo/tirestack.mdl"] = function(self,ent)
-																			self:AddItem("models/props/de_prodigy/tire1.mdl",1,0,4)
-																			if IsMounted(240) then --CSS
-																				self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1)
-																			else self:AddItem("models/props_junk/wood_pallet001a.mdl",1,0,1) end end
+					self:AddItem("models/props/de_prodigy/tire1.mdl",1,0,4)
+					if IsMounted(240) then --CSS
+						self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1)
+					else
+						self:AddItem("models/props_junk/wood_pallet001a.mdl",1,0,1)
+					end
+				end
 				ScavData.CollectFuncs["models/props_silo/tirestack2.mdl"] = function(self,ent)
-																			self:AddItem("models/props_silo/tire2.mdl",1,0,1)
-																			self:AddItem("models/props_silo/tire1.mdl",1,0,3)
-																			if IsMounted(240) then --CSS
-																				self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1)
-																			else self:AddItem("models/props_junk/wood_pallet001a.mdl",1,0,1) end end
+					self:AddItem("models/props_silo/tire2.mdl",1,0,1)
+					self:AddItem("models/props_silo/tire1.mdl",1,0,3)
+					if IsMounted(240) then --CSS
+						self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1)
+					else
+						self:AddItem("models/props_junk/wood_pallet001a.mdl",1,0,1)
+					end
+				end
 				ScavData.CollectFuncs["models/props_silo/tirestack3.mdl"] = function(self,ent)
-																			self:AddItem("models/props_silo/tire1.mdl",1,0,2)
-																			if IsMounted(240) then --CSS
-																				self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1)
-																			else self:AddItem("models/props_junk/wood_pallet001a.mdl",1,0,1) end end
+					self:AddItem("models/props_silo/tire1.mdl",1,0,2)
+					if IsMounted(240) then --CSS
+						self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1)
+					else
+						self:AddItem("models/props_junk/wood_pallet001a.mdl",1,0,1)
+					end
+				end
 				--CSS
 				ScavData.CollectFuncs["models/props/de_nuke/cinderblock_stack.mdl"] = function(self,ent) self:AddItem("models/props_junk/CinderBlock01a.mdl",1,0,11) end
 				ScavData.CollectFuncs["models/props/de_inferno/hay_bail_stack.mdl"] = function(self,ent) self:AddItem("models/props/de_inferno/hay_bails.mdl",1,0,15) end
@@ -5354,28 +5363,34 @@ PrecacheParticleSystem("scav_exp_plasma")
 				ScavData.CollectFuncs["models/props/cs_militia/haybale_target_02.mdl"] = function(self,ent) self:AddItem("models/props/de_inferno/hay_bails.mdl",1,0,4) end
 				ScavData.CollectFuncs["models/props/cs_militia/haybale_target_03.mdl"] = function(self,ent) self:AddItem("models/props/de_inferno/hay_bails.mdl",1,0,3) end
 				ScavData.CollectFuncs["models/props/de_prodigy/tirestack.mdl"] = function(self,ent)
-																			self:AddItem("models/props/de_prodigy/tire1.mdl",1,0,4)
-																			self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1) end
+					self:AddItem("models/props/de_prodigy/tire1.mdl",1,0,4)
+					self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1)
+				end
 				ScavData.CollectFuncs["models/props/de_prodigy/tirestack2.mdl"] = function(self,ent)
-																			self:AddItem("models/props/de_prodigy/tire2.mdl",1,0,1)
-																			self:AddItem("models/props/de_prodigy/tire1.mdl",1,0,3)
-																			self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1) end
+					self:AddItem("models/props/de_prodigy/tire2.mdl",1,0,1)
+					self:AddItem("models/props/de_prodigy/tire1.mdl",1,0,3)
+					self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1)
+				end
 				ScavData.CollectFuncs["models/props/de_prodigy/tirestack3.mdl"] = function(self,ent)
-																			self:AddItem("models/props/de_prodigy/tire1.mdl",1,0,2)
-																			self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1) end
+					self:AddItem("models/props/de_prodigy/tire1.mdl",1,0,2)
+					self:AddItem("models/props/de_prodigy/wood_pallet_01.mdl",1,0,1)
+				end
 				ScavData.CollectFuncs["models/props/cs_assault/box_stack1.mdl"] = function(self,ent)
-																			self:AddItem("models/props/cs_assault/dryer_box.mdl",1,0,5)
-																			self:AddItem("models/props/cs_assault/washer_box2.mdl",1,0,7) end
+					self:AddItem("models/props/cs_assault/dryer_box.mdl",1,0,5)
+					self:AddItem("models/props/cs_assault/washer_box2.mdl",1,0,7)
+				end
 				ScavData.CollectFuncs["models/props/cs_assault/box_stack2.mdl"] = function(self,ent)
-																			self:AddItem("models/props/cs_assault/dryer_box.mdl",1,0,3)
-																			self:AddItem("models/props/cs_assault/washer_box.mdl",1,0,1)
-																			self:AddItem("models/props/cs_assault/dryer_box2.mdl",1,0,1)
-																			self:AddItem("models/props/cs_assault/washer_box2.mdl",1,0,4) end
+					self:AddItem("models/props/cs_assault/dryer_box.mdl",1,0,3)
+					self:AddItem("models/props/cs_assault/washer_box.mdl",1,0,1)
+					self:AddItem("models/props/cs_assault/dryer_box2.mdl",1,0,1)
+					self:AddItem("models/props/cs_assault/washer_box2.mdl",1,0,4)
+				end
 				ScavData.CollectFuncs["models/props/cs_assault/moneypallet_washerdryer.mdl"] = function(self,ent)
-																			self:AddItem("models/props/cs_assault/dryer_box.mdl",1,0,1)
-																			self:AddItem("models/props/cs_assault/washer_box2.mdl",1,0,2)
-																			self:AddItem("models/props/cs_militia/dryer.mdl",25,0,2)
-																			self:AddItem("models/props/cs_assault/money.mdl",1,0,5) end
+					self:AddItem("models/props/cs_assault/dryer_box.mdl",1,0,1)
+					self:AddItem("models/props/cs_assault/washer_box2.mdl",1,0,2)
+					self:AddItem("models/props/cs_militia/dryer.mdl",25,0,2)
+					self:AddItem("models/props/cs_assault/money.mdl",1,0,5)
+				end
 				--TF2
 				ScavData.CollectFuncs["models/props_2fort/tire002.mdl"] = function(self,ent) self:AddItem("models/props_2fort/tire001.mdl",1,0,5) end
 				ScavData.CollectFuncs["models/props_2fort/tire003.mdl"] = function(self,ent) self:AddItem("models/props_2fort/tire001.mdl",1,0,3) end
@@ -5384,23 +5399,167 @@ PrecacheParticleSystem("scav_exp_plasma")
 				--L4D/2
 				ScavData.CollectFuncs["models/props_unique/haybails_farmhouse.mdl"] = function(self,ent) self:AddItem("models/props_unique/haybails_single.mdl",1,0,20) end
 				ScavData.CollectFuncs["models/props_interiors/medicalcabinet02.mdl"] = function(self,ent) 
-																			local choice = math.Rand(0,2)
-																			local num = math.Rand(1,2)
-																			if choice < 1 then
-																				self:AddItem("models/w_models/weapons/w_eq_medkit.mdl",1,0,math.Round(num))
-																			else
-																				self:AddItem("models/w_models/weapons/w_eq_painpills.mdl",1,0,math.Round(num))
-																			end
-																		end
-
-				--ScavData.CollectFuncs["models/items/item_item_crate.mdl"] = function(self,ent) --[[self:AddItem("models/w_models/weapons/w_eq_painpills.mdl",1,0,3)]]-- self.Owner:EmitSound("physics/metal/weapon_impact_hard1.wav") end --some random (needed?) supplies - HL2
-				--ScavData.CollectFuncs["models/items/item_beacon_crate.mdl"] = function(self,ent) --[[self:AddItem("models/w_models/weapons/w_eq_painpills.mdl",1,0,3)]]-- self.Owner:EmitSound("vehicles/junker/radar_ping_friendly1.wav") end --some random (needed?) supplies - EP2
-				--ScavData.CollectFuncs["models/props_halloween/halloween_gift.mdl"] = function(self,ent) --[[self:AddItem("models/w_models/weapons/w_eq_painpills.mdl",1,0,3)]]-- self.Owner:EmitSound("items/gift_drop.wav") end --some random (needed?) supplies - TF2
+					local choice = math.Rand(0,2)
+					local num = math.Rand(1,2)
+					if choice < 1 then
+						self:AddItem("models/w_models/weapons/w_eq_medkit.mdl",1,0,math.Round(num))
+					else
+						self:AddItem("models/w_models/weapons/w_eq_painpills.mdl",1,0,math.Round(num))
+					end
+				end
+				--CRATES
+				ScavData.CollectFuncs["models/items/item_item_crate.mdl"] = function(self,ent) --some random HL2 supplies
+					local supplies = {
+						function() self:AddItem("models/healthvial.mdl",1,0) end,
+						function() self:AddItem("models/items/battery.mdl",1,0) end,
+						function() self:AddItem("models/scav/nail.mdl",15,0) end,
+						function() self:AddItem("models/props_junk/metalgascan.mdl",25,0) end,
+						function() self:AddItem("models/props_junk/popcan01a.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/shoe001a.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/watermelon01.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/glassjug01.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/plasticbucket001a.mdl",1,0) end,
+						function() self:AddItem("models/props_lab/jar01a.mdl",1,0) end,
+						function() self:AddItem("models/props_lab/huladoll.mdl",1,0) end,
+						function() self:AddItem("models/props_combine/breenbust.mdl",1,0) end,
+						function() self:AddItem("models/props_c17/doll01.mdl",1,0) end,
+						function() self:AddItem("models/props_lab/tpplug.mdl",100,0) end,
+						function() self:AddItem("models/props_junk/metalbucket01a.mdl",10,0) end,
+						function() self:AddItem("models/scav/rad_hl2.mdl",10,0) end,
+						function() self:AddItem("models/props_junk/metal_paintcan001b.mdl",30,0) end,
+						function() self:AddItem("models/items/car_battery01.mdl",25,0) end,
+						function() self:AddItem("models/props_junk/garbage_coffeemug001a.mdl",1,0) end,
+						function() self:AddItem("models/weapons/w_stunbaton.mdl",8,0) end,
+						function() self:AddItem("models/weapons/w_pistol.mdl",18,0) end,
+						function() self:AddItem("models/weapons/w_357.mdl",6,0) end,
+						function() self:AddItem("models/weapons/w_smg1.mdl",45,0) end,
+						function() self:AddItem("models/weapons/ar2_grenade.mdl",1,0) end,
+						function() self:AddItem("models/weapons/w_irifle.mdl",30,0) end,
+						function() self:AddItem("models/items/combine_rifle_ammo01.mdl",1,0) end,
+						function() self:AddItem("models/weapons/shotgun_shell.mdl",6,0) end,
+						function() self:AddItem("models/props_trainstation/payphone_reciever001a.mdl",6,0) end,
+						function() self:AddItem("models/crossbow_bolt.mdl",1,0) end,
+						function() self:AddItem("models/weapons/w_grenade.mdl",1,0) end,
+						function() self:AddItem("models/weapons/rifleshell.mdl",1,0,5) end,
+					}
+					if self.Owner:Health() * 2 <= self.Owner:GetMaxHealth() then
+						self:AddItem("models/items/healthkit.mdl",1,0)
+					end
+					if self.Owner:Armor() * 3 <= self.Owner:GetMaxArmor() then
+						self:AddItem("models/items/battery.mdl",1,0)
+					end
+					for i=0,math.floor(math.Rand(0,3)) do
+						supplies[math.floor(math.Rand(1,#supplies+1))]()
+					end
+					self.Owner:EmitSound("physics/wood/wood_box_break1.wav",75,math.Rand(90,120),.5)
+				end
+				ScavData.CollectFuncs["models/items/item_beacon_crate.mdl"] = function(self,ent) --some random Episodic supplies
+					local supplies = {
+						--function() self:AddItem("models/healthvial.mdl",1,0) end,
+						function() self:AddItem("models/items/battery.mdl",1,0) end,
+						function() self:AddItem("models/scav/nail.mdl",15,0) end,
+						function() self:AddItem("models/props_junk/metalgascan.mdl",25,0) end,
+						--function() self:AddItem("models/props_junk/popcan01a.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/shoe001a.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/watermelon01.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/glassjug01.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/plasticbucket001a.mdl",1,0) end,
+						--function() self:AddItem("models/props_lab/jar01a.mdl",1,0) end,
+						--function() self:AddItem("models/props_lab/huladoll.mdl",1,0) end,
+						function() self:AddItem("models/props_combine/breenbust.mdl",1,0) end,
+						--function() self:AddItem("models/props_c17/doll01.mdl",1,0) end,
+						function() self:AddItem("models/props_lab/tpplug.mdl",100,0) end,
+						function() self:AddItem("models/props_junk/metalbucket01a.mdl",10,0) end,
+						function() self:AddItem("models/scav/rad_hl2.mdl",10,0) end,
+						function() self:AddItem("models/props_junk/metal_paintcan001b.mdl",30,0) end,
+						--function() self:AddItem("models/items/car_battery01.mdl",25,0) end,
+						function() self:AddItem("models/props_junk/garbage_coffeemug001a.mdl",1,0) end,
+						--function() self:AddItem("models/weapons/w_stunbaton.mdl",8,0) end,
+						function() self:AddItem("models/weapons/w_pistol.mdl",18,0) end,
+						function() self:AddItem("models/weapons/w_357.mdl",6,0) end,
+						function() self:AddItem("models/weapons/w_smg1.mdl",45,0) end,
+						function() self:AddItem("models/weapons/ar2_grenade.mdl",1,0) end,
+						function() self:AddItem("models/weapons/w_irifle.mdl",30,0) end,
+						function() self:AddItem("models/items/combine_rifle_ammo01.mdl",1,0) end,
+						function() self:AddItem("models/weapons/shotgun_shell.mdl",6,0) end,
+						function() self:AddItem("models/props_trainstation/payphone_reciever001a.mdl",6,0) end,
+						function() self:AddItem("models/crossbow_bolt.mdl",1,0) end,
+						function() self:AddItem("models/weapons/w_grenade.mdl",1,0) end,
+						function() self:AddItem("models/weapons/rifleshell.mdl",1,0,5) end,
+						--Ep2 stuff
+						function() self:AddItem("models/magnusson_device.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/flare.mdl",1,0) end,
+						function() self:AddItem("models/props_mining/railroad_spike01.mdl",1,0) end,
+						function() self:AddItem("models/weapons/hunter_flechette.mdl",25,0) end,
+						function() self:AddItem("models/props_silo/acunit02.mdl",50,0) end,
+						function() self:AddItem("models/grub_nugget_large.mdl",1,0) end,
+						function() self:AddItem("models/props_forest/stove01.mdl",20,0) end,
+					}
+					if self.Owner:Health() * 2 <= self.Owner:GetMaxHealth() then
+						self:AddItem("models/items/healthkit.mdl",1,0)
+					end
+					if self.Owner:Armor() * 3 <= self.Owner:GetMaxArmor() then
+						self:AddItem("models/items/battery.mdl",1,0)
+					end
+					for i=0,math.floor(math.Rand(0,3)) do
+						supplies[math.floor(math.Rand(1,#supplies+1))]()
+					end
+					self.Owner:EmitSound("vehicles/junker/radar_ping_friendly1.wav",75,100,.5)
+				end
+				ScavData.CollectFuncs["models/props_halloween/halloween_gift.mdl"] = function(self,ent) --some random TF2 supplies
+					local supplies = {
+						function() self:AddItem("models/items/medkit_small.mdl",1,0) end,
+						function() self:AddItem("models/weapons/c_models/c_sandwich/c_sandwich.mdl",1,0) end,
+						function() self:AddItem("models/scav/nail.mdl",25,0) end,
+						function() self:AddItem("models/props_farm/oilcan01.mdl",25,0) end,
+						function() self:AddItem("models/weapons/w_models/w_grenade_grenadelauncher.mdl",1,math.Round(math.random()),4) end,
+						function() self:AddItem("models/weapons/w_models/w_flaregun_shell.mdl",1,math.Round(math.random()),3) end,
+						function() self:AddItem("models/props_gameplay/pill_bottle01.mdl",1,0) end,
+						function() self:AddItem("models/weapons/c_models/c_flameball/c_flameball.mdl",20,math.Round(math.random())) end,
+						function() self:AddItem("models/weapons/w_models/w_rocket.mdl",1,0,4) end,
+						function() self:AddItem("models/weapons/c_models/urinejar.mdl",1,0) end,
+						function() self:AddItem("models/weapons/w_models/w_repair_claw.mdl",1,0,4) end,
+						function() self:AddItem("models/buildables/sentry1.mdl",100,math.Round(math.random())) end,
+						function() self:AddItem("models/weapons/w_models/w_stickybomb.mdl",1,math.Round(math.random()),3) end,
+						function() self:AddItem("models/props_2fort/fire_extinguisher.mdl",100,0) end,
+						function() self:AddItem("models/props_2fort/sink001.mdl",25,0) end,
+						function() self:AddItem("models/props_badlands/barrel03.mdl",10,0) end,
+						function() self:AddItem("models/weapons/c_models/c_spy_watch.mdl",30,0) end,
+						function() self:AddItem("models/flag/briefcase.mdl",1,math.Round(math.random())) end,
+						function() self:AddItem("models/weapons/c_models/c_energy_drink/c_energy_drink.mdl",1,math.Round(math.random())) end,
+						function() self:AddItem("models/weapons/c_models/c_sapper/c_sapper.mdl",8,0) end,
+						function() self:AddItem("models/weapons/c_models/c_pistol/c_pistol.mdl",12,0) end,
+						function() self:AddItem("models/weapons/w_357.mdl",6,0) end, --TODO: Gotta switch to spy's revolvers when they have their own unique models registered
+						function() self:AddItem("models/weapons/c_models/c_smg/c_smg.mdl",25,0) end,
+						function() self:AddItem("models/weapons/c_models/c_claymore/c_claymore.mdl",1,0) end,
+						function() self:AddItem("models/weapons/c_models/c_minigun/c_minigun.mdl",200,0) end,
+						function() self:AddItem("models/props_trainyard/cart_bomb_separate.mdl",1,0) end,
+						function() self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0) end,
+						function() self:AddItem("models/props_2fort/telephone001.mdl",6,0) end,
+						function() self:AddItem("models/weapons/w_models/w_arrow.mdl",1,0,3) end,
+						function() self:AddItem("models/weapons/c_models/c_flamethrower/c_flamethrower.mdl",200,math.Round(math.random())) end,
+						function() self:AddItem("models/weapons/c_models/c_sniperrifle/c_sniperrifle.mdl",25,0) end,
+					}
+					if self.Owner:Health() * 2 <= self.Owner:GetMaxHealth() then
+						self:AddItem("models/items/medkit_medium.mdl",1,0)
+					end
+					if self.Owner:Armor() * 3 <= self.Owner:GetMaxArmor() then
+						self:AddItem("models/pickups/pickup_powerup_defense.mdl",1,0)
+					end
+					for i=0,math.floor(math.Rand(0,3)) do
+						supplies[math.floor(math.Rand(1,#supplies+1))]()
+					end
+					if ent:GetModel() == "models/props_halloween/halloween_gift.mdl" then
+						self.Owner:EmitSound("items/gift_drop.wav",75,100,.5)
+					else
+						self.Owner:EmitSound("items/regenerate.wav",75,100,.5)
+					end
+				end
+				ScavData.CollectFuncs["models/props_gameplay/resupply_locker.mdl"] = ScavData.CollectFuncs["models/props_halloween/halloween_gift.mdl"]
 				--L4D2 Gift
 				--Portal Cake (isn't solid :c)
 				--CSS Laundry Box maybe?
 				--Make HL2 Oil Drums sometimes provide Radioactive/BioHazard Barrel Firemodes?
-				--TF2 Resupply Cabinet supplying Health/Weapons
 				
 				--Give a random TF2 barrel from barrel crates
 				ScavData.CollectFuncs["models/props_mvm/barrel_crate.mdl"] = function(self,ent)
