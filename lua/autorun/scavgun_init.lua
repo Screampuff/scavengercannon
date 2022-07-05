@@ -9,166 +9,187 @@ SCAV_SHORT_MAX = 32767
 CreateClientConVar("cl_scav_high",0,true,false,"Enable/disable Backup Pistol shot dynamic lighting",0,1)
 CreateClientConVar("cl_scav_colorblindmode",0,true,true,"Enable/disable colorblindness assistance",0,1)
 
-CreateConVar("scav_override_pickups",1,FCVAR_NOTIFY,"Controls the entities that the Scavenger Cannon can pick up.\n1: Standard Behavior\n2: Disables picking up vanilla items/weapons when walking over them, allowing them to be picked up by the Scavenger Cannon instead\n3: Allows picking up vanilla vehicles. Disables picking up *all* items/weapons when walking over them. May not function as expected with other addons!",1,3)
-	cvars.AddChangeCallback("scav_override_pickups", function(convar, oldValue, newValue)
-		for i=1,game.MaxPlayers() do
-			if IsValid(Entity(i)) then
-				Entity(i).JustSpawned = false
-				Entity(i).SWEPSpawned = "nil"
+local function SetupScavPickupOverrides(state)
+	for i=1,game.MaxPlayers() do
+		if IsValid(Entity(i)) then
+			Entity(i).JustSpawned = false
+			Entity(i).SWEPSpawned = "nil"
+		end
+	end
+	if tonumber(state) < 2 then
+		hook.Remove("PlayerCanPickupWeapon","Scav_DisableTouchPickup")
+		hook.Remove("PlayerCanPickupItem","Scav_DisableTouchPickup")
+		hook.Remove("PlayerSpawn","Scav_DisableTouchPickup")
+		hook.Remove("PlayerGiveSWEP","Scav_DisableTouchPickup")
+	elseif tonumber(state) < 3 then
+		hook.Add("PlayerSpawn","Scav_DisableTouchPickup",function(ply,transition) --stops checks from denying weapons/items on spawn
+			ply.JustSpawned = true
+			timer.Simple(0,function() ply.JustSpawned = false end)
+		end)
+		hook.Add("PlayerGiveSWEP","Scav_DisableTouchPickup",function(ply,weapon,sweptable) --stops checks from denying weapons from spawnmenu
+			ply.SWEPSpawned = weapon
+			timer.Simple(0,function() ply.SWEPSpawned = "nil" end)
+		end)
+		hook.Add("PlayerCanPickupWeapon","Scav_DisableTouchPickup", function(ply,weapon)
+			local wepname = weapon:GetClass()
+			if SERVER then
+				if weapon:IsPlayerHolding() == false and --cheeky way to allow +USE to still let the player pick up the weapon normally
+					ply.JustSpawned == false and
+					ply.SWEPSpawned ~= wepname and
+					(wepname == "weapon_crowbar" or
+					wepname == "weapon_stunstick" or
+					wepname == "weapon_physgun" or
+					wepname == "weapon_physcannon" or
+					wepname == "weapon_pistol" or
+					wepname == "weapon_357" or
+					wepname == "weapon_smg1" or
+					wepname == "weapon_ar2" or
+					wepname == "weapon_shotgun" or
+					wepname == "weapon_crossbow" or
+					wepname == "weapon_frag" or
+					wepname == "weapon_rpg" or
+					wepname == "weapon_slam" or
+					wepname == "weapon_bugbait" or
+					wepname == "gmod_tool" or
+					wepname == "gmod_camera" or
+					wepname == "weapon_alyxgun" or
+					wepname == "weapon_annabelle" or
+					wepname == "weapon_oldmanharpoon" or
+					wepname == "weapon_citizenpackage" or
+					wepname == "weapon_citizensuitcase" or
+					wepname == "scav_gun" or
+					wepname == "weapon_blackholegun" or
+					wepname == "weapon_backuppistol" or
+					wepname == "weapon_alchemygun") then
+					return false
+				end
 			end
-		end
-		if tonumber(newValue) < 2 then
-			hook.Remove("PlayerCanPickupWeapon","Scav_DisableTouchPickup")
-			hook.Remove("PlayerCanPickupItem","Scav_DisableTouchPickup")
-			hook.Remove("PlayerSpawn","Scav_DisableTouchPickup")
-			hook.Remove("PlayerGiveSWEP","Scav_DisableTouchPickup")
-		elseif tonumber(newValue) < 3 then
-			hook.Add("PlayerSpawn","Scav_DisableTouchPickup",function(ply,transition) --stops checks from denying weapons/items on spawn
-				ply.JustSpawned = true
-				timer.Simple(0,function() ply.JustSpawned = false end)
-			end)
-			hook.Add("PlayerGiveSWEP","Scav_DisableTouchPickup",function(ply,weapon,sweptable) --stops checks from denying weapons from spawnmenu
-				ply.SWEPSpawned = weapon
-				timer.Simple(0,function() ply.SWEPSpawned = "nil" end)
-			end)
-			hook.Add("PlayerCanPickupWeapon","Scav_DisableTouchPickup", function(ply,weapon)
+		end)
+		hook.Add("PlayerCanPickupItem","Scav_DisableTouchPickup", function(ply,item)
+			if SERVER then
+				local itemname = item:GetClass()
+				if item:IsPlayerHolding() == false and
+					ply.JustSpawned == false and
+					(itemname == "item_healthkit" or
+					itemname == "item_healthvial" or
+					itemname == "item_battery" or
+					itemname == "item_box_srounds" or
+					itemname == "item_ammo_pistol" or
+					itemname == "item_ammo_pistol_large" or --keeping things explicit in case other addons use "item_ammo_XXX" as names
+					itemname == "item_ammo_357" or
+					itemname == "item_ammo_357_large" or
+					itemname == "item_box_mrounds" or
+					itemname == "item_ammo_smg1" or
+					itemname == "item_ammo_smg1_large" or
+					itemname == "item_ar2_grenade" or
+					itemname == "item_ammo_smg1_grenade" or
+					itemname == "item_box_lrounds" or
+					itemname == "item_ammo_ar2" or
+					itemname == "item_ammo_ar2_large" or
+					itemname == "item_ammo_ar2_altfire" or
+					itemname == "item_box_buckshot" or
+					itemname == "item_ammo_crossbow" or
+					itemname == "item_rpg_round") then
+					return false
+				end
+			end
+		end)
+	else
+		hook.Add("PlayerSpawn","Scav_DisableTouchPickup",function(ply,transition)
+			ply.JustSpawned = true
+			timer.Simple(0,function() ply.JustSpawned = false end)
+		end)
+		hook.Add("PlayerGiveSWEP","Scav_DisableTouchPickup",function(ply,weapon,sweptable)
+			ply.SWEPSpawned = weapon
+			timer.Simple(0,function() ply.SWEPSpawned = "nil" end)
+		end)
+		hook.Add("PlayerCanPickupWeapon","Scav_DisableTouchPickup", function(ply,weapon)
+			if SERVER then
 				local wepname = weapon:GetClass()
-				if SERVER then
-					if weapon:IsPlayerHolding() == false and --cheeky way to allow +USE to still let the player pick up the weapon normally
-						ply.JustSpawned == false and
-						ply.SWEPSpawned ~= wepname and
-						(wepname == "weapon_crowbar" or
-						wepname == "weapon_stunstick" or
-						wepname == "weapon_physgun" or
-						wepname == "weapon_physcannon" or
-						wepname == "weapon_pistol" or
-						wepname == "weapon_357" or
-						wepname == "weapon_smg1" or
-						wepname == "weapon_ar2" or
-						wepname == "weapon_shotgun" or
-						wepname == "weapon_crossbow" or
-						wepname == "weapon_frag" or
-						wepname == "weapon_rpg" or
-						wepname == "weapon_slam" or
-						wepname == "weapon_bugbait" or
-						wepname == "gmod_tool" or
-						wepname == "gmod_camera" or
-						wepname == "weapon_alyxgun" or
-						wepname == "weapon_annabelle" or
-						wepname == "weapon_oldmanharpoon" or
-						wepname == "weapon_citizenpackage" or
-						wepname == "weapon_citizensuitcase" or 
-						wepname == "scav_gun" or 
-						wepname == "weapon_blackholegun" or 
-						wepname == "weapon_backuppistol" or 
-						wepname == "weapon_alchemygun") then
-						return false
-					end
+				if weapon:IsPlayerHolding() == false and
+					ply.JustSpawned == false and
+					ply.SWEPSpawned ~= wepname and
+					IsValid(weapon:GetPhysicsObject()) then --can't pick something up if it doesn't have a phys model, so don't prevent it.
+					return false
 				end
-			end)
-			hook.Add("PlayerCanPickupItem","Scav_DisableTouchPickup", function(ply,item)
-				if SERVER then
-					local itemname = item:GetClass()
-					if item:IsPlayerHolding() == false and
-						ply.JustSpawned == false and
-						(itemname == "item_healthkit" or
-						itemname == "item_healthvial" or
-						itemname == "item_battery" or
-						itemname == "item_box_srounds" or
-						itemname == "item_ammo_pistol" or
-						itemname == "item_ammo_pistol_large" or --keeping things explicit in case other addons use "item_ammo_XXX" as names
-						itemname == "item_ammo_357" or
-						itemname == "item_ammo_357_large" or
-						itemname == "item_box_mrounds" or
-						itemname == "item_ammo_smg1" or
-						itemname == "item_ammo_smg1_large" or
-						itemname == "item_ar2_grenade" or
-						itemname == "item_ammo_smg1_grenade" or
-						itemname == "item_box_lrounds" or
-						itemname == "item_ammo_ar2" or
-						itemname == "item_ammo_ar2_large" or
-						itemname == "item_ammo_ar2_altfire" or
-						itemname == "item_box_buckshot" or
-						itemname == "item_ammo_crossbow" or
-						itemname == "item_rpg_round") then
-						return false
-					end
+			end
+		end)
+		hook.Add("PlayerCanPickupItem","Scav_DisableTouchPickup", function(ply,item)
+			if SERVER then
+				--local itemname = item:GetClass()
+				if item:IsPlayerHolding() == false and
+					ply.JustSpawned == false and
+					IsValid(item:GetPhysicsObject()) then --can't pick something up if it doesn't have a phys model, so don't prevent it.
+					return false
 				end
-			end)
-		else
-			hook.Add("PlayerSpawn","Scav_DisableTouchPickup",function(ply,transition) 
-				ply.JustSpawned = true
-				timer.Simple(0,function() ply.JustSpawned = false end)
-			end)
-			hook.Add("PlayerGiveSWEP","Scav_DisableTouchPickup",function(ply,weapon,sweptable) 
-				ply.SWEPSpawned = weapon
-				timer.Simple(0,function() ply.SWEPSpawned = "nil" end)
-			end)
-			hook.Add("PlayerCanPickupWeapon","Scav_DisableTouchPickup", function(ply,weapon)
-				if SERVER then
-					local wepname = weapon:GetClass()
-					if weapon:IsPlayerHolding() == false and
-						ply.JustSpawned == false and
-						ply.SWEPSpawned ~= wepname and
-						IsValid(weapon:GetPhysicsObject()) then --can't pick something up if it doesn't have a phys model, so don't prevent it.
-						return false
-					end
-				end
-			end)
-			hook.Add("PlayerCanPickupItem","Scav_DisableTouchPickup", function(ply,item)
-				if SERVER then
-					--local itemname = item:GetClass()
-					if item:IsPlayerHolding() == false and
-						ply.JustSpawned == false and
-						IsValid(item:GetPhysicsObject()) then --can't pick something up if it doesn't have a phys model, so don't prevent it.
-						return false
-					end
-				end
-			end)
-		end
-	end)
+			end
+		end)
+	end
+end
 
-CreateConVar("scav_force_usefulragdolls",0,FCVAR_NOTIFY,"Force NPCs with unique firemode functions to drop solid ragdolls, regardless of ''Keep Corpses'' settings",0,1)
-	cvars.AddChangeCallback("scav_force_usefulragdolls", function(convar, oldValue, newValue)
-		if tobool(newValue) then
-			hook.Add("OnNPCKilled","ScavDropUsefulRagdoll",function(npc,attacker,inflictor)
-				if npc:GetShouldServerRagdoll() then return end --we're already making a server ragdoll
-				local class = npc:GetClass()
-				--ugly, but, not really a better way to go about it
-				if class == "npc_poisonzombie" or --disease shot collection
-					class == "npc_headcrab_black" or --disease shot
-					class == "npc_headcrab_poison" or --"
-					class == "npc_alyx" or --universal remote
-					class == "npc_dog" or --gravity gun
-					class == "npc_vortigaunt" or --vortigaunt beam
-					class == "VortigauntUriah" or --vortigaunt beam
-					class == "VortigauntSlave" or --vortigaunt beam
-					class == "npc_antlionguard" or --bugbait
-					class == "npc_antlion_worker" or --acid spit
-					class == "npc_zombine" or --grenade
-					class == "npc_hunter" or --flechettes
-					class == "npc_stalker" or --laser beam
-					class == "npc_manhack" or --buzzsaw
-					class == "npc_helicopter" or --helicopter gun
-					class == "npc_combinegunship" or --airboat gun
-					class == "npc_strider" or --strider cannon/minigun
-					class == "monster_bullchicken" or --bullsquid spit
-					class == "monster_alien_controller" or --controller balls
-					class == "monster_human_grunt" or --smg/shotgun
-					class == "monster_houndeye" or --supersonic shockwave
-					class == "monster_scientist" or --medkit
-					class == "monster_barney" or --pistol
-					class == "monster_sentry" or --auto-target rifle
-					class == "monster_alien_grunt" or --hornets
-					class == "monster_alien_slave" or --vortigaunt beam
-					class == "monster_human_assassin" then --cloak/silenced USPs
-					npc:SetShouldServerRagdoll(true)
-				end
-			end)
-		else
-			hook.Remove("OnNPCKilled","ScavDropUsefulRagdoll")
-		end
-	end)
+CreateConVar("scav_override_pickups",1,{FCVAR_NOTIFY,FCVAR_ARCHIVE},"Controls the entities that the Scavenger Cannon can pick up.\n1: Standard Behavior\n2: Disables picking up vanilla items/weapons when walking over them, allowing them to be picked up by the Scavenger Cannon instead\n3: Allows picking up vanilla vehicles. Disables picking up *all* items/weapons when walking over them. May not function as expected with other addons!",1,3)
+
+cvars.AddChangeCallback("scav_override_pickups", function(convar, oldValue, newValue)
+	SetupScavPickupOverrides(state)
+end)
+
+local function SetupScavRagdollOverrides(state)
+	if tobool(state) then
+		hook.Add("OnNPCKilled","ScavDropUsefulRagdoll",function(npc,attacker,inflictor)
+			if npc:GetShouldServerRagdoll() then return end --we're already making a server ragdoll
+			local class = npc:GetClass()
+			--ugly, but, not really a better way to go about it
+			if class == "npc_poisonzombie" or --disease shot collection
+				class == "npc_headcrab_black" or --disease shot
+				class == "npc_headcrab_poison" or --"
+				class == "npc_alyx" or --universal remote
+				class == "npc_dog" or --gravity gun
+				class == "npc_vortigaunt" or --vortigaunt beam
+				class == "VortigauntUriah" or --vortigaunt beam
+				class == "VortigauntSlave" or --vortigaunt beam
+				class == "npc_antlionguard" or --bugbait
+				class == "npc_antlion_worker" or --acid spit
+				class == "npc_zombine" or --grenade
+				class == "npc_hunter" or --flechettes
+				class == "npc_stalker" or --laser beam
+				class == "npc_manhack" or --buzzsaw
+				class == "npc_helicopter" or --helicopter gun
+				class == "npc_combinegunship" or --airboat gun
+				class == "npc_strider" or --strider cannon/minigun
+				class == "monster_bullchicken" or --bullsquid spit
+				class == "monster_alien_controller" or --controller balls
+				class == "monster_human_grunt" or --smg/shotgun
+				class == "monster_houndeye" or --supersonic shockwave
+				class == "monster_scientist" or --medkit
+				class == "monster_barney" or --pistol
+				class == "monster_sentry" or --auto-target rifle
+				class == "monster_alien_grunt" or --hornets
+				class == "monster_alien_slave" or --vortigaunt beam
+				class == "monster_human_assassin" then --cloak/silenced USPs
+				npc:SetShouldServerRagdoll(true)
+			end
+		end)
+	else
+		hook.Remove("OnNPCKilled","ScavDropUsefulRagdoll")
+	end
+end
+
+CreateConVar("scav_force_usefulragdolls",0,{FCVAR_NOTIFY,FCVAR_ARCHIVE},"Force NPCs with unique firemode functions to drop solid ragdolls, regardless of ''Keep Corpses'' settings",0,1)
+
+cvars.AddChangeCallback("scav_force_usefulragdolls", function(convar, oldValue, newValue)
+	SetupScavRagdollOverrides(newValue)
+end)
+
+hook.Add("InitPostEntity","SetupScavPickupOverrides",function()
+	local pickup = GetConVar("scav_override_pickups")
+	local rag = GetConVar("scav_force_usefulragdolls")
+	if pickup then
+		SetupScavPickupOverrides(pickup:GetInt())
+	end
+	if rag then
+		SetupScavRagdollOverrides(pickup:GetInt())
+	end
+end)
 
 if CLIENT then
 	surface.CreateFont("Scav_MenuLarge", {font = "Verdana", size = 15, weight = 600, antialias = true})

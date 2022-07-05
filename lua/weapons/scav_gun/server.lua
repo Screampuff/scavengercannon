@@ -256,7 +256,8 @@ if SERVER then
 				modeinfo.OnArmed(self, itemnew, item.ammo)
 			end
 		end
-		
+
+		self:SaveInvForRestore()
 		pl:EmitSound("weapons/smg1/switch_single.wav", 100, 100 + math.abs(amt * 2))
 		
 	end
@@ -293,6 +294,7 @@ if SERVER then
 		
 		if self.inv.itemids[itemid] then
 			self.inv.itemids[itemid]:Remove(false,nil,true)
+			self:SaveInvForRestore()
 		end
 		
 	end
@@ -439,11 +441,30 @@ if SERVER then
 		return true
 		
 	end
+
+	function SWEP:SaveInvForRestore()
+		if self.inv and IsValid(self.Owner) then
+			saverestore.AddSaveHook("scavsave_"..self.Owner:SteamID64(), function(save)
+				saverestore.WriteTable(self.inv,save)
+				saverestore.SaveEntity(self,save)
+				print(save)
+			end)
+		end
+	end
 	
 	function SWEP:OnRestore()
 		self.nextfire = 0
 		self.nextfireearly = 0
+
+		saverestore.AddRestoreHook("scavsave_"..self.Owner:SteamID64(), function(save)
+			local savedinv = saverestore.ReadTable(save)
+			if savedinv then
+				self.inv = savedinv
+			end
+		end)
+
 		ReinitializeScavInventory(self.inv)
+
 		if IsValid(self.Owner) then
 			self.inv:AddOnClient(self.Owner)
 		end
@@ -664,6 +685,7 @@ if SERVER then
 					end
 				end
 				
+				self:SaveInvForRestore()
 				self.nextfire = shoottime + cooldown
 				
 			else
@@ -719,6 +741,8 @@ if SERVER then
 				self:SetSeqEndTime(self.nextfire - 0.1)
 				self:RemoveItem(1)
 				self.Owner:EmitSound(self.shootsound, 100, math.Clamp(120 - (self.nextfire - CurTime()) * 50, 30, 255))
+
+				self:SaveInvForRestore()
 				
 				net.Start("scv_s_time")
 					net.WriteEntity(self)
@@ -795,6 +819,7 @@ if SERVER then
 		
 		ent:Remove()
 		self.inv:SendSnapshot()
+		self:SaveInvForRestore()
 		
 		return true
 		
