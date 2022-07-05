@@ -115,9 +115,11 @@ local bullet = {}
 		local dodamage = gamemode.Call("PlayerTraceAttack",attacker,dmginfo,tr.Normal,tr)
 		if SERVER then
 			local class = tr.Entity:GetClass()
-			if (class == "prop_physics") or (class == "prop_physics_respawnable") or (class == "prop_physics_multiplayer") then
+			if class == "prop_physics" or class == "prop_physics_respawnable" or class == "prop_physics_multiplayer" then
 				tr.Entity:SetHealth(1)
 				--print("setting ent health to 1: "..tostring(tr.Entity:Health()))
+			elseif class == "func_breakable_surf" then
+				tr.Entity:Fire("Shatter","(0.5,0.5,0)",0,attacker,attacker:GetWeapon("weapon_backuppistol"))
 			end
 			--print(dodamage)
 			--if dodamage then

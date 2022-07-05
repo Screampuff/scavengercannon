@@ -1955,7 +1955,7 @@ end
 		end
 		function tab.OnArmed(self,item,olditemname)
 			if SERVER then
-				if olditemname == "" or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
+				if olditemname == "" or not ScavData.models[olditemname] or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
 					if item.ammo == "models/props_2fort/telephone001.mdl" or --TF2
 							item.ammo == "models/props_spytech/control_room_console01.mdl" or
 							item.ammo == "models/props_spytech/control_room_console03.mdl" then
@@ -2360,7 +2360,8 @@ end
 					proj:Spawn()
 					return self:TakeSubammo(item,1)
 				end
-				ScavData.CollectFuncs["models/props_lab/citizenradio.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,ent:GetSkin()) end
+				ScavData.CollectFuncs["models/props_phx/misc/fender.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,ent:GetSkin()) end
+				ScavData.CollectFuncs["models/props_lab/citizenradio.mdl"] = ScavData.CollectFuncs["models/props_phx/misc/fender.mdl"]
 				ScavData.CollectFuncs["models/props_c17/canister01a.mdl"] = ScavData.CollectFuncs["models/props_lab/citizenradio.mdl"]
 				ScavData.CollectFuncs["models/props_c17/canister02a.mdl"] = ScavData.CollectFuncs["models/props_lab/citizenradio.mdl"]
 				ScavData.CollectFuncs["models/props_wasteland/speakercluster01a.mdl"] = ScavData.CollectFuncs["models/props_lab/citizenradio.mdl"]
@@ -2403,6 +2404,7 @@ end
 			end
 			tab.Cooldown = 0.75
 			
+		ScavData.RegisterFiremode(tab,"models/props_phx/misc/fender.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_c17/canister01a.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_c17/canister02a.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_lab/citizenradio.mdl")
@@ -3096,6 +3098,8 @@ end
 			tab.Cooldown = 2
 		ScavData.RegisterFiremode(tab,"models/food/burger.mdl")
 		ScavData.RegisterFiremode(tab,"models/food/hotdog.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_phx/misc/egg.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_phx/misc/potato.mdl")
 		--CSS
 		ScavData.RegisterFiremode(tab,"models/props/cs_italy/bananna.mdl")
 		--TF2
