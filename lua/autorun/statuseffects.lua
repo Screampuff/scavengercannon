@@ -320,6 +320,7 @@ local STATUS = {}
 	STATUS.Name = "Speed"
 	
 	function STATUS:Initialize()
+		self.NextStaminaHeal = CurTime()
 	end
 	
 	if SERVER then
@@ -333,7 +334,7 @@ local STATUS = {}
 	end
 
 	function STATUS:Think()
-		if SERVER and not self.NextStaminaHeal or (self.NextStaminaHeal and self.NextStaminaHeal < CurTime()) and self.Owner:IsPlayer() and self.Owner:GetSuitPower() < 100 then
+		if SERVER and IsValid(self.Owner) and self.Owner:IsPlayer() and self.Owner:GetSuitPower() < 100 and self.NextStaminaHeal and self.NextStaminaHeal < CurTime() then
 			self.Owner:SetSuitPower(math.Clamp(self.Owner:GetSuitPower()+5,0,100))
 			self.NextStaminaHeal = CurTime() + 0.5
 		end
@@ -356,14 +357,14 @@ local STATUS = {}
 	STATUS.Name = "Slow"
 	
 	function STATUS:Initialize()
-		if self.Owner:IsPlayer() then
+		if IsValid(self.Owner) then
+			self.Owner.Status_slow = self
 		end
-		self.Owner.Status_slow = self
 		self.NextStaminaHeal = CurTime()
 	end
 	
 	function STATUS:Think()
-		if SERVER and GetConVar("gmod_suit"):GetBool() and self.NextStaminaHeal < CurTime() and self.Owner:IsPlayer() then
+		if SERVER and GetConVar("gmod_suit"):GetBool() and IsValid(self.Owner) and self.Owner:IsPlayer() and self.NextStaminaHeal and self.NextStaminaHeal < CurTime() then
 			if self.Owner:IsSprinting() then
 				self.Owner:SetSuitPower(math.Clamp(self.Owner:GetSuitPower()-5,0,100))
 			elseif self.Owner:GetSuitPower() < 100 then
@@ -374,15 +375,13 @@ local STATUS = {}
 	end
 	
 	function STATUS:Finish()
-		if self.Owner:IsPlayer() then
+		if IsValid(self.Owner) then
+			self.Owner.Status_slow = false
 		end
-		self.Owner.Status_slow = false
 	end
 	
 	function STATUS:Add(duration,value)
 		self.Value = value
-		if self.Owner:IsPlayer() then
-		end
 		self.EndTime = self.EndTime+duration
 	end
 	
