@@ -130,7 +130,7 @@ end
 CreateConVar("scav_override_pickups",1,{FCVAR_NOTIFY,FCVAR_ARCHIVE},"Controls the entities that the Scavenger Cannon can pick up.\n1: Standard Behavior\n2: Disables picking up vanilla items/weapons when walking over them, allowing them to be picked up by the Scavenger Cannon instead\n3: Allows picking up vanilla vehicles. Disables picking up *all* items/weapons when walking over them. May not function as expected with other addons!",1,3)
 
 cvars.AddChangeCallback("scav_override_pickups", function(convar, oldValue, newValue)
-	SetupScavPickupOverrides(state)
+	SetupScavPickupOverrides(newValue)
 end)
 
 local function SetupScavRagdollOverrides(state)
