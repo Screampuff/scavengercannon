@@ -208,7 +208,8 @@ if SERVER then
 	end
 
 	function ENT:OnTakeDamage(dmginfo)
-		if dmginfo:GetInflictor():GetClass() ~= "hunter_flechette" then
+		local inflictor = dmginfo:GetInflictor()
+		if IsValid(inflictor) and inflictor:GetClass() ~= "hunter_flechette" then
 			self:Explode(dmginfo:GetAttacker())
 		else
 			self:Detach()

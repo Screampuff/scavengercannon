@@ -866,7 +866,7 @@ local eject = "brass"
 			tab.Level = 3
 			tab.bullet = {}
 				tab.bullet.Num = 1
-				tab.bullet.Spread = Vector(0.03,0.03,0)
+				tab.bullet.Spread = Vector(0.01,0.01,0)
 				tab.bullet.Tracer = 1
 				tab.bullet.Force = 0
 				tab.bullet.Damage = 5
@@ -1386,7 +1386,7 @@ local eject = "brass"
 					tracep.mins = tab.vmin
 					tracep.maxs = tab.vmax
 					local tr = util.TraceHull(tracep)
-					if (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer")) and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
+					if IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot()) and tr.Entity.Health and tr.Entity.GetMaxHealth and tr.Entity.SetHealth and tr.Entity:GetMaxHealth() > 0 and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
 						target = tr.Entity
 					end
 				if target:GetMaxHealth() <= target:Health() then

@@ -2744,7 +2744,7 @@ end
 					tracep.mins = tab.vmin
 					tracep.maxs = tab.vmax
 					local tr = util.TraceHull(tracep)
-					if IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer")) and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
+					if IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot()) and tr.Entity.Health and tr.Entity.GetMaxHealth and tr.Entity.SetHealth and tr.Entity:GetMaxHealth() > 0 and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
 						healent = tr.Entity
 					end
 					if healent:Health() >= healent:GetMaxHealth() then
@@ -3387,7 +3387,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 			tab.dmginfo = DamageInfo()
 			tab.Callback = function(self,tr)
 				if IsValid(tr.Entity) then
-					if tr.Entity:IsPlayer() or tr.Entity:IsNPC() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer") then
+					if tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot() then
 						tr.Entity:InflictStatusEffect("Disease",5,1)
 					end
 					local dmg = ScavData.models["models/weapons/w_models/w_syringegun.mdl"].dmginfo
@@ -3715,7 +3715,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						dmg:SetDamageType(DMG_DIRECT)
 						ent:TakeDamageInfo(dmg)
 					end
-					if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer") then
+					if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not tr.Entity:IsNextBot() then
 						return false
 					end
 					return true
@@ -3843,7 +3843,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 							sound.Play("player/pl_burnpain2.wav",tr.HitPos,75,120,1)
 						end
 					end
-					if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer") then
+					if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not tr.Entity:IsNextBot() then
 						if IsMounted(440) then --TF2
 							sound.Play("weapons/dragons_fury_impact.wav",tr.HitPos,75,100,.75)
 						else
@@ -3985,7 +3985,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 										dmg:SetDamagePosition(tr.HitPos)
 										dmg:SetDamageType(DMG_CHEMICAL)
 										ent:TakeDamageInfo(dmg)
-										if ent:IsPlayer() or ent:IsNPC() or (_ZetasInstalled and ent:GetClass() == "npc_zetaplayer") then
+										if ent:IsPlayer() or ent:IsNPC() or ent:IsNextBot() then
 											ent:SetVelocity((ent:GetPos()-self:GetPos()):GetNormalized()*1000)
 										end
 									elseif ent:GetPhysicsObject():IsValid() then
@@ -4091,7 +4091,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 							ent:InflictStatusEffect("Acid",100,(self.deathtime-CurTime())/2,self:GetOwner())
 							ent:EmitSound("ambient/levels/canals/toxic_slime_sizzle"..math.random(2,4)..".wav")
 						end
-						if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer") then
+						if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not tr.Entity:IsNextBot() then
 							return false
 						end
 						return true
@@ -4232,7 +4232,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 								ice:SetMoveType(MOVETYPE_NONE)
 							end
 						end
-						if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer") then
+						if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not tr.Entity:IsNextBot() then
 							return false
 						end
 						return true

@@ -50,7 +50,7 @@ function ENT:OnImpact(hitent)
 	local ent = ents.FindInSphere(pos,300)
 	for k,v in ipairs(ent) do
 		local intensity = (300-pos:Distance(pos+v:OBBCenter()))/15
-		if (v:IsPlayer() or v:IsNPC() or (_ZetasInstalled and v:GetClass() == "npc_zetaplayer")) and not v:IsFriendlyToPlayer(self.Owner) then
+		if IsValid(v) and (v:IsPlayer() or v:IsNPC() or v:IsNextBot()) and not v:IsFriendlyToPlayer(self.Owner) then
 			v:InflictStatusEffect("Deaf",intensity,0)
 			local dmg = DamageInfo()
 			dmg:SetDamage(intensity)

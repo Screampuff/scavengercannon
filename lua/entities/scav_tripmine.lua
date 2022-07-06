@@ -52,7 +52,7 @@ function ENT:Think()
 		
 		if self:GetIsArmed() then
 			local tr = self:GetBeamTrace()
-			if IsValid(tr.Entity) and (tr.Entity:IsNPC() or tr.Entity:IsPlayer() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer")) and not tr.Entity:IsFriendlyToPlayer(self.Owner) then
+			if IsValid(tr.Entity) and (tr.Entity:IsNPC() or tr.Entity:IsPlayer() or tr.Entity:IsNextBot()) and not tr.Entity:IsFriendlyToPlayer(self.Owner) then
 				self:OnBeamCrossedByEnemy(tr)
 			end
 		end

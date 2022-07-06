@@ -552,7 +552,7 @@ local STATUS = {}
 				self.Owner:SetNPCState(NPC_STATE_NONE)
 			elseif self.Owner:IsNPC() then
 				self.Owner:SetSchedule(SCHED_NONE)
-			elseif _ZetasInstalled and self.Owner:GetClass() == "npc_zetaplayer" then
+			elseif _ZetasInstalled and self.Owner:GetClass() == "npc_zetaplayer" then --Zeta Player specific
 				self.Owner:CancelMove()
 				self.Owner:StopLooking()
 				self.Owner:SetState('jailed/held')
@@ -583,7 +583,7 @@ local STATUS = {}
 			if ent.Status_frozen and (dmginfo:GetDamageType() == DMG_FREEZE) then
 				return true
 			end
-			if ent.Status_frozen and (ent:IsNPC() or (_ZetasInstalled and ent:GetClass() == "npc_zetaplayer")) and (dmginfo:GetDamage() > ent:Health()) then
+			if ent.Status_frozen and (ent:IsNPC() or ent:IsNextBot()) and (dmginfo:GetDamage() > ent:Health()) then
 				if ent:IsNPC() then
 					ent:SetSchedule(SCHED_NONE)
 				end
@@ -690,7 +690,7 @@ local STATUS = {}
 				dmg:SetDamageType(DMG_DIRECT)
 				self.Owner:TakeDamageInfo(dmg)
 			end
-			if _ZetasInstalled and self.Owner:GetClass() == "npc_zetaplayer" then
+			if _ZetasInstalled and self.Owner:GetClass() == "npc_zetaplayer" then --Zeta Player specific
 				self.Owner:SetState('idle')
 			end
 			if not self.Owner:IsPlayer() then

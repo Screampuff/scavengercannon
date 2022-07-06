@@ -48,7 +48,7 @@ if SERVER then
 	end
 
 	function ENT:OnImpact(hitent)
-		if hitent:GetClass() == "phys_bone_follower" then
+		if IsValid(hitent) and hitent:GetClass() == "phys_bone_follower" then
 			hitent = hitent:GetOwner()
 		end
 		local dmg = DamageInfo()

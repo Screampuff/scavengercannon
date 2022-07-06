@@ -81,7 +81,7 @@ if SERVER then
 				tracep.mins = self.trmin
 				tracep.maxs = self.trmax
 				local tr = util.TraceHull(tracep)
-			if tr.Entity and (tr.Entity:IsNPC() or tr.Entity:IsPlayer() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer")) and (tr.HitPos() ~= self:GetPos()) then
+			if IsValid(tr.Entity) and (tr.Entity:IsNPC() or tr.Entity:IsPlayer() or tr.Entity:IsNextBot()) and (tr.HitPos() ~= self:GetPos()) then
 				local mins = tr.Entity:OBBMaxs()
 				local maxs = tr.Entity:OBBMins()
 				pos = tr.Entity:GetPos()+Vector(math.Rand(mins.x,maxs.x),math.Rand(mins.y,maxs.y),math.Rand(mins.z,maxs.z))
@@ -101,7 +101,7 @@ if SERVER then
 				dmg:SetDamageType(DMG_DISSOLVE)
 				dmg:SetDamage(1000)
 				data.HitEntity:TakeDamageInfo(dmg)
-				if data.HitEntity:IsPlayer() or data.HitEntity:IsNPC() or (_ZetasInstalled and data.HitEntity:GetClass() == "npc_zetaplayer") then
+				if IsValid(data.HitEntity) and (data.HitEntity:IsPlayer() or data.HitEntity:IsNPC() or data.HitEntity:IsNextBot()) then
 					data.HitEntity:EmitSound("weapons/physcannon/energy_disintegrate"..math.random(4,5)..".wav")
 				end
 			end
@@ -183,8 +183,8 @@ if SERVER then
 	function ENT:OnRemove()
 	end
 
-	hook.Add("GravGunOnPickedUp","scav_comballpickup",function(pl,ent) if ent:GetClass() == "scav_projectile_comball" then ent.Owner = pl ent.sound:Play() ent.grabbedtime = CurTime() end end)
-	hook.Add("GravGunOnDropped","scav_comballdrop",function(pl,ent) if ent:GetClass() == "scav_projectile_comball" then ent.Owner = pl ent.sound:Stop() ent.lifetime = (ent.lifetime+CurTime()-ent.grabbedtime) end end)
+	hook.Add("GravGunOnPickedUp","scav_comballpickup",function(pl,ent) if IsValid(ent) and ent:GetClass() == "scav_projectile_comball" then ent.Owner = pl ent.sound:Play() ent.grabbedtime = CurTime() end end)
+	hook.Add("GravGunOnDropped","scav_comballdrop",function(pl,ent) if IsValid(ent) and ent:GetClass() == "scav_projectile_comball" then ent.Owner = pl ent.sound:Stop() ent.lifetime = (ent.lifetime+CurTime()-ent.grabbedtime) end end)
 	--local function dissolvesound(ent,inflictor,killer)
 	--	if (inflictor:GetClass() == "scav_projectile_comball") or (killer:GetClass() == "scav_projectile_comball") then
 	--		ent:EmitSound("weapons/physcannon/energy_disintegrate"..math.random(4,5)..".wav")

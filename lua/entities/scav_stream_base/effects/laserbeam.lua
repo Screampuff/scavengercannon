@@ -37,7 +37,7 @@ if CLIENT then
 		local tr = self:GetTrace(10000,nil,mins,maxs)
 		local part = self.em:Add("particle/smokesprites_000"..math.random(1,9),tr.HitPos)
 		if part then
-			if tr.Entity:IsNPC() or tr.Entity:IsPlayer() or (_ZetasInstalled and tr.Entity:GetClass() == "npc_zetaplayer") then
+			if IsValid(tr.Entity) and (tr.Entity:IsNPC() or tr.Entity:IsPlayer() or tr.Entity:IsNextBot()) then
 				part:SetColor(100,100,100)
 			end
 			part:SetDieTime(1)
@@ -88,7 +88,7 @@ if CLIENT then
 		render.SetMaterial(beamglowmat2)
 		render.DrawSprite(pos1,math.random(20,30),math.random(20,30),lasercol)
 		--render.SetMaterial(self.mat3)
-		if trace.Entity:IsNPC() or trace.Entity:IsPlayer() or (_ZetasInstalled and trace.Entity:GetClass() == "npc_zetaplayer") then
+		if IsValid(trace.Entity) and (trace.Entity:IsNPC() or trace.Entity:IsPlayer() or trace.Entity:IsNextBot()) then
 			local size = math.random(20,50)
 			render.DrawSprite(pos2+(pos1-pos2):GetNormalized()*8,size,size,color_white)
 		else

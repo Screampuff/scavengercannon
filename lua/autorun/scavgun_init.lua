@@ -899,5 +899,7 @@ function ENTITY:IsFriendlyToPlayer(pl)
 		else
 			return false
 		end
+	else
+		return false
 	end
 end

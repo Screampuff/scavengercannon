@@ -89,7 +89,7 @@ function ENT:Think()
 			
 			for _,v in ipairs(ents.FindInSphere(self:GetPos(),512)) do -- check all enemies within range, add them to the enemies table if they aren't there already
 			
-				if IsValid(v) and (v:IsNPC() or (v:IsPlayer() and v:Alive()) or (_ZetasInstalled and v:GetClass() == "npc_zetaplayer")) and not v:IsFriendlyToPlayer(self.Owner) and v ~= self.Owner and not table.HasValue(self.enemies,v) then
+				if IsValid(v) and (v:IsNPC() or (v:IsPlayer() and v:Alive()) or v:IsNextBot()) and not v:IsFriendlyToPlayer(self.Owner) and v ~= self.Owner and not table.HasValue(self.enemies,v) then
 				
 					table.insert(self.enemies,v)
 					

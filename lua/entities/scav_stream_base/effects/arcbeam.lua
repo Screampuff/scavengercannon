@@ -42,7 +42,7 @@ if SERVER then
 		local currentdist = self.Range
 		local currentang = self.Cone
 		for k,v in pairs(ents.FindInSphere(pos,self.Range)) do
-			if v:IsNPC() or (v:IsPlayer() and v ~= self:GetPlayer() and v:Alive()) or (_ZetasInstalled and v:GetClass() == "npc_zetaplayer") then
+			if IsValid(v) and (v:IsNPC() or v:IsNextBot() or (v:IsPlayer() and v ~= self:GetPlayer() and v:Alive())) then
 				local entpos = v:GetPos()+v:OBBCenter()
 				local dist = entpos:Distance(pos)
 				if (dist < currentdist) then

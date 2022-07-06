@@ -95,7 +95,7 @@ if SERVER then
 		local inflictor = dmginfo:GetInflictor()
 		local attacker = dmginfo:GetAttacker()
 		local amount = dmginfo:GetDamage()
-		if dmginfo:IsExplosionDamage() and ((inflictor:GetClass() == "scav_projectile_rocket") or (inflictor:GetClass() == "scav_projectile_grenade")) then
+		if dmginfo:IsExplosionDamage() and IsValid(inflictor) and ((inflictor:GetClass() == "scav_projectile_rocket") or (inflictor:GetClass() == "scav_projectile_grenade")) then
 			dmginfo:SetDamageForce(dmginfo:GetDamageForce()*20)
 		end
 	end)

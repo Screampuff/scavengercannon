@@ -102,7 +102,7 @@ if SERVER then
 	function ENT:PhysicsCollide(data,physobj)
 		self.drag = self.drag+1
 		self:GetPhysicsObject():SetDragCoefficient(self.drag)
-		if not self.bounce and IsValid(data.HitEntity) and (data.HitEntity:IsPlayer() or data.HitEntity:IsNPC() or (_ZetasInstalled and data.HitEntity:GetClass() == "npc_zetaplayer")) then
+		if not self.bounce and IsValid(data.HitEntity) and (data.HitEntity:IsPlayer() or data.HitEntity:IsNPC() or data.HitEntity:IsNextBot()) then
 			self:SetMoveType(MOVETYPE_NONE)
 			self.shouldexplode = data.HitEntity
 		end

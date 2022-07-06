@@ -696,6 +696,8 @@ if CLIENT then
 
 			if item and ScavData.models[item.ammo] and ScavData.models[item.ammo].FireFunc then --check to make sure that this item is valid and has a firemode
 
+				if game.SinglePlayer() and not IsFirstTimePredicted() then return end
+
 				local cooldown = ScavData.models[self.currentmodel].Cooldown * self:GetCooldownScale()
 
 				ScavData.models[item.ammo].FireFunc(self,item)
@@ -2202,6 +2204,10 @@ if SERVER then
 			self.mousepressed = false
 		end
 
+		if game.SinglePlayer() then
+			self:CallOnClient("Think")
+		end
+
 		self.LastThink = CurTime()
 		return true
 
@@ -2296,6 +2302,10 @@ if SERVER then
 		self.BarrelRestSpeed = 0
 		self.BarrelRotation = 0
 
+		if game.SinglePlayer() then
+			self:CallOnClient("Deploy")
+		end
+
 		return true
 
 	end
@@ -2321,6 +2331,10 @@ if SERVER then
 
 			if self.soundloops.barrelspin then
 				self.soundloops.barrelspin:Stop()
+			end
+
+			if game.SinglePlayer() then
+				self:CallOnClient("Holster")
 			end
 
 			return true

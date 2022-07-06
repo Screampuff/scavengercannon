@@ -73,7 +73,7 @@ function ENT:Think()
 			
 			for i=1,table.getn(tab),1 do
 			
-				if tab[i]:IsPlayer() or tab[i]:IsNPC() or (_ZetasInstalled and tab[i]:GetClass() == "npc_zetaplayer") then
+				if IsValid(tab[i]) and (tab[i]:IsPlayer() or tab[i]:IsNPC() or tab[i]:IsNextBot()) then
 				
 					if tab[i]:GetPos():Distance(self:GetPos()) < 150 and not tab[i]:IsFriendlyToPlayer(self.Owner) then
 					
@@ -157,7 +157,7 @@ function ENT:Think()
 		self.inrange = false
 		local tab = ents.FindInSphere(self:GetPos(), 250)
 		for i=1,table.getn(tab),1 do
-			if tab[i]:IsPlayer() or tab[i]:IsNPC() or (_ZetasInstalled and tab[i]:GetClass() == "npc_zetaplayer") then
+			if IsValid(tab[i]) and (tab[i]:IsPlayer() or tab[i]:IsNPC() or tab[i]:IsNextBot()) then
 				self.inrange = true
 			end
 		end

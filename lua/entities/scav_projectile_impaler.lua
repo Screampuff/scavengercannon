@@ -198,7 +198,7 @@ if SERVER then
             efdata:SetNormal(hitnormal)
             util.Effect("ef_scav_impalerimpact", efdata)
 
-            if (ent:IsNPC() or ent:IsPlayer() or ent:IsNextBot()) and ent:Health() and ent:Health() > 0 then
+            if (ent:IsNPC() or ent:IsPlayer() or ent:IsNextBot()) and ent.Health and ent:Health() > 0 then
 
 				sound.Play("ambient/machines/slicer"..math.random(2,3)..".wav", hitpos, 90, 100)
 
@@ -318,6 +318,9 @@ if SERVER then
                     self:Remove()
                 end
 
+            elseif not ent.Health or not ent.GetMaxHealth or (ent.Health and ent.GetMaxHealth and ent:GetMaxHealth() <= 0) then
+				self:SetNoDraw(true)
+				self:Remove()
             end
 
             if not self.Pinned then
