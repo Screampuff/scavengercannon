@@ -486,26 +486,34 @@ else
 		
 	end)
 
-	local ITEMFILE = "scavdata/knownitems.txt"
-	local read = file.Read(ITEMFILE,"DATA")
-	
+	local ITEMDIR = "scavdata"
+	local ITEMFILE = "knownitems.txt"
+	local read = file.Read(ITEMDIR.."/"..ITEMFILE,"DATA")
+
 	if read then
 		knownmodels = util.JSONToTable(read)
 	else
 		knownmodels = {}
+		if not file.Exists(ITEMDIR,"DATA") then
+			file.CreateDir(ITEMDIR)
+		end
 	end
 
 	hook.Add("InitPostEntity","Scav_LoadKnownFiremodes",function()
 	
 		local PlayerID = util.CRC(LocalPlayer():SteamID())
-		if not file.Exists(ITEMFILE,"DATA") then
+		if not file.Exists(ITEMDIR.."/"..ITEMFILE,"DATA") then
 			knownmodels.ID = PlayerID
+			local writestring = util.TableToJSON(knownmodels)
+			file.Write(ITEMDIR.."/"..ITEMFILE,writestring)
 		end
-		
+
 		if knownmodels.ID ~= PlayerID then
 			print("Invalid firemode memory table, deleting file.")
-			file.Delete(ITEMFILE)
+			file.Delete(ITEMDIR.."/"..ITEMFILE)
 			knownmodels = {["ID"] = PlayerID}
+			local writestring = util.TableToJSON(knownmodels)
+			file.Write(ITEMDIR.."/"..ITEMFILE,writestring)
 		end
 		
 	end)
@@ -513,8 +521,9 @@ else
 	function ScavData.ProcessLocalPlayerItemKnowledge(modelname)
 		if not knownmodels[modelname] and ScavData.models[modelname] then
 			knownmodels[modelname] = true
-			writestring = util.TableToJSON(knownmodels)
-			file.Write(ITEMFILE,writestring)
+			table.sort(knownmodels)
+			local writestring = util.TableToJSON(knownmodels)
+			file.Write(ITEMDIR.."/"..ITEMFILE,writestring)
 		end
 	end
 

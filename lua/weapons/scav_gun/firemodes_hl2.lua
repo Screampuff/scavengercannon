@@ -1736,7 +1736,7 @@ local eject = "brass"
 								self.Owner:EmitSound("weapons/smg_shoot.wav",75,100)
 							end
 						else
-							timer.Simple(.025,function() 
+							timer.Simple(.025,function()
 								tf2shelleject(self)
 							end)
 						end
@@ -1748,7 +1748,7 @@ local eject = "brass"
 								self.Owner:EmitSound("weapons/doom_sniper_smg.wav",75,100)
 							end
 						else
-							timer.Simple(.025,function() 
+							timer.Simple(.025,function()
 								tf2shelleject(self)
 							end)
 						end
