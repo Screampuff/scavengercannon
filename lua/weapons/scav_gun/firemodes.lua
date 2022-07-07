@@ -5475,17 +5475,35 @@ PrecacheParticleSystem("scav_exp_plasma")
 						function() self:AddItem("models/weapons/w_grenade.mdl",1,0) end,
 						function() self:AddItem("models/weapons/rifleshell.mdl",1,0,5) end,
 					}
-					if self.Owner:Health() * 2 <= self.Owner:GetMaxHealth() then
-						self:AddItem("models/items/healthkit.mdl",1,0)
+					if ScavData.FormatModelname(ent:GetModel()) == "models/items/item_item_crate.mdl" then
+						if self.Owner:Health() * 2 <= self.Owner:GetMaxHealth() then
+							self:AddItem("models/items/healthkit.mdl",1,0)
+						end
+						if self.Owner:Armor() * 3 <= self.Owner:GetMaxArmor() then
+							self:AddItem("models/items/battery.mdl",1,0)
+						end
+						for i=0,math.floor(math.Rand(0,3)) do
+							supplies[math.floor(math.Rand(1,#supplies+1))]()
+						end
+						self.Owner:EmitSound("physics/wood/wood_box_break1.wav",75,math.Rand(90,120),.5)
+					else --Pot of Greed allows you to draw two cards
+						for i=1,2 do
+							supplies[math.floor(math.Rand(1,#supplies+1))]()
+						end
+						self.Owner:EmitSound("weapons/scav_gun/drawtwocards.wav",75)
 					end
-					if self.Owner:Armor() * 3 <= self.Owner:GetMaxArmor() then
-						self:AddItem("models/items/battery.mdl",1,0)
-					end
-					for i=0,math.floor(math.Rand(0,3)) do
-						supplies[math.floor(math.Rand(1,#supplies+1))]()
-					end
-					self.Owner:EmitSound("physics/wood/wood_box_break1.wav",75,math.Rand(90,120),.5)
 				end
+				ScavData.CollectFuncs["models/props_c17/pottery01a.mdl"] = ScavData.CollectFuncs["models/items/item_item_crate.mdl"]
+				ScavData.CollectFuncs["models/props_c17/pottery02a.mdl"] = ScavData.CollectFuncs["models/items/item_item_crate.mdl"]
+				ScavData.CollectFuncs["models/props_c17/pottery03a.mdl"] = ScavData.CollectFuncs["models/items/item_item_crate.mdl"]
+				ScavData.CollectFuncs["models/props_c17/pottery04a.mdl"] = ScavData.CollectFuncs["models/items/item_item_crate.mdl"]
+				ScavData.CollectFuncs["models/props_c17/pottery05a.mdl"] = ScavData.CollectFuncs["models/items/item_item_crate.mdl"]
+				ScavData.CollectFuncs["models/props_c17/pottery06a.mdl"] = ScavData.CollectFuncs["models/items/item_item_crate.mdl"]
+				ScavData.CollectFuncs["models/props_c17/pottery07a.mdl"] = ScavData.CollectFuncs["models/items/item_item_crate.mdl"]
+				ScavData.CollectFuncs["models/props_c17/pottery08a.mdl"] = ScavData.CollectFuncs["models/items/item_item_crate.mdl"]
+				ScavData.CollectFuncs["models/props_c17/pottery09a.mdl"] = ScavData.CollectFuncs["models/items/item_item_crate.mdl"]
+				ScavData.CollectFuncs["models/props_c17/pottery_large01a.mdl"] = ScavData.CollectFuncs["models/items/item_item_crate.mdl"]
+				--Ep2
 				ScavData.CollectFuncs["models/items/item_beacon_crate.mdl"] = function(self,ent) --some random Episodic supplies
 					local supplies = {
 						--function() self:AddItem("models/healthvial.mdl",1,0) end,
@@ -5573,22 +5591,31 @@ PrecacheParticleSystem("scav_exp_plasma")
 						function() self:AddItem("models/weapons/c_models/c_flamethrower/c_flamethrower.mdl",200,math.Round(math.random())) end,
 						function() self:AddItem("models/weapons/c_models/c_sniperrifle/c_sniperrifle.mdl",25,0) end,
 					}
-					if self.Owner:Health() * 2 <= self.Owner:GetMaxHealth() then
-						self:AddItem("models/items/medkit_medium.mdl",1,0)
-					end
-					if self.Owner:Armor() * 3 <= self.Owner:GetMaxArmor() then
-						self:AddItem("models/pickups/pickup_powerup_defense.mdl",1,0)
-					end
-					for i=0,math.floor(math.Rand(0,3)) do
-						supplies[math.floor(math.Rand(1,#supplies+1))]()
-					end
-					if ent:GetModel() == "models/props_halloween/halloween_gift.mdl" then
-						self.Owner:EmitSound("items/gift_drop.wav",75,100,.5)
+					if ScavData.FormatModelname(ent:GetModel()) ~= "models/props_manor/vase_01.mdl" then
+						if self.Owner:Health() * 2 <= self.Owner:GetMaxHealth() then
+							self:AddItem("models/items/medkit_medium.mdl",1,0)
+						end
+						if self.Owner:Armor() * 3 <= self.Owner:GetMaxArmor() then
+							self:AddItem("models/pickups/pickup_powerup_defense.mdl",1,0)
+						end
+						for i=0,math.floor(math.Rand(0,3)) do
+							supplies[math.floor(math.Rand(1,#supplies+1))]()
+						end
+						if ent:GetModel() == "models/props_halloween/halloween_gift.mdl" then
+							self.Owner:EmitSound("items/gift_drop.wav",75,100,.5)
+						else
+							self.Owner:EmitSound("items/regenerate.wav",75,100,.5)
+						end
 					else
-						self.Owner:EmitSound("items/regenerate.wav",75,100,.5)
+						for i=1,2 do
+							supplies[math.floor(math.Rand(1,#supplies+1))]()
+						end
+						self.Owner:EmitSound("weapons/scav_gun/drawtwocards.wav",75)
 					end
+						
 				end
 				ScavData.CollectFuncs["models/props_gameplay/resupply_locker.mdl"] = ScavData.CollectFuncs["models/props_halloween/halloween_gift.mdl"]
+				ScavData.CollectFuncs["models/props_manor/vase_01.mdl"] = ScavData.CollectFuncs["models/props_halloween/halloween_gift.mdl"]
 				--L4D2 Gift
 				--Portal Cake (isn't solid :c)
 				--CSS Laundry Box maybe?
