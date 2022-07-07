@@ -754,13 +754,15 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_M3.Single")
 					else
 						timer.Simple(.5,function() 
-							local ef = EffectData()
-							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-							if attach then
-								ef:SetOrigin(attach.Pos)
-								ef:SetAngles(attach.Ang)
-								ef:SetFlags(75) --velocity
-								util.Effect("EjectBrass_12Gauge",ef)
+							if IsValid(self) then
+								local ef = EffectData()
+								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+								if attach then
+									ef:SetOrigin(attach.Pos)
+									ef:SetAngles(attach.Ang)
+									ef:SetFlags(75) --velocity
+									util.Effect("EjectBrass_12Gauge",ef)
+								end
 							end
 						end)
 					end
