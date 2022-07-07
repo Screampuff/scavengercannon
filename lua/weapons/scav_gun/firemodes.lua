@@ -3533,7 +3533,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:ViewPunch(Angle(math.Rand(-1,0)-8,math.Rand(-0.1,0.1),0))
 					self.Owner:EmitSound("weapons/shotgun/shotgun_dbl_fire.wav")
-					timer.Simple(0.5, if IsValid(self) then function() self:SendWeaponAnim(ACT_VM_HOLSTER) end end)
+					timer.Simple(0.5, function() if IsValid(self) then self:SendWeaponAnim(ACT_VM_HOLSTER) end end)
 					timer.Simple(0.75, function() if IsValid(self) then self.Owner:EmitSound("weapons/shotgun/shotgun_reload3.wav",100,65) end end)
 					timer.Simple(1.75, function() if IsValid(self) then self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav",100,120) end end)
 					return true
