@@ -435,18 +435,18 @@ end
 
 						if item.ammo == "models/props_mining/railroad_spike01.mdl" then --yes this is in recognition of the railway rifle from Fallout 3
 							self.Owner:EmitSound("ambient/machines/train_horn_1.wav")
-						end
+						
 
-						if item.ammo == "models/props_c17/trappropeller_blade.mdl" then
+						elseif item.ammo == "models/props_c17/trappropeller_blade.mdl" then
 							proj.Trail = util.SpriteTrail(proj,0,Color(255,255,255,255),true,2,0,0.3,0.25,"trails/smoke.vmt")
 							proj.DmgAmt = 100
 							proj.NoPin = true
 							proj.Drop = vector_origin
 							proj:SetAngles(self.Owner:EyeAngles())
 							self.Owner:EmitSound("ambient/machines/catapult_throw.wav")
-						end
+						
 
-						if item.ammo == "models/props_junk/harpoon002a.mdl" then
+						elseif item.ammo == "models/props_junk/harpoon002a.mdl" then
 							self.Owner:EmitSound("ambient/machines/catapult_throw.wav")
 							proj.DmgAmt = 100
 						end
@@ -523,6 +523,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_bow.mdl"] = function(self,ent) self:AddItem("models/weapons/bowarrow_bolt.mdl",1,0,1) end --1 arrow from bows
 				ScavData.CollectFuncs["models/weapons/w_bow_black.mdl"] = ScavData.CollectFuncs["models/weapons/w_bow.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_xbow.mdl"] = ScavData.CollectFuncs["models/weapons/w_bow.mdl"]
+				ScavData.CollectFuncs["models/weapons/w_axe_proj.mdl"] = function(self,ent) self:AddItem("models/weapons/w_axe.mdl",1,0,1) end --1 unscuffed axe model
 			else
 				tab.fov = 10
 			end
@@ -596,7 +597,6 @@ end
 		--FoF
 		ScavData.RegisterFiremode(tab,"models/weapons/bowarrow_bolt.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/w_axe.mdl")
-		ScavData.RegisterFiremode(tab,"models/weapons/w_axe_proj.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/w_knife.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/w_machete.mdl")
 		
@@ -3475,44 +3475,46 @@ PrecacheParticleSystem("scav_exp_plasma")
 			tab.Level = 4
 			if SERVER then
 				tab.FireFunc = function(self,item)
+					local chunks = {}
+					local mdl = ""
+					local ang = self.Owner:GetAngles()
 					if item.ammo == "models/props_combine/breenbust.mdl" then
-						for i=1,7,1 do
-							local projmod = "models/props_combine/breenbust_Chunk0"..i..".mdl"
-							local proj = self:CreateEnt("prop_physics")
-							local randvec = Vector(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
-							proj:SetModel(projmod)
-							proj:SetPos(self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec))
-							proj:SetAngles(self.Owner:GetAngles())
-							proj:SetPhysicsAttacker(self.Owner)
-							proj:SetCollisionGroup(13)
-							proj:Spawn()
-							proj:SetOwner(self.Owner)
-							proj:GetPhysicsObject():SetMass(10)
-							proj:GetPhysicsObject():AddGameFlag(FVPHYSICS_PENETRATING)
-							proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500+self.Owner:GetVelocity())
-							proj:GetPhysicsObject():SetBuoyancyRatio(0)
-							proj:Fire("kill",1,"3")
-							--gamemode.Call("ScavFired",self.Owner,proj)
-						end
+						chunks = {"1","2","3","4","5","6","7"}
+						mdl = "models/props_combine/breenbust_Chunk0"
+					elseif item.ammo == "models/props_debris/concrete_spawnplug001a.mdl" then
+						chunks = {"a","b","c","d","e","f","g","h","i","j","k"}
+						mdl = "models/props_debris/concrete_spawnchunk001"
+						ang:Add(Angle(90,0,0))
 					elseif item.ammo == "models/props/cs_office/plant01.mdl" then
-						for i=1,7,1 do
-							local projmod = "models/props/cs_office/plant01_p"..i..".mdl"
-							local proj = self:CreateEnt("prop_physics")
-							local randvec = Vector(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
-							proj:SetModel(projmod)
-							proj:SetPos(self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec))
-							proj:SetAngles(self.Owner:GetAngles())
-							proj:SetPhysicsAttacker(self.Owner)
-							proj:SetCollisionGroup(13)
-							proj:Spawn()
-							proj:SetOwner(self.Owner)
-							proj:GetPhysicsObject():SetMass(10)
-							proj:GetPhysicsObject():AddGameFlag(FVPHYSICS_PENETRATING)
-							proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500+self.Owner:GetVelocity())
-							proj:GetPhysicsObject():SetBuoyancyRatio(0)
-							proj:Fire("kill",1,"3")
-							--gamemode.Call("ScavFired",self.Owner,proj)
-						end
+						chunks = {"1","2","3","4","5","6","7"}
+						mdl = "models/props/cs_office/plant01_p"
+					elseif item.ammo == "models/props/de_inferno/flower_barrel.mdl" then
+						chunks = {"1","2","3","4","5","6","7","8","9","10","11"}
+						mdl = "models/props/de_inferno/flower_barrel_p"
+					elseif item.ammo == "models/props/de_inferno/fountain_bowl.mdl" then
+						chunks = {"2","3","4","5","6","7","8","9","10"}
+						mdl = "models/props/de_inferno/fountain_bowl_p"
+					elseif item.ammo == "models/props/cs_militia/skylight_glass.mdl" then
+						chunks = {"2","3","4","5","6","7","8","9","10","11","12","13","14"}
+						mdl = "models/props/cs_militia/skylight_glass_p"
+						ang:Add(Angle(90,0,0))
+					end
+					for i=1,#chunks,1 do
+						local proj = self:CreateEnt("prop_physics")
+						local randvec = Vector(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
+						proj:SetModel(mdl .. chunks[i] .. ".mdl")
+						proj:SetPos(self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec))
+						proj:SetAngles(ang)
+						proj:SetPhysicsAttacker(self.Owner)
+						proj:SetCollisionGroup(13)
+						proj:Spawn()
+						proj:SetOwner(self.Owner)
+						proj:GetPhysicsObject():SetMass(10)
+						proj:GetPhysicsObject():AddGameFlag(FVPHYSICS_PENETRATING)
+						proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500+self.Owner:GetVelocity())
+						proj:GetPhysicsObject():SetBuoyancyRatio(0)
+						proj:Fire("kill",1,"3")
+						--gamemode.Call("ScavFired",self.Owner,proj)
 					end
 					self.Owner:GetPhysicsObject(wake)
 					self.Owner:SetVelocity(self.Owner:GetVelocity()-self:GetAimVector()*200)
@@ -3527,9 +3529,12 @@ PrecacheParticleSystem("scav_exp_plasma")
 			end
 			tab.Cooldown = 2
 		ScavData.RegisterFiremode(tab,"models/props_combine/breenbust.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_debris/concrete_spawnplug001a.mdl")
 		--CSS
 		ScavData.RegisterFiremode(tab,"models/props/cs_office/plant01.mdl")
-		--ScavData.RegisterFiremode(tab,"models/props/de_inferno/flower_barrel.mdl") --TODO: maybe
+		ScavData.RegisterFiremode(tab,"models/props/de_inferno/flower_barrel.mdl")
+		ScavData.RegisterFiremode(tab,"models/props/de_inferno/fountain_bowl.mdl")
+		ScavData.RegisterFiremode(tab,"models/props/cs_militia/skylight_glass.mdl")
 	
 	
 	
@@ -3542,56 +3547,62 @@ PrecacheParticleSystem("scav_exp_plasma")
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 4
 			if SERVER then
-				tab.models = {"a","b","c","d","e","f","g","h","i","j","k","l","m"}
-				tab.models2 = {"01","02","03","04","05","06","08","09","10","11","12","13","14"}
-				tab.modelsmelon = {"01a","01b","01c","02a","02b","02c","02a"}
-				tab.modelssink = {"b","c","d","e","f","g","h"}
 				tab.FireFunc = function(self,item)
-					local total = table.getn(tab.models)
+					local chunks = {}
+					local mdl = ""
+					local ang = self.Owner:GetAngles()
 					if item.ammo == "models/props_interiors/toilet.mdl" or
 						item.ammo == "models/props_interiors/toilet_b.mdl" or
 						item.ammo == "models/props_interiors/toilet_b_breakable01.mdl" or
 						item.ammo == "models/props_interiors/toilet_elongated.mdl" then
-						total = table.getn(tab.models2)
+						chunks = {"01","02","03","04","05","06","08","09","10","11","12","13","14"}
+						mdl = "models/props_interiors/toilet_b_breakable01_part"
 					elseif item.ammo == "models/props_junk/watermelon01.mdl" then
-						total = table.getn(tab.modelsmelon)
+						chunks = {"01a","01b","01c","02a","02b","02c","02a"}
+						mdl = "models/props_junk/watermelon01_chunk"
 					elseif item.ammo == "models/props_wasteland/prison_sink001a.mdl" or
 						item.ammo == "models/props_wasteland/prison_sink001b.mdl" then
-						total = table.getn(tab.modelssink)
+						chunks = {"b","c","d","e","f","g","h"}
+						mdl = "models/props_wasteland/prison_sinkchunk001"
+					elseif item.ammo == "models/props/de_inferno/wine_barrel.mdl" then
+						chunks = {"1","2","3","4","5","6","7","8","9","10","11"}
+						mdl = "models/props/de_inferno/wine_barrel_p"
+					elseif item.ammo == "models/props/de_inferno/claypot01.mdl" or
+						item.ammo == "models/props/de_inferno/claypot02.mdl" then
+						chunks = {"1","2","3","4"}
+						mdl = string.sub(item.ammo,1,-5) .. "_damage_0"
+					elseif item.ammo == "models/props/de_inferno/claypot03.mdl" then
+						chunks = {"1","2","3","4","5","6"}
+						mdl = "models/props/de_inferno/claypot03_damage_0"
+					elseif item.ammo == "models/props/cs_office/projector.mdl" then
+						chunks = {"gib1","gib2","gib3","p1a","p1b","p2a","p2b","p3a","p3b","p4a","p4b","p5","p6a","p6b","p7a","p7b"}
+						mdl = "models/props/cs_office/projector_"
+						ang:Add(Angle(90,0,0))
+					else
+						chunks = {"a","b","c","d","e","f","g","h","i","j","k","l","m"}
+						mdl = "models/props_wasteland/prison_toiletchunk01"
 					end
-					for i=1,total do
-							math.randomseed(CurTime()+i)
-							local proj = self:CreateEnt("prop_physics")
-							if item.ammo == "models/props_interiors/toilet.mdl" or
-								item.ammo == "models/props_interiors/toilet_b.mdl" or
-								item.ammo == "models/props_interiors/toilet_b_breakable01.mdl" or
-								item.ammo == "models/props_interiors/toilet_elongated.mdl" then
-								proj:SetModel("models/props_interiors/toilet_b_breakable01_part"..ScavData.models[self.inv.items[1].ammo].models2[i]..".mdl")
-							elseif item.ammo == "models/props_junk/watermelon01.mdl" then
-								proj:SetModel("models/props_junk/watermelon01_chunk"..ScavData.models[self.inv.items[1].ammo].modelsmelon[i]..".mdl")
-							elseif item.ammo == "models/props_wasteland/prison_sink001a.mdl" or
-								item.ammo == "models/props_wasteland/prison_sink001b.mdl" then
-								proj:SetModel("models/props_wasteland/prison_sinkchunk001"..ScavData.models[self.inv.items[1].ammo].modelssink[i]..".mdl")
-							else
-								proj:SetModel("models/props_wasteland/prison_toiletchunk01"..ScavData.models[self.inv.items[1].ammo].models[i]..".mdl")
-							end
-							local randvec = Vector(math.sin(i),math.cos(i),math.sin(i)*math.cos(i))*0.05
-							--local randvec = Vector(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))
-							--local randvec = Vector((i+math.random(-7,7))*0.01*(math.floor(CurTime())-CurTime()),(i+math.random(-6,6))*0.01*(math.floor(CurTime())-CurTime()),(i+math.random(-5,5))*0.01*(math.floor(CurTime())-CurTime()))
-							proj:SetPos(self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec))
-							proj:SetAngles(self:GetAimVector():Angle())
-							proj:SetPhysicsAttacker(self.Owner)
-							proj:SetCollisionGroup(13)
-							proj:SetGravity(0)
-							proj:Spawn()
-							proj:SetOwner(self.Owner)
-							proj:GetPhysicsObject():SetMass(7)
-							
-							proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500)
-							proj:GetPhysicsObject():SetBuoyancyRatio(0)
-							proj:Fire("kill",1,"2")
-							--gamemode.Call("ScavFired",self.Owner,proj)
-							self.Owner:SetAnimation(PLAYER_ATTACK1)
+					for i=1,#chunks,1 do
+						math.randomseed(CurTime()+i)
+						local proj = self:CreateEnt("prop_physics")
+						proj:SetModel(mdl..chunks[i]..".mdl")
+						local randvec = Vector(math.sin(i),math.cos(i),math.sin(i)*math.cos(i))*0.05
+						--local randvec = Vector(math.Rand(-0.05,0.05),math.Rand(-0.05,0.05),math.Rand(-0.05,0.05))
+						--local randvec = Vector((i+math.random(-7,7))*0.01*(math.floor(CurTime())-CurTime()),(i+math.random(-6,6))*0.01*(math.floor(CurTime())-CurTime()),(i+math.random(-5,5))*0.01*(math.floor(CurTime())-CurTime()))
+						proj:SetPos(self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec))
+						proj:SetAngles(ang)
+						proj:SetPhysicsAttacker(self.Owner)
+						proj:SetCollisionGroup(13)
+						proj:SetGravity(0)
+						proj:Spawn()
+						proj:SetOwner(self.Owner)
+						proj:GetPhysicsObject():SetMass(7)
+						
+						proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500)
+						proj:GetPhysicsObject():SetBuoyancyRatio(0)
+						proj:Fire("kill",1,"2")
+						--gamemode.Call("ScavFired",self.Owner,proj)
+						self.Owner:SetAnimation(PLAYER_ATTACK1)
 					end
 			
 					self.Owner:ViewPunch(Angle(math.Rand(-1,0)-8,math.Rand(-0.1,0.1),0))
@@ -3608,6 +3619,12 @@ PrecacheParticleSystem("scav_exp_plasma")
 			ScavData.RegisterFiremode(tab,"models/props_junk/watermelon01.mdl")
 			ScavData.RegisterFiremode(tab,"models/props_wasteland/prison_sink001a.mdl")
 			ScavData.RegisterFiremode(tab,"models/props_wasteland/prison_sink001b.mdl")
+			--CSS
+			ScavData.RegisterFiremode(tab,"models/props/de_inferno/wine_barrel.mdl")
+			ScavData.RegisterFiremode(tab,"models/props/de_inferno/claypot01.mdl")
+			ScavData.RegisterFiremode(tab,"models/props/de_inferno/claypot02.mdl")
+			ScavData.RegisterFiremode(tab,"models/props/de_inferno/claypot03.mdl")
+			ScavData.RegisterFiremode(tab,"models/props/cs_office/projector.mdl")
 			--L4D/2
 			ScavData.RegisterFiremode(tab,"models/props_interiors/urinal01.mdl")
 			ScavData.RegisterFiremode(tab,"models/props_interiors/toilet.mdl")
@@ -5057,13 +5074,13 @@ PrecacheParticleSystem("scav_exp_plasma")
 						bullet.Callback = ScavData.models[self.chargeitem.ammo].Callback
 					self.Owner:FireBullets(bullet)
 					self:MuzzleFlash2()
-					-- if CLIENT then
-					-- 	if not self.Owner:Crouching() or not (IsValid(self.Owner:GetGroundEntity()) or self.Owner:GetGroundEntity():IsWorld()) then
-					-- 		self.Owner:SetEyeAngles((VectorRand()*0.1+self:GetAimVector()):Angle()) --BUG TODO: Very choppy in multiplayer
-					-- 	else
-					-- 		self.Owner:SetEyeAngles((VectorRand()*0.02+self:GetAimVector()):Angle())
-					-- 	end
-					-- end
+					if CLIENT and game.SinglePlayer() then
+						if not self.Owner:Crouching() or not (IsValid(self.Owner:GetGroundEntity()) or self.Owner:GetGroundEntity():IsWorld()) then
+							self.Owner:SetEyeAngles((VectorRand()*0.1+self:GetAimVector()):Angle()) --BUG TODO: Very choppy in multiplayer
+						else
+							self.Owner:SetEyeAngles((VectorRand()*0.02+self:GetAimVector()):Angle())
+						end
+					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					timer.Simple(.025,function()
 						if not self.Owner:GetViewModel() then return end
@@ -5420,7 +5437,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						function() self:AddItem("models/props_junk/shoe001a.mdl",1,0) end,
 						function() self:AddItem("models/props_junk/watermelon01.mdl",1,0) end,
 						function() self:AddItem("models/props_junk/glassjug01.mdl",1,0) end,
-						function() self:AddItem("models/props_junk/plasticbucket001a.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/plasticbucket001a.mdl",200,0) end,
 						function() self:AddItem("models/props_lab/jar01a.mdl",1,0) end,
 						function() self:AddItem("models/props_lab/huladoll.mdl",1,0) end,
 						function() self:AddItem("models/props_combine/breenbust.mdl",1,0) end,
@@ -5465,7 +5482,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						function() self:AddItem("models/props_junk/shoe001a.mdl",1,0) end,
 						function() self:AddItem("models/props_junk/watermelon01.mdl",1,0) end,
 						function() self:AddItem("models/props_junk/glassjug01.mdl",1,0) end,
-						function() self:AddItem("models/props_junk/plasticbucket001a.mdl",1,0) end,
+						function() self:AddItem("models/props_junk/plasticbucket001a.mdl",200,0) end,
 						--function() self:AddItem("models/props_lab/jar01a.mdl",1,0) end,
 						--function() self:AddItem("models/props_lab/huladoll.mdl",1,0) end,
 						function() self:AddItem("models/props_combine/breenbust.mdl",1,0) end,
