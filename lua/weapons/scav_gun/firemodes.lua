@@ -1948,7 +1948,9 @@ end
 						if IsValid(startpos) then
 							startpos:SetPos(newbullet.Src)
 							startpos:Spawn() --info_null removes itself, so no need for cleanup
-							startpos:FireBullets(newbullet)
+							if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+								startpos:FireBullets(newbullet)
+							end
 						end
 					end)
 				end
@@ -1998,7 +2000,9 @@ end
 									if IsValid(ent) then
 										ent:SetPos(bullet1.Src)
 										ent:Spawn() --info_null removes itself, so no need for cleanup
-										ent:FireBullets(bullet1)
+										if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+											ent:FireBullets(bullet1)
+										end
 									end
 							end)
 							timer.Simple((i + .5)/100,function()
@@ -2006,14 +2010,18 @@ end
 									if IsValid(ent) then
 										ent:SetPos(bullet2.Src)
 										ent:Spawn()
-										ent:FireBullets(bullet2)
+										if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+											ent:FireBullets(bullet2)
+										end
 									end
 							end)
 						end
 					end
 				end
 			end
-			self.Owner:FireBullets(bullet)
+			if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+				self.Owner:FireBullets(bullet)
+			end
 			self:MuzzleFlash2()
 			self.Owner:SetAnimation(PLAYER_ATTACK1)
 			if item.ammo == "models/props_2fort/telephone001.mdl" or --TF2
@@ -2577,7 +2585,9 @@ end
 					if CurTime()-self.sniperzoomstart <= 0.5 or not self.Owner:KeyDown(IN_ATTACK2) then
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-						self.Owner:FireBullets(bullet)
+						if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+							self.Owner:FireBullets(bullet)
+						end
 						timer.Simple(.45,function() 
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -3362,7 +3372,9 @@ PrecacheParticleSystem("scav_exp_plasma")
 				local tab = ScavData.models[self.inv.items[1].ammo]
 				tab.bullet.Src = self.Owner:GetShootPos()
 				tab.bullet.Dir = self:GetAimVector()
-				self.Owner:FireBullets(tab.bullet)
+				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					self.Owner:FireBullets(tab.bullet)
+				end
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("^weapons/ar2/fire1.wav")
 				if SERVER then return self:TakeSubammo(item,1) end
@@ -5055,7 +5067,9 @@ PrecacheParticleSystem("scav_exp_plasma")
 						bullet.Damage = 6
 						bullet.TracerName = "ef_scav_tr_b"
 						bullet.Callback = ScavData.models[self.chargeitem.ammo].Callback
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					-- if CLIENT then
 					-- 	if not self.Owner:Crouching() or not (IsValid(self.Owner:GetGroundEntity()) or self.Owner:GetGroundEntity():IsWorld()) then

@@ -139,7 +139,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/175,0.1)
@@ -201,7 +203,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.3,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/200,0.125)
@@ -267,7 +271,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.3,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/215,0.125)
@@ -328,7 +334,9 @@ local eject = "brass"
 						self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-						self.Owner:FireBullets(bullet)
+						if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+							self.Owner:FireBullets(bullet)
+						end
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
@@ -383,7 +391,9 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
@@ -433,7 +443,9 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
@@ -503,7 +515,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/215,0.125)
@@ -564,7 +578,9 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
@@ -614,7 +630,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/200,0.125)
@@ -727,7 +745,9 @@ local eject = "brass"
 					self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
@@ -773,7 +793,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/220,0.1)
@@ -839,7 +861,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					--self:MuzzleFlash2() --no flash on silenced weapon!
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/220,0.1)
@@ -901,7 +925,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/175,0.09)
@@ -969,7 +995,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/200,0.165)
@@ -1037,7 +1065,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-1,math.Rand(-0.2,0.2),0),0.1,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/220,0.075)
@@ -1102,7 +1132,9 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
@@ -1155,7 +1187,9 @@ local eject = "brass"
 						self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-						self.Owner:FireBullets(bullet)
+						if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+							self.Owner:FireBullets(bullet)
+						end
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if SERVER then
@@ -1209,7 +1243,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
@@ -1274,7 +1310,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/220,0.1)
@@ -1340,7 +1378,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					--self:MuzzleFlash2() --no flash on silenced weapon!
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/200,0.14)
@@ -1402,7 +1442,9 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:AddInaccuracy(1/210,0.1)
@@ -1463,7 +1505,9 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
@@ -1512,7 +1556,9 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					--self:MuzzleFlash2() --no flash on silenced weapon!
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
@@ -1590,7 +1636,9 @@ local eject = "brass"
 					self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
@@ -1643,7 +1691,9 @@ local eject = "brass"
 				tab.ChargeAttack = function(self,item)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self.Owner:GetAimVector()
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("weapons/rifle_desert/gunfire/rifle_fire_1.wav")
 					if SERVER then self:TakeSubammo(item,1) end
