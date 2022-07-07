@@ -718,7 +718,7 @@ local eject = "brass"
 					if olditemname == "" or not ScavData.models[olditemname] or ScavData.models[item.ammo].Name ~= ScavData.models[olditemname].Name then
 						if item.ammo == "models/weapons/shells/shell_shotgun.mdl" then
 							self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
-							timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
+							timer.Simple(.25,function() if IsValid(self) then self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end end)
 						elseif item.ammo == "models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" or
 							item.ammo == "models/workshop_partner/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" then
 						elseif item.ammo == "models/shotgunshell.mdl" then
@@ -749,7 +749,7 @@ local eject = "brass"
 					timer.Simple(0.4,function()
 						if SERVER then
 							self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
-							timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
+							timer.Simple(.25,function() if IsValid(self) then self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end end)
 						else
 							tf2shelleject(self,"shotgun")
 						end
@@ -763,27 +763,29 @@ local eject = "brass"
 							self.Owner:EmitSound("weapons/sbarrel1.wav")
 						end
 						timer.Simple(0.4,function()
-							if SERVER then
-								self.Owner:EmitSound("weapons/scock1.wav")
-							else
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach == nil then
-									attach = self:GetAttachment(self:LookupAttachment(eject))
-								end
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									--lovingly borrowed from https:--steamcommunity.com/sharedfiles/filedetails/?id=1360233031
-									local angShellAngles = self.Owner:EyeAngles()
-									local vecShellVelocity = self.Owner:GetAbsVelocity()
-									vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
-									vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
-									vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
-									ef:SetStart(vecShellVelocity)
-									ef:SetEntity(self.Owner)
-									ef:SetFlags(1) --shotgun shell
-									util.Effect("HL1ShellEject",ef)
+							if IsValid(self) then
+								if SERVER then
+									self.Owner:EmitSound("weapons/scock1.wav")
+								else
+									local ef = EffectData()
+									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+									if attach == nil then
+										attach = self:GetAttachment(self:LookupAttachment(eject))
+									end
+									if attach then
+										ef:SetOrigin(attach.Pos)
+										ef:SetAngles(attach.Ang)
+										--lovingly borrowed from https:--steamcommunity.com/sharedfiles/filedetails/?id=1360233031
+										local angShellAngles = self.Owner:EyeAngles()
+										local vecShellVelocity = self.Owner:GetAbsVelocity()
+										vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
+										vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
+										vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
+										ef:SetStart(vecShellVelocity)
+										ef:SetEntity(self.Owner)
+										ef:SetFlags(1) --shotgun shell
+										util.Effect("HL1ShellEject",ef)
+									end
 								end
 							end
 						end)
@@ -792,15 +794,17 @@ local eject = "brass"
 							self.Owner:EmitSound("weapons/shotgun/shotgun_fire6.wav")
 						end
 						timer.Simple(0.4,function()
-							if SERVER then
-								self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
-							else
-								local ef = EffectData()
-								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-								if attach then
-									ef:SetOrigin(attach.Pos)
-									ef:SetAngles(attach.Ang)
-									util.Effect("ShotgunShellEject",ef)
+							if IsValid(self) then
+								if SERVER then
+									self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
+								else
+									local ef = EffectData()
+									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+									if attach then
+										ef:SetOrigin(attach.Pos)
+										ef:SetAngles(attach.Ang)
+										util.Effect("ShotgunShellEject",ef)
+									end
 								end
 							end
 						end)
