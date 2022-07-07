@@ -71,7 +71,9 @@ end
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_30cal.Shoot")
@@ -137,7 +139,9 @@ end
 						bullet.Dir = self:GetAimVector()
 						self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
 						if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_Bar.Shoot")
@@ -196,7 +200,9 @@ end
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
 					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_C96.Shoot")
@@ -252,7 +258,9 @@ end
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-				self.Owner:FireBullets(bullet)
+				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					self.Owner:FireBullets(bullet)
+				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_Kar.Shoot")
@@ -299,7 +307,9 @@ end
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-				self.Owner:FireBullets(bullet)
+				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					self.Owner:FireBullets(bullet)
+				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_Carbine.Shoot")
@@ -341,7 +351,9 @@ end
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_Garand.Shoot")
@@ -406,7 +418,9 @@ end
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-				self.Owner:FireBullets(bullet)
+				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					self.Owner:FireBullets(bullet)
+				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_Springfield.Shoot")
@@ -451,7 +465,9 @@ end
 				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 				bullet.Src = self.Owner:GetShootPos()
 				bullet.Dir = self:GetAimVector()
-				self.Owner:FireBullets(bullet)
+				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					self.Owner:FireBullets(bullet)
+				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_Colt.Shoot")
@@ -586,7 +602,9 @@ end
 							bullet.Dir = self:GetAimVector()
 						--self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true) --TODO: DoD:S viewpunch
 						self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
-						self.Owner:FireBullets(bullet)
+						if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+							self.Owner:FireBullets(bullet)
+						end
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						if CLIENT then
@@ -670,7 +688,9 @@ end
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_MP40.Shoot")
@@ -728,7 +748,9 @@ end
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_MP44.Shoot")
@@ -784,7 +806,9 @@ end
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.2)
 				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-				self.Owner:FireBullets(bullet)
+				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					self.Owner:FireBullets(bullet)
+				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_Luger.Shoot")
@@ -825,7 +849,9 @@ end
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_Thompson.Shoot")

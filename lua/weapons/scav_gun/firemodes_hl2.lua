@@ -52,7 +52,9 @@ local eject = "brass"
 						if SERVER then self.Owner:EmitSound("npc/turret_floor/shoot"..math.random(1,3)..".wav") end
 						bullet.TracerName = "AR2Tracer"
 					end
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if CLIENT then
 						self.Owner:ScavViewPunch(Angle(math.Rand(0,1),math.Rand(-1,1),0),0.5)
@@ -731,7 +733,9 @@ local eject = "brass"
 				self.Owner:ScavViewPunch(Angle(-10,math.Rand(-0.1,0.1),0),0.3)
 				bullet.Src = self.Owner:GetShootPos()
 				bullet.Dir = self:GetAimVector()
-				self.Owner:FireBullets(bullet)
+				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					self.Owner:FireBullets(bullet)
+				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				if item.ammo == "models/weapons/shells/shell_shotgun.mdl" then --TF2
@@ -876,8 +880,9 @@ local eject = "brass"
 				self.Owner:ScavViewPunch(Angle(math.Rand(-1,1),math.Rand(-1,1),0),0.5)
 				tab.bullet.Src = self.Owner:GetShootPos()
 				tab.bullet.Dir = self:GetAimVector()
-
-				self.Owner:FireBullets(tab.bullet)
+				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					self.Owner:FireBullets(tab.bullet)
+				end
 				if SERVER then self.Owner:SetAnimation(PLAYER_ATTACK1) end
 				self:MuzzleFlash2()
 				if item.ammo == "models/items/boxsrounds.mdl" or item.ammo == "models/weapons/w_pistol.mdl" then
@@ -1018,7 +1023,9 @@ local eject = "brass"
 						bullet.Spread = Vector(0.02*scale1,0.02*scale1,0)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:MuzzleFlash2(2)
 					if SERVER then
@@ -1093,7 +1100,9 @@ local eject = "brass"
 					bullet.Spread = Vector(0.02*scale1,0.02*scale1,0)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					ef:SetEntity(self)
 					if CLIENT and self.Owner == GetViewEntity() then
 						ef:SetEntity(self.Owner:GetViewModel())
@@ -1196,7 +1205,9 @@ local eject = "brass"
 				end
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self:MuzzleFlash2(2)
 					if SERVER then self:TakeSubammo(item,1) end
@@ -1311,7 +1322,9 @@ local eject = "brass"
 					bullet.Damage = 6
 					bullet.TracerName = "HelicopterTracer"
 					bullet.Callback = ScavData.models[self.chargeitem.ammo].Callback
-				self.Owner:FireBullets(bullet)
+				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					self.Owner:FireBullets(bullet)
+				end
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self:MuzzleFlash2("ChopperMuzzleFlash")
 				if SERVER then
@@ -1592,7 +1605,9 @@ local eject = "brass"
 				bullet.Force = 5
 				bullet.Damage = 40
 				bullet.TracerName = "ef_scav_tr_b"
-				self.Owner:FireBullets(bullet)
+				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					self.Owner:FireBullets(bullet)
+				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_357.Single")
@@ -1721,7 +1736,9 @@ local eject = "brass"
 						bullet.Force = 5
 						bullet.Damage = 4
 						bullet.TracerName = "ef_scav_tr_b"
-					self.Owner:FireBullets(bullet)
+					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						self.Owner:FireBullets(bullet)
+					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then

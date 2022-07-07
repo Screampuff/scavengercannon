@@ -8,8 +8,9 @@ ENT.Author = "Anya O'Quinn"
 local ClassName = "scav_projectile_impaler"
 
 function ENT:SetupDataTables()
-	self:NetworkVar("Entity",	0, "AHitEnt")
+	self:NetworkVar("Float", 	0, "Length")
 	self:NetworkVar("Bool", 	0, "Hit")
+	self:NetworkVar("Entity",	0, "AHitEnt")
 	self:NetworkVar("Int", 		0, "AHitBone")
 	self:NetworkVar("Vector", 	0, "AHitPos")
 	self:NetworkVar("Angle", 	0, "AHitAng")
@@ -87,7 +88,7 @@ if SERVER then
             self.Vel = self.Owner:GetAimVector() * 3000
 		end
 
-		self.Length = math.floor(math.max(self:OBBMaxs().x - self:OBBMins().x,self:OBBMaxs().y - self:OBBMins().y,self:OBBMaxs().z - self:OBBMins().z))
+		self:SetLength(math.floor(math.max(self:OBBMaxs().x - self:OBBMins().x,self:OBBMaxs().y - self:OBBMins().y,self:OBBMaxs().z - self:OBBMins().z)))
 
 	end
 
@@ -128,11 +129,78 @@ if SERVER then
 
 			self:SetPos(hitpos)
 
+			if self:GetModel() == "models/crossbow_bolt.mdl" then
+				self:SetPos(self:GetPos() - self:GetForward():GetNormalized() * 10)
+			elseif self:GetModel() == "models/props_junk/harpoon002a.mdl" then
+				self:SetPos(self:GetPos() - self:GetForward():GetNormalized() * 30)
+			elseif self:GetModel() == "models/weapons/c_models/c_scimitar/c_scimitar.mdl"
+				or self:GetModel() == "models/workshop/weapons/c_models/c_scimitar/c_scimitar.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_machete/c_machete.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_croc_knife/c_croc_knife.mdl"
+				or self:GetModel() == "models/workshop/weapons/c_models/c_croc_knife/c_croc_knife.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_wood_machete/c_wood_machete.mdl"
+				or self:GetModel() == "models/workshop/weapons/c_models/c_wood_machete/c_wood_machete.mdl"
+			then
+				self:SetPos(self:GetPos() - self:GetForward():GetNormalized() * 15)
+				self.ImpactDamageType = DMG_SLASH
+			elseif self:GetModel() == "models/weapons/w_knife_ct.mdl" then
+				self:SetPos(self:GetPos() - self:GetUp():GetNormalized() * 5 - self:GetForward():GetNormalized() * 8)
+				self.ImpactDamageType = DMG_SLASH
+			elseif self:GetModel() == "models/weapons/w_knife_t.mdl"
+				or self:GetModel() == "models/weapons/w_models/w_knife.mdl"
+				or self:GetModel() == "models/workshop_partner/weapons/c_models/c_prinny_knife/c_prinny_knife.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_acr_hookblade/c_acr_hookblade.mdl"
+				or self:GetModel() == "models/workshop/weapons/c_models/c_acr_hookblade/c_acr_hookblade.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_ava_roseknife/c_ava_roseknife.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_ava_roseknife/c_ava_roseknife_v.mdl"
+				or self:GetModel() == "models/workshop/weapons/c_models/c_ava_roseknife/c_ava_roseknife.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_switchblade/c_switchblade.mdl"
+				or self:GetModel() == "models/workshop/weapons/c_models/c_switchblade/c_switchblade.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_sd_cleaver/c_sd_cleaver.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_sd_cleaver/v_sd_cleaver.mdl"
+				or self:GetModel() == "models/workshop_partner/weapons/c_models/c_sd_cleaver/c_sd_cleaver.mdl"
+				or self:GetModel() == "models/workshop_partner/weapons/c_models/c_sd_cleaver/v_sd_cleaver.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_shogun_kunai/c_shogun_kunai.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_voodoo_pin/c_voodoo_pin.mdl"
+				or self:GetModel() == "models/workshop/weapons/c_models/c_voodoo_pin/c_voodoo_pin.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_eternal_reward/c_eternal_reward.mdl"
+			then
+				self:SetPos(self:GetPos() - self:GetUp():GetNormalized() * 8)
+				self.ImpactDamageType = DMG_SLASH
+			elseif self:GetModel() == "models/weapons/c_models/c_claymore/c_claymore.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_claymore/c_claymore_xmas.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_scout_sword/c_scout_sword.mdl"
+				or self:GetModel() == "models/workshop/weapons/c_models/c_scout_sword/c_scout_sword.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_shogun_katana/c_shogun_katana.mdl"
+				or self:GetModel() == "models/weapons/c_models/c_shogun_katana/c_shogun_katana_soldier.mdl"
+				or self:GetModel() == "models/workshop_partner/weapons/c_models/c_shogun_katana/c_shogun_katana.mdl"
+				or self:GetModel() == "models/workshop_partner/weapons/c_models/c_shogun_katana/c_shogun_katana_soldier.mdl"
+				or self:GetModel() == "models/workshop/weapons/c_models/c_demo_sultan_sword/c_demo_sultan_sword.mdl"
+				or self:GetModel() == "models/weapons/melee/w_machete.mdl"
+				or self:GetModel() == "models/weapons/melee/w_katana.mdl"
+			then
+				self:SetPos(self:GetPos() - self:GetUp():GetNormalized() * 20)
+				self.ImpactDamageType = DMG_SLASH
+			elseif self:GetModel() == "models/weapons/melee/w_pitchfork.mdl"
+			then
+				self:SetPos(self:GetPos() - self:GetUp():GetNormalized() * 30)
+				self.ImpactDamageType = DMG_SLASH
+			elseif self:GetModel() == "models/lostcoast/fisherman/harpoon.mdl"
+			then
+				self:SetPos(self:GetPos() - self:GetUp():GetNormalized() * 20)
+			end
+
             if IsValid(self.Trail) then
                 self.Trail:Fire("Kill",1,1)
             end
 
 			if hitsky or not self:IsInWorld() or not ent then
+				self:SetNoDraw(true)
+				self:Remove()
+			end
+
+			if IsValid(ent) and ent:GetClass() == "func_breakable_surf" then
+				ent:Fire("Shatter")
 				self:SetNoDraw(true)
 				self:Remove()
 			end
@@ -196,15 +264,16 @@ if SERVER then
 			efdata:SetOrigin(hitpos)
             efdata:SetEntity(self)
             efdata:SetNormal(hitnormal)
+            efdata:SetDamageType(self.ImpactDamageType or DMG_BULLET)
             util.Effect("ef_scav_impalerimpact", efdata)
 
-            if (ent:IsNPC() or ent:IsPlayer() or ent:IsNextBot()) and ent.Health and ent:Health() > 0 then
+            if (ent:IsNPC() or ent:IsPlayer() or ent:IsNextBot()) and ent.Health and (ent:Health() > 0 or ent:GetMaxHealth() == 0) then --ew
 
 				sound.Play("ambient/machines/slicer"..math.random(2,3)..".wav", hitpos, 90, 100)
 
                 local tracew = {}
                 tracew.start = hitpos
-                tracew.endpos = hitpos + (self.Vel * (self.Length/500 or 0.1))
+                tracew.endpos = hitpos + (self.Vel * (self:GetLength()/500 or 0.1))
                 tracew.mask = MASK_SHOT_HULL
 
                 tracew.filter = function(tr_ent)
@@ -318,9 +387,6 @@ if SERVER then
                     self:Remove()
                 end
 
-            elseif not ent.Health or not ent.GetMaxHealth or (ent.Health and ent.GetMaxHealth and ent:GetMaxHealth() <= 0) then
-				self:SetNoDraw(true)
-				self:Remove()
             end
 
             if not self.Pinned then
@@ -333,6 +399,7 @@ if SERVER then
 		end
 
 		if self:GetHit() and IsValid(self:GetAHitEnt()) and self:GetAHitEnt():Health() <= 0 and not self.PerformPin then
+			self:SetNoDraw(true)
 			self:Remove()
 		end
 
@@ -344,7 +411,7 @@ if SERVER then
 
 	function ENT:OnRemove()
 		if IsValid(self.Trail) then
-			self.Trail:Remove()
+			self.Trail:Fire("Kill",0)
 		end
 	end
 
@@ -371,48 +438,24 @@ if CLIENT then
 		local trdata = {}
 		trdata.start = self.Pos
 		trdata.endpos = self.Pos + data:GetNormal() * -10
+		if IsValid(data:GetEntity()) then
+			trdata.filter = data:GetEntity()
+		end
 		local tr = util.TraceLine(trdata)
 
 		local ef = EffectData()
 		ef:SetStart(self:GetVelocity():GetNormalized() * -1)
 		ef:SetOrigin(tr.HitPos)
+		ef:SetStart(self.Pos)
+		ef:SetSurfaceProp(tr.SurfaceProps)
+		ef:SetHitBox(tr.HitBox)
+		ef:SetNormal(tr.HitNormal)
+		ef:SetDamageType(data:GetDamageType() or DMG_BULLET)
+		ef:SetScale(1)
+		ef:SetMagnitude(1)
+		ef:SetEntity(tr.Entity or game.GetWorld())
 
-		if tr.MatType == MAT_BLOODYFLESH or tr.MatType == MAT_FLESH then
-			util.Effect("BloodImpact", ef)
-			sound.Play("physics/flesh/flesh_impact_bullet"..math.random(1,5)..".wav", vOrig, 80, 100)
-			sound.Play("weapons/crossbow/hitbod"..math.random(1,2)..".wav", vOrig, 90, 100)
-			util.Decal("Blood", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
-		elseif tr.MatType == MAT_ALIENFLESH or tr.MatType == MAT_ANTLION or tr.MatType == MAT_EGGSHELL then
-			ef:SetScale(0.35)
-			util.Effect("StriderBlood", ef)
-			sound.Play("physics/flesh/flesh_impact_bullet"..math.random(1,5)..".wav", vOrig, 80, 100)
-			sound.Play("weapons/crossbow/hitbod"..math.random(1,2)..".wav", vOrig, 90, 100)
-			util.Decal("Impact.Antlion", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
-		elseif tr.MatType == MAT_CONCRETE then
-			util.Effect("GlassImpact", ef)
-			sound.Play("physics/concrete/concrete_impact_bullet"..math.random(1,4)..".wav", vOrig, 80, 100)
-			util.Decal("Impact.Concrete", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
-		elseif tr.MatType == MAT_PLASTIC then
-			util.Effect("GlassImpact", ef)
-			sound.Play("physics/plastic/plastic_box_impact_hard"..math.random(1,4)..".wav", vOrig, 80, 100)
-			util.Decal("Impact.Glass", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
-		elseif tr.MatType == MAT_GLASS or tr.MatType == MAT_TILE then
-			util.Effect("GlassImpact", ef)
-			sound.Play("physics/concrete/concrete_impact_bullet"..math.random(1,4)..".wav", vOrig, 80, 100)
-			util.Decal("Impact.Glass", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
-		elseif tr.MatType == MAT_METAL or tr.MatType == MAT_GRATE or tr.MatType == MAT_VENT or tr.MatType == MAT_COMPUTER then
-			util.Effect("MetalSpark", ef)
-			sound.Play("physics/metal/metal_solid_impact_bullet"..math.random(1,4)..".wav", vOrig, 80, 100)
-			util.Decal("Impact.Metal", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
-		elseif tr.MatType == MAT_WOOD then
-			util.Effect("AirboatGunImpact", ef)
-			sound.Play("physics/wood/wood_solid_impact_bullet"..math.random(1,5)..".wav", vOrig, 80, 100)
-			util.Decal("Impact.Wood", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
-		elseif tr.MatType == MAT_DIRT or tr.MatType == MAT_SAND or tr.MatType == MAT_GRASS or tr.MatType == MAT_FOLIAGE then
-			util.Effect("GlassImpact", ef)
-			sound.Play("physics/surfaces/sand_impact_bullet"..math.random(1,4)..".wav", vOrig, 80, 100)
-			util.Decal("Impact.Sand", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
-		end
+		util.Effect("Impact", ef)
 
 	end
 
