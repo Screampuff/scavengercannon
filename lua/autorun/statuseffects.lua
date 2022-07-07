@@ -419,12 +419,16 @@ local STATUS = {}
 
 	function STATUS:Initialize()
 		local r,g,b,a = self.Owner:GetColor().r,self.Owner:GetColor().g,self.Owner:GetColor().b,self.Owner:GetColor().a
-		self.Owner:SetColor(Color(r,g,b,0))
-		self.Owner:SetRenderMode(RENDERMODE_TRANSALPHA)
+		--self.Owner:SetColor(Color(r,g,b,0))
+		--self.Owner:SetRenderMode(RENDERMODE_TRANSALPHA)
+		self.Owner:SetMaterial("effects/predator_camo")
+		self.Owner:DrawShadow(false)
 		if self.Owner:IsPlayer() then
 			for k,v in ipairs(self.Owner:GetWeapons()) do
-				v:SetColor(Color(r,g,b,0))
-				v:SetRenderMode(RENDERMODE_TRANSALPHA)
+				--v:SetColor(Color(r,g,b,0))
+				--v:SetRenderMode(RENDERMODE_TRANSALPHA)
+				v:SetMaterial("effects/predator_camo")
+				v:DrawShadow(false)
 			end
 			--[[if SERVER then
 				for i, npc in ipairs( ents.FindByClass( "npc_*" ) ) do
@@ -443,8 +447,8 @@ local STATUS = {}
 				pos.z = pos.z+1
 				self.Owner:SetPos(pos)
 				--self.Owner:GetViewModel():SetMaterial("models/shadertest/predator")
-				self.Owner:GetViewModel():SetMaterial("models/props_combine/com_shield001a")
-				self.Owner:GetHands():SetMaterial("models/props_combine/com_shield001a")
+				self.Owner:GetViewModel():SetMaterial("effects/predator_camo")
+				self.Owner:GetHands():SetMaterial("effects/predator_camo")
 			end
 		end
 		if IsMounted(440) then --only use TF2 sounds if TF2 is mounted
@@ -472,10 +476,14 @@ local STATUS = {}
 		local r,g,b,a = self.Owner:GetColor().r,self.Owner:GetColor().g,self.Owner:GetColor().b,self.Owner:GetColor().a
 		self.Owner:SetColor(Color(r,g,b,a))
 		self.Owner:SetRenderMode(RENDERMODE_NORMAL)
+		self.Owner:SetMaterial("")
+		self.Owner:DrawShadow(true)
 		if self.Owner:IsPlayer() then
 			for k,v in ipairs(self.Owner:GetWeapons()) do
 				v:SetColor(Color(r,g,b,255))
+				v:SetMaterial("")
 				v:SetRenderMode(RENDERMODE_NORMAL)
+				v:DrawShadow(true)
 			end
 			--[[if SERVER then
 				for i, npc in ipairs( ents.FindByClass( "npc_*" ) ) do
