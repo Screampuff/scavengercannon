@@ -92,6 +92,59 @@ if SERVER then
 
 	end
 
+	local offsetmodels = {}
+	
+	--HL2
+	offsetmodels["models/crossbow_bolt.mdl"] = {Vector(0,-10,0)}
+	offsetmodels["models/props_junk/harpoon002a.mdl"] = {Vector(0,-30,0)}
+	
+	--CSS
+	offsetmodels["models/weapons/w_knife_ct.mdl"] = {Vector(0,-8,-5), DMG_SLASH}
+	offsetmodels["models/weapons/w_knife_t.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	
+	--TF2
+	offsetmodels["models/weapons/c_models/c_scimitar/c_scimitar.mdl"] = {Vector(0,-15,0), DMG_SLASH}
+	offsetmodels["models/workshop/weapons/c_models/c_scimitar/c_scimitar.mdl"] = {Vector(0,-15,0), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_machete/c_machete.mdl"] = {Vector(0,-15,0), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_croc_knife/c_croc_knife.mdl"] = {Vector(0,-15,0), DMG_SLASH}
+	offsetmodels["models/workshop/weapons/c_models/c_croc_knife/c_croc_knife.mdl"] = {Vector(0,-15,0), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_wood_machete/c_wood_machete.mdl"] = {Vector(0,-15,0), DMG_SLASH}
+	offsetmodels["models/workshop/weapons/c_models/c_wood_machete/c_wood_machete.mdl"] = {Vector(0,-15,0), DMG_SLASH}
+	offsetmodels["models/weapons/w_models/w_knife.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/workshop_partner/weapons/c_models/c_prinny_knife/c_prinny_knife.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_acr_hookblade/c_acr_hookblade.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/workshop/weapons/c_models/c_acr_hookblade/c_acr_hookblade.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_ava_roseknife/c_ava_roseknife.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_ava_roseknife/c_ava_roseknife_v.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/workshop/weapons/c_models/c_ava_roseknife/c_ava_roseknife.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_switchblade/c_switchblade.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/workshop/weapons/c_models/c_switchblade/c_switchblade.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_sd_cleaver/c_sd_cleaver.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_sd_cleaver/v_sd_cleaver.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/workshop_partner/weapons/c_models/c_sd_cleaver/c_sd_cleaver.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/workshop_partner/weapons/c_models/c_sd_cleaver/v_sd_cleaver.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_shogun_kunai/c_shogun_kunai.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_voodoo_pin/c_voodoo_pin.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/workshop/weapons/c_models/c_voodoo_pin/c_voodoo_pin.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_eternal_reward/c_eternal_reward.mdl"] = {Vector(0,0,-8), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_claymore/c_claymore.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_claymore/c_claymore_xmas.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_scout_sword/c_scout_sword.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	offsetmodels["models/workshop/weapons/c_models/c_scout_sword/c_scout_sword.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_shogun_katana/c_shogun_katana.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	offsetmodels["models/weapons/c_models/c_shogun_katana/c_shogun_katana_soldier.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	offsetmodels["models/workshop_partner/weapons/c_models/c_shogun_katana/c_shogun_katana.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	offsetmodels["models/workshop_partner/weapons/c_models/c_shogun_katana/c_shogun_katana_soldier.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	offsetmodels["models/workshop/weapons/c_models/c_demo_sultan_sword/c_demo_sultan_sword.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	
+	--L4D2
+	offsetmodels["models/weapons/melee/w_machete.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	offsetmodels["models/weapons/melee/w_katana.mdl"] = {Vector(0,0,-20), DMG_SLASH}
+	offsetmodels["models/weapons/melee/w_pitchfork.mdl"] = {Vector(0,0,-30), DMG_SLASH}
+	
+	--Lost Coast
+	offsetmodels["models/lostcoast/fisherman/harpoon.mdl"] = {Vector(0,0,-20)}
+	
 	local b_trace 	= {}
 	local b_tr 		= {}
 
@@ -128,66 +181,12 @@ if SERVER then
 		if IsValid(self) and not self:GetHit() and hit then
 
 			self:SetPos(hitpos)
-
-			if self:GetModel() == "models/crossbow_bolt.mdl" then
-				self:SetPos(self:GetPos() - self:GetForward():GetNormalized() * 10)
-			elseif self:GetModel() == "models/props_junk/harpoon002a.mdl" then
-				self:SetPos(self:GetPos() - self:GetForward():GetNormalized() * 30)
-			elseif self:GetModel() == "models/weapons/c_models/c_scimitar/c_scimitar.mdl"
-				or self:GetModel() == "models/workshop/weapons/c_models/c_scimitar/c_scimitar.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_machete/c_machete.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_croc_knife/c_croc_knife.mdl"
-				or self:GetModel() == "models/workshop/weapons/c_models/c_croc_knife/c_croc_knife.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_wood_machete/c_wood_machete.mdl"
-				or self:GetModel() == "models/workshop/weapons/c_models/c_wood_machete/c_wood_machete.mdl"
-			then
-				self:SetPos(self:GetPos() - self:GetForward():GetNormalized() * 15)
-				self.ImpactDamageType = DMG_SLASH
-			elseif self:GetModel() == "models/weapons/w_knife_ct.mdl" then
-				self:SetPos(self:GetPos() - self:GetUp():GetNormalized() * 5 - self:GetForward():GetNormalized() * 8)
-				self.ImpactDamageType = DMG_SLASH
-			elseif self:GetModel() == "models/weapons/w_knife_t.mdl"
-				or self:GetModel() == "models/weapons/w_models/w_knife.mdl"
-				or self:GetModel() == "models/workshop_partner/weapons/c_models/c_prinny_knife/c_prinny_knife.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_acr_hookblade/c_acr_hookblade.mdl"
-				or self:GetModel() == "models/workshop/weapons/c_models/c_acr_hookblade/c_acr_hookblade.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_ava_roseknife/c_ava_roseknife.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_ava_roseknife/c_ava_roseknife_v.mdl"
-				or self:GetModel() == "models/workshop/weapons/c_models/c_ava_roseknife/c_ava_roseknife.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_switchblade/c_switchblade.mdl"
-				or self:GetModel() == "models/workshop/weapons/c_models/c_switchblade/c_switchblade.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_sd_cleaver/c_sd_cleaver.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_sd_cleaver/v_sd_cleaver.mdl"
-				or self:GetModel() == "models/workshop_partner/weapons/c_models/c_sd_cleaver/c_sd_cleaver.mdl"
-				or self:GetModel() == "models/workshop_partner/weapons/c_models/c_sd_cleaver/v_sd_cleaver.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_shogun_kunai/c_shogun_kunai.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_voodoo_pin/c_voodoo_pin.mdl"
-				or self:GetModel() == "models/workshop/weapons/c_models/c_voodoo_pin/c_voodoo_pin.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_eternal_reward/c_eternal_reward.mdl"
-			then
-				self:SetPos(self:GetPos() - self:GetUp():GetNormalized() * 8)
-				self.ImpactDamageType = DMG_SLASH
-			elseif self:GetModel() == "models/weapons/c_models/c_claymore/c_claymore.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_claymore/c_claymore_xmas.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_scout_sword/c_scout_sword.mdl"
-				or self:GetModel() == "models/workshop/weapons/c_models/c_scout_sword/c_scout_sword.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_shogun_katana/c_shogun_katana.mdl"
-				or self:GetModel() == "models/weapons/c_models/c_shogun_katana/c_shogun_katana_soldier.mdl"
-				or self:GetModel() == "models/workshop_partner/weapons/c_models/c_shogun_katana/c_shogun_katana.mdl"
-				or self:GetModel() == "models/workshop_partner/weapons/c_models/c_shogun_katana/c_shogun_katana_soldier.mdl"
-				or self:GetModel() == "models/workshop/weapons/c_models/c_demo_sultan_sword/c_demo_sultan_sword.mdl"
-				or self:GetModel() == "models/weapons/melee/w_machete.mdl"
-				or self:GetModel() == "models/weapons/melee/w_katana.mdl"
-			then
-				self:SetPos(self:GetPos() - self:GetUp():GetNormalized() * 20)
-				self.ImpactDamageType = DMG_SLASH
-			elseif self:GetModel() == "models/weapons/melee/w_pitchfork.mdl"
-			then
-				self:SetPos(self:GetPos() - self:GetUp():GetNormalized() * 30)
-				self.ImpactDamageType = DMG_SLASH
-			elseif self:GetModel() == "models/lostcoast/fisherman/harpoon.mdl"
-			then
-				self:SetPos(self:GetPos() - self:GetUp():GetNormalized() * 20)
+			
+			if offsetmodels[self:GetModel()] then
+				self:SetPos(self:GetPos() + (self:GetRight():GetNormalized() * offsetmodels[self:GetModel()][1].x) + (self:GetForward():GetNormalized() * offsetmodels[self:GetModel()][1].y) + (self:GetUp():GetNormalized() * offsetmodels[self:GetModel()][1].z))
+				if offsetmodels[self:GetModel()][2] then
+					self.ImpactDamageType = offsetmodels[self:GetModel()][2]
+				end
 			end
 
             if IsValid(self.Trail) then
