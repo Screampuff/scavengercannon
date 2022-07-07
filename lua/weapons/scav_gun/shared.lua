@@ -370,21 +370,21 @@ function SWEP:MuzzleFlash2(effectname,isparticle)
 
 	local att = self:LookupAttachment("muzzle")
 	local posang = self:GetAttachment(att)
+	if IsValid(posang) then
+		local ef = EffectData()
+		ef:SetEntity(self)
+		ef:SetOrigin(posang.Pos)
+		ef:SetNormal(posang.Ang:Forward())
+		ef:SetStart(posang.Pos)
+		ef:SetAttachment(att)
 
-	local ef = EffectData()
-	ef:SetEntity(self)
-	ef:SetOrigin(posang.Pos)
-	ef:SetNormal(posang.Ang:Forward())
-	ef:SetStart(posang.Pos)
-	ef:SetAttachment(att)
-
-	if not isparticle then
-		util.Effect(effectname,ef)
-	elseif type(effectname) == "number" then
-		ef:SetScale(effectname)
-		util.Effect("ef_scav_muzzleflare",ef)
+		if not isparticle then
+			util.Effect(effectname,ef)
+		elseif type(effectname) == "number" then
+			ef:SetScale(effectname)
+			util.Effect("ef_scav_muzzleflare",ef)
+		end
 	end
-
 end
 
 if SERVER then

@@ -1963,7 +1963,7 @@ end
 							item.ammo == "models/props_spytech/control_room_console01.mdl" or
 							item.ammo == "models/props_spytech/control_room_console03.mdl" then
 						self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
-						timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
+						timer.Simple(.25,function() if IsValid(self) then self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end end)
 					else --HL2
 						self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
 					end
@@ -2033,7 +2033,7 @@ end
 				timer.Simple(0.4,function()
 					if SERVER then
 						self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
-						timer.Simple(.25,function() self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end)
+						timer.Simple(.25,function() if IsValid(self) then self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end end)
 					else
 						tf2shelleject(self,"shotgun")
 					end
