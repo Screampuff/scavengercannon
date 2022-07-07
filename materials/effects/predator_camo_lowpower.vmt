@@ -1,0 +1,38 @@
+"Refract"
+{
+ 	"$model" 1
+ 	"$refractamount" "0"
+ 	"$bluramount" "2"
+	"$scale" "[1 1]"
+	"$dudvmap" "dev/water_dudv"
+	"$normalmap" "dev/water_normal"
+	"$bumpframe" "0"
+	"$translucent" "1"
+	"$forcerefract" 1
+	"$nofog" "1"	
+	"$envmap" "env_cubemap"
+	"$envmapsaturation" "[0 0 0]"
+	"$envmaptint" "[.35 .35 .35]"
+	"$envmapcontrast" 1
+	"$refracttint" "[1.5 1.5 1.5]"
+	"$cloakpassenabled" "1"
+	"$cloakfactor" "0.998"
+	"$cloakcolortint" "[0 0 0]"
+	"Proxies"
+	{
+		"AnimatedTexture"
+		{
+			"animatedtexturevar" "$normalmap"
+			"animatedtextureframenumvar" "$bumpframe"
+			"animatedtextureframerate" 30.00
+		}
+		Sine
+		{
+			sineperiod	4
+			sinemin		0.003
+			sinemax		0.06
+			timeoffset		0.5
+			resultVar		$refractamount
+		}
+	}
+}
