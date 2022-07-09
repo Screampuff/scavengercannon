@@ -480,9 +480,9 @@ local STATUS = {}
 		self.Owner:DrawShadow(true)
 		if self.Owner:IsPlayer() then
 			for k,v in ipairs(self.Owner:GetWeapons()) do
-				v:SetColor(Color(r,g,b,255))
+				--v:SetColor(Color(r,g,b,255))
 				v:SetMaterial("")
-				v:SetRenderMode(RENDERMODE_NORMAL)
+				--v:SetRenderMode(RENDERMODE_NORMAL)
 				v:DrawShadow(true)
 			end
 			--[[if SERVER then

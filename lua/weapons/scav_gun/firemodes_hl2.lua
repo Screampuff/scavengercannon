@@ -803,6 +803,7 @@ local eject = "brass"
 									if attach then
 										ef:SetOrigin(attach.Pos)
 										ef:SetAngles(attach.Ang)
+										ef:SetEntity(self)
 										util.Effect("ShotgunShellEject",ef)
 									end
 								end
@@ -900,6 +901,7 @@ local eject = "brass"
 							if attach then
 								ef:SetOrigin(attach.Pos)
 								ef:SetAngles(attach.Ang)
+								ef:SetEntity(self)
 								util.Effect("ShellEject",ef)
 							end
 						end)
@@ -1630,6 +1632,7 @@ local eject = "brass"
 								if attach then
 									ef:SetOrigin(attach.Pos)
 									ef:SetAngles(attach.Ang)
+									ef:SetEntity(self)
 									for i=1,6 do
 										util.Effect("ShellEject",ef)
 									end
@@ -1647,6 +1650,7 @@ local eject = "brass"
 							if attach then
 								ef:SetOrigin(attach.Pos)
 								ef:SetAngles(attach.Ang)
+								ef:SetEntity(self)
 								util.Effect("ShellEject",ef)
 							end
 						end
@@ -1809,6 +1813,7 @@ local eject = "brass"
 									if attach then
 										ef:SetOrigin(attach.Pos)
 										ef:SetAngles(attach.Ang)
+										ef:SetEntity(self)
 										util.Effect("ShellEject",ef)
 									end
 								end)
@@ -1824,6 +1829,7 @@ local eject = "brass"
 									if attach then
 										ef:SetOrigin(attach.Pos)
 										ef:SetAngles(attach.Ang)
+										ef:SetEntity(self)
 										util.Effect("ShellEject",ef)
 									end
 								end)
