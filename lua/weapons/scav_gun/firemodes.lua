@@ -2049,6 +2049,7 @@ end
 						if attach then
 							ef:SetOrigin(attach.Pos)
 							ef:SetAngles(attach.Ang)
+							ef:SetEntity(self)
 							util.Effect("ShotgunShellEject",ef)
 						end
 					end)
@@ -2588,25 +2589,27 @@ end
 						if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
 							self.Owner:FireBullets(bullet)
 						end
-						timer.Simple(.45,function() 
-							local ef = EffectData()
-							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-							if attach then
-								ef:SetOrigin(attach.Pos)
-								ef:SetAngles(attach.Ang)
-								ef:SetEntity(self)
-								if item.ammo == "models/weapons/rifleshell.mdl" then
-									if SERVER then
-										self:EmitSound("weapons/smg1/switch_burst.wav",75,100,1)
+						timer.Simple(.45,function()
+							if IsValid(self) then
+								local ef = EffectData()
+								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+								if attach then
+									ef:SetOrigin(attach.Pos)
+									ef:SetAngles(attach.Ang)
+									ef:SetEntity(self)
+									if item.ammo == "models/weapons/rifleshell.mdl" then
+										if SERVER then
+											self:EmitSound("weapons/smg1/switch_burst.wav",75,100,1)
+										else
+											util.Effect("RifleShellEject",ef)
+										end
 									else
-										util.Effect("RifleShellEject",ef)
-									end
-								else
-									if SERVER then
-										self:EmitSound("weapons/sniper_bolt_back.wav",75,100,1)
-										timer.Simple(.25,function() self.Owner:EmitSound("weapons/sniper_bolt_forward.wav") end)
-									else
-										tf2shelleject(self,"sniperrifle")
+										if SERVER then
+											self:EmitSound("weapons/sniper_bolt_back.wav",75,100,1)
+											timer.Simple(.25,function() self.Owner:EmitSound("weapons/sniper_bolt_forward.wav") end)
+										else
+											tf2shelleject(self,"sniperrifle")
+										end
 									end
 								end
 							end
@@ -5107,6 +5110,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 									local ef = EffectData()
 										ef:SetOrigin(attach.Pos)
 										ef:SetAngles(attach.Ang)
+										ef:SetEntity(self)
 									util.Effect("RifleShellEject",ef)
 								end
 							else --TF2
@@ -5144,7 +5148,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					self.Owner:EmitSound("weapons/minigun_wind_up.wav")
 					self.soundloops.minigunspin = CreateSound(self.Owner,"weapons/minigun_spin.wav")
 					self.soundloops.minigunfire = CreateSound(self.Owner,"weapons/minigun_shoot.wav")
-					self:SetBarrelRestSpeed(900)	
+					self:SetBarrelRestSpeed(900)
 				end								
 				return false
 			end
