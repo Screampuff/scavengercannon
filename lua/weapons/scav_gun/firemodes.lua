@@ -12,10 +12,6 @@ local ScavData = ScavData
 DMG_FREEZE = 16
 DMG_CHEMICAL = 1048576
 
---date checks
-local halloween = os.date("%m") == "10"
-local christmas = os.date("%m") == "12"
-
 local eject = "brass"
 
 util.PrecacheModel("models/scav/shells/shell_pistol_tf2.mdl")
@@ -321,14 +317,14 @@ end
 				ScavData.CollectFuncs["models/maxofs2d/hover_classic.mdl"] = ScavData.GiveOneOfItemInf
 				--TF2
 				ScavData.CollectFuncs["models/weapons/c_models/c_xms_cold_shoulder/c_xms_cold_shoulder.mdl"] = function(self,ent)
-						if christmas then
+						if self.christmas then
 							self:AddItem("models/workshop/weapons/c_models/c_xms_cold_shoulder/c_xms_cold_shoulder_festivizer.mdl",SCAV_SHORT_MAX,ent:GetSkin(),1)
 						else
 							self:AddItem("models/weapons/c_models/c_xms_cold_shoulder/c_xms_cold_shoulder.mdl",SCAV_SHORT_MAX,ent:GetSkin(),1)
 						end
 					end
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_xms_cold_shoulder/c_xms_cold_shoulder.mdl"] = function(self,ent)
-						if christmas then
+						if self.christmas then
 							self:AddItem("models/workshop/weapons/c_models/c_xms_cold_shoulder/c_xms_cold_shoulder_festivizer.mdl",SCAV_SHORT_MAX,ent:GetSkin(),1)
 						else
 							self:AddItem("models/workshop/weapons/c_models/c_xms_cold_shoulder/c_xms_cold_shoulder.mdl",SCAV_SHORT_MAX,ent:GetSkin(),1)
@@ -474,14 +470,14 @@ end
 				ScavData.CollectFuncs["models/weapons/w_crossbow.mdl"] = function(self,ent) self:AddItem("models/crossbow_bolt.mdl",1,ent:GetSkin(),1) end --1 bolt from the crossbow
 				--TF2
 				ScavData.CollectFuncs["models/weapons/w_models/w_arrow.mdl"] = function(self,ent) --Christmas check
-					if christmas then
+					if self.christmas then
 						self:AddItem("models/weapons/w_models/w_arrow_xmas.mdl",1,0,1)
 					else
 						self:AddItem("models/weapons/w_models/w_arrow.mdl",1,0,1)
 					end
 				end
 				ScavData.CollectFuncs["models/weapons/c_models/c_claymore/c_claymore.mdl"] = function(self,ent) --Christmas check
-					if christmas then
+					if self.christmas then
 						self:AddItem("models/weapons/c_models/c_claymore/c_claymore_xmas.mdl",1,math.fmod(ent:GetSkin(),2),1)
 					else
 						self:AddItem("models/weapons/c_models/c_claymore/c_claymore.mdl",1,ent:GetSkin(),1)
@@ -490,7 +486,7 @@ end
 				ScavData.CollectFuncs["models/weapons/c_models/c_dartgun.mdl"] = function(self,ent) self:AddItem("models/weapons/c_models/c_dart.mdl",1,ent:GetSkin(),5) end --5 darts from Sydney Sleeper
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_sydney_sleeper/c_sydney_sleeper.mdl"] = function(self,ent) self:AddItem("models/workshop/weapons/c_models/c_sydney_sleeper/c_sydney_sleeper_dart.mdl",1,ent:GetSkin(),5) end --5 darts from Sydney Sleeper
 				ScavData.CollectFuncs["models/weapons/c_models/c_bow/c_bow.mdl"] = function(self,ent) --3 arrows from Huntsman
-						if christmas then
+						if self.christmas then
 							self:AddItem("models/weapons/w_models/w_arrow_xmas.mdl",1,0,3)
 						else
 							self:AddItem("models/weapons/w_models/w_arrow.mdl",1,0,3)
@@ -498,7 +494,7 @@ end
 					end
 				ScavData.CollectFuncs["models/workshop_partner/weapons/c_models/c_bow_thief/c_bow_thief.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_bow/c_bow.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_crusaders_crossbow/c_crusaders_crossbow.mdl"] = function(self,ent) --1 arrow from Crusader's Crossbow TODO: syringe
-					if christmas then
+					if self.christmas then
 						self:AddItem("models/weapons/w_models/w_arrow_xmas.mdl",1,0,1)
 					else
 						self:AddItem("models/weapons/w_models/w_arrow.mdl",1,0,1)
@@ -889,7 +885,7 @@ end
 					end
 				--TF2
 				ScavData.CollectFuncs["models/weapons/c_models/c_energy_drink/c_energy_drink.mdl"] = function(self,ent)
-						if christmas and ent:GetSkin() < 2 then
+						if self.christmas and ent:GetSkin() < 2 then
 							self:AddItem("models/weapons/c_models/c_xms_energy_drink/c_xms_energy_drink.mdl",1,ent:GetSkin(),1)
 						else
 							self:AddItem("models/weapons/c_models/c_energy_drink/c_energy_drink.mdl",1,ent:GetSkin(),1)
@@ -1251,7 +1247,7 @@ end
 				ScavData.CollectFuncs["models/weapons/w_defuser.mdl"] = ScavData.GiveOneOfItemInf
 				--TF2
 				ScavData.CollectFuncs["models/weapons/w_models/w_wrangler.mdl"] = function(self,ent)
-					if christmas then
+					if self.christmas then
 						self:AddItem("models/weapons/c_models/c_wrangler_xmas.mdl",SCAV_SHORT_MAX,ent:GetSkin(),1)
 					else
 						self:AddItem(ScavData.FormatModelname(ent:GetModel()),SCAV_SHORT_MAX,ent:GetSkin(),1)
@@ -1611,17 +1607,17 @@ end
 				ScavData.CollectFuncs["models/weapons/c_models/c_drg_righteousbison/c_drg_righteousbison.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_drg_pomson/c_drg_pomson.mdl"]
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_drg_righteousbison/c_drg_righteousbison.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_drg_pomson/c_drg_pomson.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_models/w_sapper.mdl"] = function(self,ent) --holiday check
-						if christmas then
+						if self.christmas then
 							self:AddItem("models/weapons/c_models/c_sapper/c_sapper_xmas.mdl",8,math.floor(math.Rand(0,2)))
 						else
-							self:AddItem(ScavData.FormatModelname(ent:GetModel()),8,0)
+							self:AddItem(ScavData.FormatModelname(ent:GetModel()),8,ent:GetSkin())
 						end
 					end
 				ScavData.CollectFuncs["models/weapons/w_models/w_sd_sapper.mdl"] = ScavData.CollectFuncs["models/weapons/w_stunbaton.mdl"]
 				ScavData.CollectFuncs["models/buildables/sd_sapper_dispenser.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sd_sapper.mdl"]
 				ScavData.CollectFuncs["models/workshop_partner/weapons/c_models/c_sd_sapper/c_sd_sapper.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sd_sapper.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_sapper/c_sapper.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sapper.mdl"]
-				ScavData.CollectFuncs["models/weapons/c_models/c_sapper/c_sapper_xmas.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sapper.mdl"]
+				ScavData.CollectFuncs["models/weapons/c_models/c_sapper/c_sapper_xmas.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),8,ent:GetSkin()) end
 				ScavData.CollectFuncs["models/weapons/c_models/c_p2rec/c_p2rec.mdl"] = ScavData.CollectFuncs["models/weapons/w_stunbaton.mdl"]
 				ScavData.CollectFuncs["models/workshop_partner/weapons/c_models/c_sd_neonsign/c_sd_neonsign.mdl"] = ScavData.CollectFuncs["models/weapons/w_stunbaton.mdl"]
 				ScavData.CollectFuncs["models/buildables/sapper_dispenser.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sapper.mdl"]
@@ -1892,7 +1888,10 @@ end
 				--CSS
 				ScavData.CollectFuncs["models/props/de_inferno/cannon_gun.mdl"] = function(self,ent) self:AddItem("models/props_phx/misc/smallcannonball.mdl",1,0,1) end --1 cannonball from de_inferno cannon
 				--L4D/2
-				ScavData.CollectFuncs["models/props_unique/airport/atlas.mdl"] = function(self,ent) self:AddItem("models/props_unique/airport/atlas_break_ball.mdl",1,0,1) end --1 world from Atlas
+				ScavData.CollectFuncs["models/props_unique/airport/atlas.mdl"] = function(self,ent) --1 world from Atlas
+					self:AddItem("models/props_unique/airport/atlas.mdl",1,0,1)
+					self:AddItem("models/props_unique/airport/atlas_break_ball.mdl",1,0,1)
+				end
 				--FoF
 				ScavData.CollectFuncs["models/weapons/cannon_top.mdl"] = function(self,ent) self:AddItem("models/weapons/cannon_ball.mdl",1,0,1) end --1 cannonball from cannon
 			end
@@ -2409,6 +2408,7 @@ end
 				ScavData.CollectFuncs["models/props_fairgrounds/bass_amp.mdl"] = ScavData.CollectFuncs["models/props_fairgrounds/amp_plexi.mdl"]
 				ScavData.CollectFuncs["models/props_unique/jukebox01_body.mdl"] = ScavData.CollectFuncs["models/props_fairgrounds/amp_plexi.mdl"]
 				ScavData.CollectFuncs["models/weapons/melee/w_electric_guitar.mdl"] = ScavData.CollectFuncs["models/props_fairgrounds/amp_plexi.mdl"]
+				ScavData.CollectFuncs["models/props_fairgrounds/strongmangame_bell.mdl"] = ScavData.CollectFuncs["models/props_spytech/fire_bell01.mdl"]
 				--HL:S
 				ScavData.CollectFuncs["models/houndeye.mdl"] = ScavData.CollectFuncs["models/props/cs_office/radio.mdl"]
 			end
@@ -2440,6 +2440,7 @@ end
 		ScavData.RegisterFiremode(tab,"models/props_fairgrounds/monitor_speaker.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_unique/jukebox01_body.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/melee/w_electric_guitar.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_fairgrounds/strongmangame_bell.mdl")
 		--Portal
 		ScavData.RegisterFiremode(tab,"models/props/radio_reference.mdl")
 		ScavData.RegisterFiremode(tab,"models/props/food_can/food_can.mdl")
@@ -2498,7 +2499,7 @@ end
 				ScavData.CollectFuncs["models/props_hydro/water_barrel_cluster2.mdl"] = function(self,ent) self:AddItem("models/props_badlands/barrel01.mdl",2,0,8) end --eight barrels from the clusters
 				ScavData.CollectFuncs["models/props_hydro/water_barrel_cluster3.mdl"] = function(self,ent) self:AddItem("models/props_badlands/barrel01.mdl",2,0,8) end --eight barrels from the clusters
 				ScavData.CollectFuncs["models/weapons/c_models/urinejar.mdl"] = function(self,ent)
-					if christmas then
+					if self.christmas then
 						self:AddItem("models/weapons/c_models/c_xms_urinejar.mdl",1,math.floor(math.Rand(0,2)),1)
 					else
 						self:AddItem("models/weapons/c_models/urinejar.mdl",1,0,1)
@@ -2840,21 +2841,21 @@ end
 				end
 				--TF2
 				ScavData.CollectFuncs["models/items/medkit_small.mdl"] = function(self,ent)
-					if halloween then
+					if self.halloween then
 						self:AddItem("models/props_halloween/halloween_medkit_small.mdl",1,0,1)
 					else
 						self:AddItem("models/items/medkit_small.mdl",1,0,1)
 					end
 				end
 				ScavData.CollectFuncs["models/items/medkit_medium.mdl"] = function(self,ent)
-					if halloween then
+					if self.halloween then
 						self:AddItem("models/props_halloween/halloween_medkit_medium.mdl",1,0,1)
 					else
 						self:AddItem("models/items/medkit_medium.mdl",1,0,1)
 					end
 				end
 				ScavData.CollectFuncs["models/items/medkit_large.mdl"] = function(self,ent)
-					if halloween then
+					if self.halloween then
 						self:AddItem("models/props_halloween/halloween_medkit_large.mdl",1,0,1)
 					else
 						self:AddItem("models/items/medkit_large.mdl",1,0,1)
@@ -3095,14 +3096,14 @@ end
 				ScavData.CollectFuncs["models/props/cs_italy/bananna_bunch.mdl"] = function(self,ent) self:AddItem("models/props/cs_italy/bananna.mdl",1,0,5) end
 				--TF2
 				ScavData.CollectFuncs["models/weapons/c_models/c_sandwich/c_sandwich.mdl"] = function(self,ent) --Christmas check
-						if christmas then
+						if self.christmas then
 							self:AddItem("models/weapons/c_models/c_sandwich/c_sandwich_xmas.mdl",1,math.floor(math.Rand(0,2)),1)
 						else
 							self:AddItem(ScavData.FormatModelname(ent:GetModel()),1,0,1)
 						end
 					end
 				ScavData.CollectFuncs["models/items/plate.mdl"] = function(self,ent) --Christmas check
-						if christmas then
+						if self.christmas then
 							self:AddItem("models/items/plate_sandwich_xmas.mdl",1,math.floor(math.Rand(0,2)),1)
 						else
 							self:AddItem(ScavData.FormatModelname(ent:GetModel()),1,0,1)
@@ -3153,7 +3154,7 @@ end
 				--TF2
 				ScavData.CollectFuncs["models/props_island/steroid_drum_cluster.mdl"] = function(self,ent) self:AddItem("models/props_island/steroid_drum.mdl",1,0,8) end
 				ScavData.CollectFuncs["models/weapons/c_models/c_buffpack/c_buffpack.mdl"] = function(self,ent) --Christmas check
-					if christmas then
+					if self.christmas then
 						self:AddItem("models/weapons/c_models/c_buffpack/c_buffpack_xmas.mdl",1,math.floor(math.Rand(0,2)),1)
 					else
 						self:AddItem(ScavData.FormatModelname(ent:GetModel()),1,0,1)
@@ -3236,11 +3237,25 @@ end
 				--FoF
 				ScavData.CollectFuncs["models/weapons/w_whiskey.mdl"] = function(self,ent)
 					self:AddItem(ScavData.FormatModelname(ent:GetModel()),1,0,1)
+					local voice = {"voice","voice2","voice4"}
 					local rand = math.floor(math.Rand(1,3))
-					self.Owner:EmitSound("player/voice/whiskey_passwhiskey".. rand .. ".wav",75,100,1,CHAN_VOICE)
+					self.Owner:EmitSound("player/" .. voice[math.floor(math.Rand(1,4))] .. "/whiskey_passwhiskey".. rand .. ".wav",75,100,1,CHAN_VOICE)
 				end
 				ScavData.CollectFuncs["models/weapons/w_whiskey2.mdl"] = ScavData.CollectFuncs["models/weapons/w_whiskey.mdl"]
 				ScavData.CollectFuncs["models/items_fof/whiskey_world.mdl"] = ScavData.CollectFuncs["models/weapons/w_whiskey.mdl"]
+				ScavData.CollectFuncs["models/elpaso/barrel2.mdl"] = function(self,ent)
+					for i=1,5,1 do
+						if math.random() < .5 then
+							self:AddItem(ScavData.FormatModelname("models/weapons/w_whiskey.mdl"),1,0,1)
+						else
+							self:AddItem(ScavData.FormatModelname("models/weapons/w_whiskey2.mdl"),1,0,1)
+						end
+					end
+					local voice = {"voice","voice2","voice4"}
+					local rand = math.floor(math.Rand(1,3))
+					self.Owner:EmitSound("player/" .. voice[math.floor(math.Rand(1,4))] .. "/howl_yeehaw".. rand .. ".wav",75,100,1,CHAN_VOICE)
+				end
+				ScavData.CollectFuncs["models/elpaso/barrel2_small.mdl"] = ScavData.CollectFuncs["models/elpaso/barrel2.mdl"]
 			end
 			tab.Cooldown = 2
 		ScavData.RegisterFiremode(tab,"models/props_junk/glassjug01.mdl")
@@ -3493,6 +3508,9 @@ PrecacheParticleSystem("scav_exp_plasma")
 					local chunks = {}
 					local mdl = ""
 					local ang = self.Owner:GetAngles()
+					local randvec = Vector(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
+					local pos = self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec)
+					local mass = 10
 					if item.ammo == "models/props_combine/breenbust.mdl" then
 						chunks = {"1","2","3","4","5","6","7"}
 						mdl = "models/props_combine/breenbust_Chunk0"
@@ -3513,18 +3531,22 @@ PrecacheParticleSystem("scav_exp_plasma")
 						chunks = {"2","3","4","5","6","7","8","9","10","11","12","13","14"}
 						mdl = "models/props/cs_militia/skylight_glass_p"
 						ang:Add(Angle(90,0,0))
+					elseif item.ammo == "models/props_unique/airport/atlas.mdl" then
+						chunks = {"1","2","3","4","5","6","7","8","9"}
+						mdl = "models/props_unique/airport/atlas_break0"
+						pos:Add(Vector(0,0,-32))
+						mass = 1000
 					end
 					for i=1,#chunks,1 do
 						local proj = self:CreateEnt("prop_physics")
-						local randvec = Vector(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
 						proj:SetModel(mdl .. chunks[i] .. ".mdl")
-						proj:SetPos(self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec))
+						proj:SetPos(pos)
 						proj:SetAngles(ang)
 						proj:SetPhysicsAttacker(self.Owner)
 						proj:SetCollisionGroup(13)
 						proj:Spawn()
 						proj:SetOwner(self.Owner)
-						proj:GetPhysicsObject():SetMass(10)
+						proj:GetPhysicsObject():SetMass(mass)
 						proj:GetPhysicsObject():AddGameFlag(FVPHYSICS_PENETRATING)
 						proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500+self.Owner:GetVelocity())
 						proj:GetPhysicsObject():SetBuoyancyRatio(0)
@@ -3550,6 +3572,8 @@ PrecacheParticleSystem("scav_exp_plasma")
 		ScavData.RegisterFiremode(tab,"models/props/de_inferno/flower_barrel.mdl")
 		ScavData.RegisterFiremode(tab,"models/props/de_inferno/fountain_bowl.mdl")
 		ScavData.RegisterFiremode(tab,"models/props/cs_militia/skylight_glass.mdl")
+		--L4D/2
+		ScavData.RegisterFiremode(tab,"models/props_unique/airport/atlas.mdl")
 	
 	
 	
@@ -3775,7 +3799,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 				ScavData.CollectFuncs["models/weapons/c_models/c_degreaser/c_degreaser.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_flamethrower/c_flamethrower.mdl"]
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_degreaser/c_degreaser.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_degreaser/c_degreaser.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_flamethrower/c_backburner.mdl"] = function(self,ent) --Christmas check
-					if christmas then
+					if self.christmas then
 						self:AddItem("models/weapons/c_models/c_flamethrower/c_backburner_xmas.mdl",200,ent:GetSkin(),1)
 					else
 						self:AddItem(ScavData.FormatModelname(ent:GetModel()),200,ent:GetSkin(),1)
@@ -3956,6 +3980,8 @@ PrecacheParticleSystem("scav_exp_plasma")
 				ScavData.CollectFuncs["models/props_interiors/stove02.mdl"] = ScavData.CollectFuncs["models/props_c17/furniturefireplace001a.mdl"]
 				ScavData.CollectFuncs["models/props_interiors/stove03_industrial.mdl"] = ScavData.CollectFuncs["models/props_c17/furniturefireplace001a.mdl"]
 				ScavData.CollectFuncs["models/props_interiors/stove04_industrial.mdl"] = ScavData.CollectFuncs["models/props_c17/furniturefireplace001a.mdl"]
+				--FoF
+				ScavData.CollectFuncs["models/props/forest/furnace_2.mdl"] = ScavData.CollectFuncs["models/props_c17/furniturefireplace001a.mdl"]
 			end
 			ScavData.RegisterFiremode(tab,"models/props_c17/furniturefireplace001a.mdl")
 			ScavData.RegisterFiremode(tab,"models/props_c17/furniturestove001a.mdl")
@@ -3975,6 +4001,8 @@ PrecacheParticleSystem("scav_exp_plasma")
 			ScavData.RegisterFiremode(tab,"models/props_interiors/stove02.mdl")
 			ScavData.RegisterFiremode(tab,"models/props_interiors/stove03_industrial.mdl")
 			ScavData.RegisterFiremode(tab,"models/props_interiors/stove04_industrial.mdl")
+			--FoF
+			ScavData.RegisterFiremode(tab,"models/props/forest/furnace_2.mdl")
 
 --[[==============================================================================================
 	--Fire Extinguisher
@@ -5279,14 +5307,17 @@ PrecacheParticleSystem("scav_exp_plasma")
 					self:AddItem("models/weapons/shells/shell_shotgun.mdl",1,0,2)
 					self:AddItem("models/weapons/w_models/w_pistol.mdl",12,0,1)
 				end
+				ScavData.CollectFuncs["models/items/ammopack_small_bday.mdl"] = ScavData.CollectFuncs["models/items/ammopack_small.mdl"]
 				ScavData.CollectFuncs["models/items/ammopack_medium.mdl"] = function(self,ent)
 					self:AddItem("models/weapons/shells/shell_shotgun.mdl",1,0,4)
 					self:AddItem("models/weapons/w_models/w_pistol.mdl",12,0,2)
 				end
+				ScavData.CollectFuncs["models/items/ammopack_medium_bday.mdl"] = ScavData.CollectFuncs["models/items/ammopack_medium.mdl"]
 				ScavData.CollectFuncs["models/items/ammopack_large.mdl"] = function(self,ent)
 					self:AddItem("models/weapons/w_models/w_rocket.mdl",1,0,2)
 					self:AddItem("models/weapons/w_models/w_minigun.mdl",50,0)
 				end
+				ScavData.CollectFuncs["models/items/ammopack_large_bday.mdl"] = ScavData.CollectFuncs["models/items/ammopack_large.mdl"]
 				ScavData.CollectFuncs["models/props_vehicles/car001b_hatchback.mdl"] = function(self,ent)
 					self:AddItem("models/props_c17/trappropeller_engine.mdl",1,0)
 					self:AddItem("models/props_vehicles/carparts_tire01a.mdl",1,0)
@@ -5605,7 +5636,8 @@ PrecacheParticleSystem("scav_exp_plasma")
 						for i=0,math.floor(math.Rand(0,3)) do
 							supplies[math.floor(math.Rand(1,#supplies+1))]()
 						end
-						if ent:GetModel() == "models/props_halloween/halloween_gift.mdl" then
+						if ent:GetModel() == "models/props_halloween/halloween_gift.mdl" or
+							ent:GetModel() == "models/items/tf_gift.mdl" then
 							self.Owner:EmitSound("items/gift_drop.wav",75,100,.5)
 						else
 							self.Owner:EmitSound("items/regenerate.wav",75,100,.5)
@@ -5619,6 +5651,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						
 				end
 				ScavData.CollectFuncs["models/props_gameplay/resupply_locker.mdl"] = ScavData.CollectFuncs["models/props_halloween/halloween_gift.mdl"]
+				ScavData.CollectFuncs["models/items/tf_gift.mdl"] = ScavData.CollectFuncs["models/props_halloween/halloween_gift.mdl"]
 				ScavData.CollectFuncs["models/props_manor/vase_01.mdl"] = ScavData.CollectFuncs["models/props_halloween/halloween_gift.mdl"]
 				--L4D2 Gift
 				--Portal Cake (isn't solid :c)

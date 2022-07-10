@@ -55,10 +55,28 @@ SWEP.DrawCrosshair 			= false
 SWEP.seqendtime 			= 0
 SWEP.CooldownScale 			= 1 --cooldown will be scaled by this much
 SWEP.WeaponCharge 			= 0 --the amount of charge the scavgun has (Modifying this will do nothing, it's meant to be set and used by firemodes)
-SWEP.skin 					= 0
 SWEP.Inaccuracy 			= 1
 SWEP.startlock 				= 0
 SWEP.endlock 				= 0
+
+--date checks
+SWEP.halloween = (not GetConVar("scav_force_holiday"):GetBool() and tonumber(os.date("%m")) == 10) or GetConVar("scav_force_holiday"):GetInt() == 10
+SWEP.christmas = (not GetConVar("scav_force_holiday"):GetBool() and (tonumber(os.date("%m")) == 7 or tonumber(os.date("%m")) == 12)) or GetConVar("scav_force_holiday"):GetInt() == 7 or GetConVar("scav_force_holiday"):GetInt() == 12
+
+cvars.AddChangeCallback("scav_force_holiday", function(convar, oldValue, newValue)
+	local mon = tonumber(newValue)
+	local christmasinjuly = (mon == 0 and tonumber(os.date("%m")) == 7) or mon == 7
+	local spookymonth = (mon == 0 and tonumber(os.date("%m")) == 10) or mon == 10
+	local whatsthis = (mon == 0 and tonumber(os.date("%m")) == 12) or mon == 12
+	local entities = ents.GetAll()
+	for i=1,#entities do
+		if IsValid(entities[i]) and entities[i]:IsWeapon() and entities[i]:GetClass() == "scav_gun" then
+			entities[i].halloween = spookymonth
+			entities[i].christmas = whatsthis or christmasinjuly
+		end
+	end
+end)
+
 
 local ENTITY 	= FindMetaTable("Entity")
 local PLAYER 	= FindMetaTable("Player")
@@ -94,6 +112,20 @@ function SWEP:SetupDataTables()
 
 end
 
+devskins = {
+	[74124770] = "models/weapons/scavenger/skins/anya/scav", --Anya
+	[36401654] = "models/weapons/scavenger/skins/anya/scav", --Sierra (testing)
+}
+
+function SWEP:Reskin(steamid)
+	if devskins[steamid] ~= nil then
+		self:SetSubMaterial(0,devskins[steamid])
+		if IsValid(self.Owner:GetViewModel()) and self.Owner:GetActiveWeapon():GetClass() == "scav_gun" then
+			self.Owner:GetViewModel():SetSubMaterial(0,devskins[steamid])
+		end
+	end
+end
+
 function SWEP:Initialize()
 
 	self:SetHoldType(self.HoldType)
@@ -107,6 +139,10 @@ function SWEP:Initialize()
 	if SERVER then
 		self.Effects = {}
 		self.soundloops = {}
+	end
+
+	if IsValid(self.Owner) then
+		self:Reskin(self.Owner:AccountID())
 	end
 
 end
@@ -646,6 +682,9 @@ if CLIENT then
 
 	function SWEP:Holster()
 		self:DestroyWModel()
+		if IsValid(self.Owner) and IsValid(self.Owner:GetViewModel()) then
+			self.Owner:GetViewModel():SetSubMaterial(0)
+		end
 		return false
 	end
 
@@ -874,6 +913,11 @@ if CLIENT then
 		self:SetHoldType(self.HoldType)
 		self.seqendtime = 0
 		self.BarrelRotation = 0
+		
+		if IsValid(self.Owner) then
+			self:Reskin(self.Owner:AccountID())
+		end
+
 	end
 
 	net.Receive("scv_asgn", function()
@@ -2264,6 +2308,10 @@ if SERVER then
 		if self.soundloops.barrelspin then
 			self.soundloops.barrelspin:Stop()
 		end
+		
+		if IsValid(self.Owner) and IsValid(self.Owner:GetViewModel()) then
+			self.Owner:GetViewModel():SetSubMaterial(0)
+		end
 	end
 
 	function SWEP:Deploy(manual)
@@ -2283,8 +2331,7 @@ if SERVER then
 			self.soundloops.barrelspin = CreateSound(self.Owner,"npc/combine_gunship/engine_rotor_loop1.wav")
 		end
 
-		self:SetSkin(self.skin)
-		self.Owner:GetViewModel():SetSkin(self.skin)
+		self:Reskin(self.Owner:AccountID())
 
 		self.seqendtime = 0
 		self:SetHoldType(self.HoldType)

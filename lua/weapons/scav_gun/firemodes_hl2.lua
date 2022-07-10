@@ -1717,6 +1717,12 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/weapons/w_walker.mdl"] = ScavData.CollectFuncs["models/weapons/w_coltnavy.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_walker2.mdl"] = ScavData.CollectFuncs["models/weapons/w_walker.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_sharps.mdl"] = ScavData.CollectFuncs["models/weapons/w_carbine.mdl"]
+				ScavData.CollectFuncs["models/props/gun_cabinet/gun_cabinet.mdl"] = ScavData.CollectFuncs["models/props/cs_militia/gun_cabinet.mdl"] --2 x 2 .357 rounds from the gun cabinet
+				ScavData.CollectFuncs["models/props/gun_cabinet/gun_cabinet_gold.mdl"] = function(self,ent) --8 x 1, 6 x 2 .357 rounds from the gun cabinet
+					self:AddItem("models/weapons/w_357.mdl",6,0,1)
+					self:AddItem("models/weapons/w_annabelle.mdl",8,0,1)
+					self:AddItem("models/weapons/w_357.mdl",6,0,1)
+				end
 			end
 			tab.Cooldown = 1
 		ScavData.RegisterFiremode(tab,"models/weapons/w_357.mdl")
