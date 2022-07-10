@@ -128,6 +128,10 @@ end
 
 function SWEP:Initialize()
 
+	if CLIENT and IsValid(self.Owner) then
+		self:Reskin(self.Owner:AccountID())
+	end
+
 	self:SetHoldType(self.HoldType)
 	self.LastThink = CurTime()
 	self:SetDeploySpeed(1)
@@ -139,10 +143,6 @@ function SWEP:Initialize()
 	if SERVER then
 		self.Effects = {}
 		self.soundloops = {}
-	end
-
-	if IsValid(self.Owner) then
-		self:Reskin(self.Owner:AccountID())
 	end
 
 end
@@ -595,6 +595,9 @@ if CLIENT then
 			if IsValid(self.Menu) then
 				self.Menu:Remove()
 			end
+		end
+		if IsValid(self.Owner) and IsValid(self.Owner:GetViewModel()) then
+			self.Owner:GetViewModel():SetSubMaterial(0)
 		end
 		self:DestroyWModel()
 	end
@@ -2307,10 +2310,6 @@ if SERVER then
 		end
 		if self.soundloops.barrelspin then
 			self.soundloops.barrelspin:Stop()
-		end
-		
-		if IsValid(self.Owner) and IsValid(self.Owner:GetViewModel()) then
-			self.Owner:GetViewModel():SetSubMaterial(0)
 		end
 	end
 
