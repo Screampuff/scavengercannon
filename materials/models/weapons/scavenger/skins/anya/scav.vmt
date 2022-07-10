@@ -1,0 +1,10 @@
+Patch
+{
+	include materials\models\weapons\scavenger\scav.vmt
+	insert
+	{
+		$basetexture		"models/weapons/scavenger/skins/anya/scav"
+		$detail				"models/weapons/scavenger/skins/anya/scav_detail"
+		$envmaptint			"[ 0.5 0.5 0.5 ]"
+	}
+}
