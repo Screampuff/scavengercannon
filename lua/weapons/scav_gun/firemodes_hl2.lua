@@ -137,8 +137,8 @@ local eject = "brass"
 					proj:SetSkin(item.data)
 					proj:GetPhysicsObject():Wake()
 					proj:GetPhysicsObject():EnableGravity(true)
-					proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*2500*self:GetForceScale()) --self:GetAimVector():Angle():Up()*0.1
-					timer.Simple(0, function() proj:GetPhysicsObject():AddAngleVelocity(Vector(0,10000,0)) end)
+					proj:GetPhysicsObject():SetVelocity(self:GetAimVector()*2500*self:GetForceScale()) --self:GetAimVector():Angle():Up()*0.1 
+					proj:GetPhysicsObject():AddAngleVelocity(Vector(0,10000,0)) 
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound(self.shootsound)
 					return self:TakeSubammo(item,1)

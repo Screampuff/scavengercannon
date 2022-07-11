@@ -2598,7 +2598,8 @@ end
 									ef:SetOrigin(attach.Pos)
 									ef:SetAngles(attach.Ang)
 									ef:SetEntity(self)
-									if item.ammo == "models/weapons/rifleshell.mdl" then
+									if item.ammo == "models/weapons/rifleshell.mdl" or
+										item.ammo == "models/weapons/w_combine_sniper.mdl" then
 										if SERVER then
 											self:EmitSound("weapons/smg1/switch_burst.wav",75,100,1)
 										else
@@ -2617,7 +2618,8 @@ end
 						end)
 						if SERVER then
 							self:TakeSubammo(item,1)
-							if item.ammo == "models/weapons/rifleshell.mdl" then
+							if item.ammo == "models/weapons/rifleshell.mdl" or
+											"models/weapons/w_combine_sniper.mdl" then
 								self.Owner:EmitSound("NPC_Sniper.FireBullet")
 							elseif SERVER then
 								if self.Owner:GetStatusEffect("DamageX") then
@@ -2656,9 +2658,9 @@ end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/shells/shell_sniperrifle.mdl"] = function(self,ent) self:AddItem("models/weapons/rifleshell.mdl",1,0,1) end
 				--Ep2
-				ScavData.CollectFuncs["models/weapons/w_combine_sniper.mdl"] = function(self,ent) self:AddItem("models/weapons/rifleshell.mdl",1,0,5) end
+				ScavData.CollectFuncs["models/weapons/w_combine_sniper.mdl"] = function(self,ent) self:AddItem("models/weapons/w_combine_sniper.mdl",5,0,1) end
 				--TF2
-				ScavData.CollectFuncs["models/weapons/w_models/w_sniperrifle.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),25,ent:GetSkin(),1) end
+				ScavData.CollectFuncs["models/weapons/w_models/w_sniperrifle.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),5,ent:GetSkin(),1) end
 				ScavData.CollectFuncs["models/weapons/c_models/c_sniperrifle/c_sniperrifle.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sniperrifle.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_bazaar_sniper/c_bazaar_sniper.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sniperrifle.mdl"]
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_bazaar_sniper/c_bazaar_sniper.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sniperrifle.mdl"]
@@ -2670,6 +2672,8 @@ end
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_invasion_sniperrifle/c_invasion_sniperrifle.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sniperrifle.mdl"]
 			end
 			ScavData.RegisterFiremode(tab,"models/weapons/rifleshell.mdl")
+			--Ep2
+			ScavData.RegisterFiremode(tab,"models/weapons/w_combine_sniper.mdl")
 			--TF2
 			ScavData.RegisterFiremode(tab,"models/weapons/w_models/w_sniperrifle.mdl")
 			ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_sniperrifle/c_sniperrifle.mdl")
@@ -2739,93 +2743,134 @@ end
 --[[==============================================================================================
 	-- Medkits
 ==============================================================================================]]--
-		
+	
+		medkit = {
+			["models/healthvial.mdl"] = function(healent)
+				if SERVER and IsValid(healent) then
+					healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+10))
+					healent:EmitSound("items/smallmedkit1.wav")
+				end
+				return 2
+			end,
+			["models/items/medkit_small.mdl"] = function(healent)
+				if SERVER and IsValid(healent) then
+					healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+healent:GetMaxHealth()*0.205)) --20.5%
+					healent:EmitSound("items/smallmedkit1.wav")
+				end
+				return 2
+			end,
+			["models/items/medkit_small_bday.mdl"] = function(healent) return medkit["models/items/medkit_small.mdl"](healent) end,
+			["models/props_halloween/halloween_medkit_small.mdl"] = function(healent) return medkit["models/items/medkit_small.mdl"](healent) end,
+			["models/items/medkit_medium.mdl"] = function(healent)
+				if SERVER and IsValid(healent) then
+					healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+healent:GetMaxHealth()*0.5))
+					healent:EmitSound("items/smallmedkit1.wav")
+				end
+				return 2
+			end,
+			["models/items/medkit_medium_bday.mdl"] = function(healent) return medkit["models/items/medkit_medium.mdl"](healent) end,
+			["models/props_halloween/halloween_medkit_medium.mdl"] = function(healent) return medkit["models/items/medkit_medium.mdl"](healent) end,
+			["models/items/medkit_large.mdl"] = function(healent)
+				if SERVER and IsValid(healent) then
+					healent:SetHealth(healent:GetMaxHealth())
+					healent:EmitSound("items/smallmedkit1.wav")
+				end
+				return 2
+			end,
+			["models/items/medkit_large_bday.mdl"] = function(healent) return medkit["models/items/medkit_large.mdl"](healent) end,
+			["models/props_halloween/halloween_medkit_large.mdl"] = function(healent) return medkit["models/items/medkit_large.mdl"](healent) end,
+			["models/w_models/weapons/w_eq_medkit.mdl"] = function(healent)
+				if SERVER and IsValid(healent) then
+					healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+math.max(1,math.floor((healent:GetMaxHealth()-healent:Health())*0.8)))) --heal 80% of our current damage (or at least 1 health)
+					healent:EmitSound("items/smallmedkit1.wav")
+				end
+				return 2
+			end,
+			["models/w_models/weapons/w_eq_defibrillator.mdl"] = function(healent)
+				if SERVER and IsValid(healent) then
+					healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+50)) --TODO: Make this revive?
+					healent:EmitSound("weapons/defibrillator/defibrillator_use.wav")
+				end
+				return 2
+			end,
+			["models/grub_nugget_large.mdl"] = function(healent)
+				if SERVER and IsValid(healent) then
+					healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+6))
+					healent:EmitSound("items/smallmedkit1.wav")
+				end
+				return .5
+			end,
+			["models/grub_nugget_medium.mdl"] = function(healent)
+				if SERVER and IsValid(healent) then
+					healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+4))
+					healent:EmitSound("items/smallmedkit1.wav")
+				end
+				return .5
+			end,
+			["models/grub_nugget_small.mdl"] = function(healent)
+				if SERVER and IsValid(healent) then
+					healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+1))
+					healent:EmitSound("items/smallmedkit1.wav")
+				end
+				return .5
+			end,
+			["models/items/personalmedkit/personalmedkit.mdl"] = function(healent)
+				if SERVER and IsValid(healent) then
+					healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+50))
+					healent:InflictStatusEffect("Disease",-5,1)
+					healent:EmitSound("items/smallmedkit1.wav")
+				end
+				return 2
+			end,
+		}
+
 		local tab = {}
 			tab.Name = "#weapon_medkit"
 			tab.anim = ACT_VM_IDLE
 			tab.Level = 1
 			tab.vmin = Vector(-12,-12,-12)
-			tab.vmax = Vector(12,12,12)			
-			if SERVER then
-				tab.FireFunc = function(self,item)
-					local healent = self.Owner
-					local tab = ScavData.models[self.inv.items[1].ammo]
-					local tracep = {}
-					tracep.start = self.Owner:GetShootPos()
-					tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*100
-					tracep.filter = self.Owner
-					tracep.mask = MASK_SHOT
-					tracep.mins = tab.vmin
-					tracep.maxs = tab.vmax
-					local tr = util.TraceHull(tracep)
-					if IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot()) and tr.Entity.Health and tr.Entity.GetMaxHealth and tr.Entity.SetHealth and tr.Entity:GetMaxHealth() > 0 and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
-						healent = tr.Entity
+			tab.vmax = Vector(12,12,12)
+			tab.FireFunc = function(self,item)
+				local healent = self.Owner
+				--local tab = ScavData.models[self.inv.items[1].ammo]
+				local tracep = {}
+				tracep.start = self.Owner:GetShootPos()
+				tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*100
+				tracep.filter = self.Owner
+				tracep.mask = MASK_SHOT
+				tracep.mins = tab.vmin
+				tracep.maxs = tab.vmax
+				local tr = util.TraceHull(tracep)
+				if IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot()) and tr.Entity.Health and tr.Entity.GetMaxHealth and tr.Entity.SetHealth and tr.Entity:GetMaxHealth() > 0 and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
+					healent = tr.Entity
+				end
+				if healent:Health() >= healent:GetMaxHealth() then
+					if SERVER then
+						healent:EmitSound("buttons/button11.wav")
 					end
-					if healent:Health() >= healent:GetMaxHealth() then
-							healent:EmitSound("buttons/button11.wav")
-							tab.Cooldown = 0.2
-						return false
-					end
-					local starthealth = healent:Health()
-					if item.ammo == "models/healthvial.mdl" then
-						healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+10))
-						healent:EmitSound("items/smallmedkit1.wav")
-					elseif item.ammo == "models/items/medkit_small.mdl" or
-							item.ammo == "models/items/medkit_small_bday.mdl" or
-							item.ammo == "models/props_halloween/halloween_medkit_small.mdl" then
-						healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+healent:GetMaxHealth()*0.205)) --20.5%
-						healent:EmitSound("items/smallmedkit1.wav")
-					elseif item.ammo == "models/items/medkit_medium.mdl" or
-							item.ammo == "models/items/medkit_medium_bday.mdl" or
-							item.ammo == "models/props_halloween/halloween_medkit_medium.mdl" then
-						healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+healent:GetMaxHealth()/2))
-						healent:EmitSound("items/smallmedkit1.wav")
-					elseif item.ammo == "models/items/medkit_large.mdl" or
-							item.ammo == "models/items/medkit_large_bday.mdl" or
-							item.ammo == "models/props_halloween/halloween_medkit_large.mdl" then
-						healent:SetHealth(healent:GetMaxHealth())
-						healent:EmitSound("items/smallmedkit1.wav")
-					elseif item.ammo == "models/w_models/weapons/w_eq_medkit.mdl" then
-						healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+math.max(1,math.floor((healent:GetMaxHealth()-healent:Health())*0.8)))) --heal 80% of our current damage (or at least 1 health)
-						healent:EmitSound("items/smallmedkit1.wav")
-					elseif item.ammo == "models/w_models/weapons/w_eq_defibrillator.mdl" then
-						healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+50)) --TODO: Make this revive?
-						healent:EmitSound("weapons/defibrillator/defibrillator_use.wav")
-					elseif item.ammo == "models/w_models/weapons/w_eq_painpills.mdl" then --TODO: Move Pain Pills to their own tab (for name, mostly)
-						if healent:GetStatusEffect("TemporaryHealth") then
-							healent:EmitSound("buttons/button11.wav")
-							tab.Cooldown = 0.2
-							return false
-						else
-							healent:InflictStatusEffect("TemporaryHealth",50,1)
-						end
-						healent:EmitSound("player/items/pain_pills/pills_deploy_1.wav")
-					elseif item.ammo == "models/grub_nugget_large.mdl" then
-						healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+6))
-						healent:EmitSound("items/smallmedkit1.wav")
-					elseif item.ammo == "models/grub_nugget_medium.mdl" then
-						healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+4))
-						healent:EmitSound("items/smallmedkit1.wav")
-					elseif item.ammo == "models/grub_nugget_small.mdl" then
-						healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+1))
-						healent:EmitSound("items/smallmedkit1.wav")
-					elseif item.ammo == "models/items/personalmedkit/personalmedkit.mdl" then
-						healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+50))
-						healent:InflictStatusEffect("Disease",-5,1)
-						healent:EmitSound("items/smallmedkit1.wav")
-					else
+					tab.Cooldown = 0.2
+					return false
+				end
+				local starthealth = healent:Health()
+
+				if medkit[item.ammo] == nil then
+					if SERVER then
 						healent:SetHealth(math.min(healent:GetMaxHealth(),healent:Health()+25))
 						healent:EmitSound("items/smallmedkit1.wav")
 					end
-					local ef = EffectData()
-					ef:SetRadius(math.max(2,healent:Health()-starthealth))
-					ef:SetOrigin(self.Owner:GetPos())
-					ef:SetScale(self.Owner:EntIndex())
-					ef:SetEntity(healent)
-					util.Effect("ef_scav_heal",ef,nil,true)
 					tab.Cooldown = 2
-					return true
+				else
+					tab.Cooldown = medkit[item.ammo](healent)
 				end
+				local ef = EffectData()
+				ef:SetRadius(math.max(2,healent:Health()-starthealth))
+				ef:SetOrigin(self.Owner:GetPos())
+				ef:SetScale(self.Owner:EntIndex())
+				ef:SetEntity(healent)
+				util.Effect("ef_scav_heal",ef,nil,true)
+				return true
+			end
+			if SERVER then
 				--Ep2
 				ScavData.CollectFuncs["models/antlion_grub_squashed.mdl"] = function(self,ent)
 					local healthratio = self.Owner:Health() / self.Owner:GetMaxHealth()
@@ -2862,15 +2907,10 @@ end
 					end
 				end
 				--L4D/2
-				ScavData.CollectFuncs["models/survivors/survivor_manager.mdl"] = function(self,ent)
-					self:AddItem("models/w_models/weapons/w_eq_painpills.mdl",1,0,3)
-					self.Owner:EmitSound("player/survivor/voice/manager/takepills02.wav",75,100,1,CHAN_VOICE)
-				end --3 pills from Louis (ahehe)
 				ScavData.CollectFuncs["models/w_models/weapons/w_eq_defibrillator_no_paddles.mdl"] = function(self,ent) self:AddItem("models/w_models/weapons/w_eq_defibrillator.mdl",1,0,1) end
 				--HLS
 				ScavData.CollectFuncs["models/scientist.mdl"] = function(self,ent) self:AddItem("models/w_medkit.mdl",1,0,1) end
 			end
-			tab.Cooldown = 2
 		ScavData.RegisterFiremode(tab,"models/items/healthkit.mdl")
 		ScavData.RegisterFiremode(tab,"models/healthvial.mdl")
 		--TF2
@@ -2886,7 +2926,6 @@ end
 		--L4D/2
 		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_eq_medkit.mdl")
 		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_eq_defibrillator.mdl")
-		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_eq_painpills.mdl")
 		--Ep2
 		ScavData.RegisterFiremode(tab,"models/grub_nugget_large.mdl")
 		ScavData.RegisterFiremode(tab,"models/grub_nugget_medium.mdl")
@@ -2895,6 +2934,76 @@ end
 		ScavData.RegisterFiremode(tab,"models/w_medkit.mdl")
 		--ASW
 		ScavData.RegisterFiremode(tab,"models/items/personalmedkit/personalmedkit.mdl")
+
+--[[==============================================================================================
+	-- Pain Pills (temporary health)
+==============================================================================================]]--
+		
+		local tab = {}
+			tab.Name = "#scav.scavcan.pills"
+			tab.anim = ACT_VM_IDLE
+			tab.Level = 1
+			tab.vmin = Vector(-12,-12,-12)
+			tab.vmax = Vector(12,12,12)
+			tab.FireFunc = function(self,item)
+				local healent = self.Owner
+				--local tab = ScavData.models[self.inv.items[1].ammo]
+				local tracep = {}
+				tracep.start = self.Owner:GetShootPos()
+				tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*100
+				tracep.filter = self.Owner
+				tracep.mask = MASK_SHOT
+				tracep.mins = tab.vmin
+				tracep.maxs = tab.vmax
+				local tr = util.TraceHull(tracep)
+				if IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot()) and tr.Entity.Health and tr.Entity.GetMaxHealth and tr.Entity.SetHealth and tr.Entity:GetMaxHealth() > 0 and (tr.Entity:Health() < tr.Entity:GetMaxHealth()) then
+					healent = tr.Entity
+				end
+				if healent:Health() >= healent:GetMaxHealth() then
+					if SERVER then
+						healent:EmitSound("buttons/button11.wav")
+					end
+					tab.Cooldown = 0.2
+					return false
+				end
+				local starthealth = healent:Health()
+
+				if healent:GetStatusEffect("TemporaryHealth") then
+					if SERVER then
+						healent:EmitSound("buttons/button11.wav")
+					end
+					tab.Cooldown = 0.2
+					return false
+				elseif SERVER then
+					healent:InflictStatusEffect("TemporaryHealth",50,1)
+				end
+				if SERVER then
+					if IsMounted(550) or IsMounted(500) then --L4D2 or L4D
+						healent:EmitSound("player/items/pain_pills/pills_deploy_1.wav")
+					else
+						healent:EmitSound("weapons/smg1/switch_burst.wav",75,180,1)
+					end
+				end
+				
+				local ef = EffectData()
+				ef:SetRadius(math.max(2,healent:Health()-starthealth))
+				ef:SetOrigin(self.Owner:GetPos())
+				ef:SetScale(self.Owner:EntIndex())
+				ef:SetEntity(healent)
+				util.Effect("ef_scav_heal",ef,nil,true)
+				tab.Cooldown = 1
+				return true
+			end
+			if SERVER then
+				--L4D/2
+				ScavData.CollectFuncs["models/survivors/survivor_manager.mdl"] = function(self,ent)
+					self:AddItem("models/w_models/weapons/w_eq_painpills.mdl",1,0,3)
+					self.Owner:EmitSound("player/survivor/voice/manager/takepills02.wav",75,100,1,CHAN_VOICE)
+				end --3 pills from Louis (ahehe)
+			end
+		ScavData.RegisterFiremode(tab,"models/scav/pill_bottle.mdl")
+		--L4D/2
+		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_eq_painpills.mdl")
 
 --[[==============================================================================================
 	-- Blast Shower
@@ -3883,7 +3992,6 @@ PrecacheParticleSystem("scav_exp_plasma")
 							end
 						local reduced = self.Owner:GetWeapon("scav_gun").nextfire - tab.Cooldown / 3
 						self.Owner:GetWeapon("scav_gun").nextfire = reduced
-						util.AddNetworkString("scv_s_time")
 						net.Start("scv_s_time")
 							net.WriteEntity(self.Owner:GetWeapon("scav_gun"))
 							net.WriteInt(math.floor(reduced),32)
@@ -5508,7 +5616,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						function() self:AddItem("models/props_trainstation/payphone_reciever001a.mdl",6,0) end,
 						function() self:AddItem("models/crossbow_bolt.mdl",1,0) end,
 						function() self:AddItem("models/weapons/w_grenade.mdl",1,0) end,
-						function() self:AddItem("models/weapons/rifleshell.mdl",1,0,5) end,
+						function() self:AddItem("models/weapons/rifleshell.mdl",5,0) end,
 					}
 					if ScavData.FormatModelname(ent:GetModel()) == "models/items/item_item_crate.mdl" then
 						if self.Owner:Health() * 2 <= self.Owner:GetMaxHealth() then
@@ -5571,7 +5679,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						function() self:AddItem("models/props_trainstation/payphone_reciever001a.mdl",6,0) end,
 						function() self:AddItem("models/crossbow_bolt.mdl",1,0) end,
 						function() self:AddItem("models/weapons/w_grenade.mdl",1,0) end,
-						function() self:AddItem("models/weapons/rifleshell.mdl",1,0,5) end,
+						function() self:AddItem("models/weapons/w_combine_sniper.mdl",5,0) end,
 						--Ep2 stuff
 						function() self:AddItem("models/magnusson_device.mdl",1,0) end,
 						function() self:AddItem("models/props_junk/flare.mdl",1,0) end,

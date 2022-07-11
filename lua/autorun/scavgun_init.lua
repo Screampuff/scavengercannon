@@ -72,6 +72,7 @@ local function SetupScavPickupOverrides(state)
 					ply.JustSpawned == false and
 					(itemname == "item_healthkit" or
 					itemname == "item_healthvial" or
+					itemname == "item_grubnugget" or
 					itemname == "item_battery" or
 					itemname == "item_box_srounds" or
 					itemname == "item_ammo_pistol" or
@@ -308,6 +309,7 @@ ScavData.OKClasses = {
 	item_item_crate = 2,
 	item_healthkit = 2,
 	item_healthvial = 2,
+	item_grubnugget = 2,
 	item_healthcharger = 2,
 	item_battery = 2,
 	item_suitcharger = 2,
