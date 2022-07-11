@@ -2577,9 +2577,17 @@ end
 					hook.Add("AdjustMouseSensitivity","ScavZoomedIn", function()
 						return ScavData.models[self:GetCurrentItem().ammo].fov / GetConVar("fov_desired"):GetFloat()
 					end)
+					if CLIENT then
+						hook.Add( "RenderScreenspaceEffects","ScavScope", function()
+							DrawMaterialOverlay( "effects/combine_binocoverlay", 0.02 )
+						end )
+					end
 					if self.Owner:KeyDown(IN_ATTACK2) then --let the player cancel the scope with Mouse2
 						self:SetZoomed(false)
 						hook.Remove("AdjustMouseSensitivity","ScavZoomedIn")
+						if CLIENT then
+							hook.Remove("RenderScreenspaceEffects","ScavScope")
+						end
 						return 0.05
 					end
 				end
@@ -2641,6 +2649,9 @@ end
 					end
 					self:SetZoomed(false)
 					hook.Remove("AdjustMouseSensitivity","ScavZoomedIn")
+					if CLIENT then
+						hook.Remove("RenderScreenspaceEffects","ScavScope")
+					end
 					tab.chargeanim = ACT_VM_SECONDARYATTACK
 					return 1
 				end
