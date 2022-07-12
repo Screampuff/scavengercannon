@@ -3891,10 +3891,10 @@ PrecacheParticleSystem("scav_exp_plasma")
 						dmg:SetDamageType(DMG_DIRECT)
 						ent:TakeDamageInfo(dmg)
 					end
-					if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not tr.Entity:IsNextBot() then
-						return false
+					if not (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot()) then
+						self:SetPiercing(false)
 					end
-					return true
+					return
 				end
 				proj:SetCallback(callback)
 				proj:SetBBox(Vector(-7,-7,-7),Vector(7,7,7))
@@ -3987,55 +3987,54 @@ PrecacheParticleSystem("scav_exp_plasma")
 			if SERVER then
 				tab.Callback = function(self,tr)
 					local ent = tr.Entity
-					if IsValid(ent) and (not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner)) then
-						local dmg = DamageInfo()
-							local multiplier = 1
-							if ent:IsOnFire() then multiplier = 3 end --TODO: triple damage should only count on center of projectile
-							if ent:IsNPC() then multiplier = multiplier / 2 end --nerf damage against NPCs
-							dmg:SetDamage((15 + (self.deathtime-CurTime())*5)*multiplier) -- 15-20 damage per shot, tripled if the target is on fire
-							dmg:SetDamageForce(tr.Normal*30)
-							dmg:SetDamagePosition(tr.HitPos)
-							if IsValid(self:GetOwner()) then
-								dmg:SetAttacker(self:GetOwner())
+					if IsValid(ent) then
+						if not ent:IsPlayer() or gamemode.Call("PlayerShouldTakeDamage",ent,self.Owner) then
+							local dmg = DamageInfo()
+								local multiplier = 1
+								if ent:IsOnFire() then multiplier = 3 end --TODO: triple damage should only count on center of projectile
+								if ent:IsNPC() then multiplier = multiplier * .5 end --nerf damage against NPCs
+								dmg:SetDamage((15 + (self.deathtime-CurTime())*5)*multiplier) -- 15-20 damage per shot, tripled if the target is on fire
+								dmg:SetDamageForce(tr.Normal*30)
+								dmg:SetDamagePosition(tr.HitPos)
+								if IsValid(self:GetOwner()) then
+									dmg:SetAttacker(self:GetOwner())
+								end
+								if IsValid(self:GetInflictor()) then
+									dmg:SetInflictor(self:GetInflictor())
+								end
+							local reduced = self.Owner:GetWeapon("scav_gun").nextfire - tab.Cooldown / 3
+							if self.hits == 0 then
+								self.Owner:GetWeapon("scav_gun").nextfire = reduced
+								self.hits = self.hits + 1
 							end
-							if IsValid(self:GetInflictor()) then
-								dmg:SetInflictor(self:GetInflictor())
+							net.Start("scv_s_time")
+								net.WriteEntity(self.Owner:GetWeapon("scav_gun"))
+								net.WriteInt(math.floor(reduced),32)
+								net.WriteFloat(reduced - math.floor(reduced))
+							net.Send(self.Owner)
+							dmg:SetDamageType(bit.bor(DMG_DIRECT,DMG_BURN))
+							ent:TakeDamageInfo(dmg)
+							ent:Ignite(3,0)
+							ent.ignitedby = self.Owner
+							if IsMounted(440) then --TF2
+								sound.Play("weapons/dragons_fury_impact_hit.wav",tr.HitPos,75,100,.75)
+							else
+								sound.Play("player/pl_burnpain2.wav",tr.HitPos,75,120,1)
 							end
-						local reduced = self.Owner:GetWeapon("scav_gun").nextfire - tab.Cooldown / 3
-						self.Owner:GetWeapon("scav_gun").nextfire = reduced
-						net.Start("scv_s_time")
-							net.WriteEntity(self.Owner:GetWeapon("scav_gun"))
-							net.WriteInt(math.floor(reduced),32)
-							net.WriteFloat(reduced - math.floor(reduced))
-						net.Send(self.Owner)
-						dmg:SetDamageType(bit.bor(DMG_DIRECT,DMG_BURN))
-						ent:TakeDamageInfo(dmg)
-						ent:Ignite(3,0)
-						ent.ignitedby = self.Owner
-						if IsMounted(440) then --TF2
-							sound.Play("weapons/dragons_fury_impact_hit.wav",tr.HitPos,75,100,.75)
-						else
-							sound.Play("player/pl_burnpain2.wav",tr.HitPos,75,120,1)
+						end
+						if not (ent:IsPlayer() or ent:IsNPC() or ent:IsNextBot()) then
+							if IsMounted(440) then --TF2
+								sound.Play("weapons/dragons_fury_impact.wav",tr.HitPos,75,100,.75)
+							else
+								sound.Play("player/pl_burnpain2.wav",tr.HitPos,75,80,1)
+							end
+							if ent:IsWorld() then
+								self:SetPiercing(false)
+								return
+							end
 						end
 					end
-					if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not tr.Entity:IsNextBot() then
-						if IsMounted(440) then --TF2
-							sound.Play("weapons/dragons_fury_impact.wav",tr.HitPos,75,100,.75)
-						else
-							sound.Play("player/pl_burnpain2.wav",tr.HitPos,75,80,1)
-						end
-						return true
-					end
-					if tr.Entity:IsWorld() then
-						if IsMounted(440) then --TF2
-							sound.Play("weapons/dragons_fury_impact.wav",tr.HitPos,75,100,.75)
-						else
-							sound.Play("player/pl_burnpain2.wav",tr.HitPos,75,80,1)
-						end
-						return false
-					end
-					
-					return true
+					return
 				end
 				tab.proj = GProjectile()
 				tab.proj:SetCallback(tab.Callback)
@@ -4044,7 +4043,8 @@ PrecacheParticleSystem("scav_exp_plasma")
 				tab.proj:SetGravity(vector_origin)
 				tab.proj:SetMask(bit.bor(MASK_SHOT,CONTENTS_WATER,CONTENTS_SLIME))
 				tab.proj:SetLifetime(0.17533333)
-				local proj = tab.proj
+				tab.proj.hits = 0
+				--local proj = tab.proj
 
 				function tab.FireFunc(self,item)
 						local tab = ScavData.models[self.inv.items[1].ammo]
@@ -4270,10 +4270,10 @@ PrecacheParticleSystem("scav_exp_plasma")
 							ent:InflictStatusEffect("Acid",100,(self.deathtime-CurTime())/2,self:GetOwner())
 							ent:EmitSound("ambient/levels/canals/toxic_slime_sizzle"..math.random(2,4)..".wav")
 						end
-						if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not tr.Entity:IsNextBot() then
-							return false
+						if not (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot()) then
+							self:SetPiercing(false)
 						end
-						return true
+						return
 					end
 					proj:SetCallback(callback)
 					proj:SetBBox(Vector(-8,-8,-8),Vector(8,8,8))
@@ -4411,10 +4411,10 @@ PrecacheParticleSystem("scav_exp_plasma")
 								ice:SetMoveType(MOVETYPE_NONE)
 							end
 						end
-						if not tr.Entity:IsPlayer() or not tr.Entity:IsNPC() or not tr.Entity:IsNextBot() then
-							return false
+						if not (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot()) then
+							self:SetPiercing(false)
 						end
-						return true
+						return
 					end
 					proj:SetCallback(callback)
 					proj:SetBBox(Vector(-8,-8,-8),Vector(8,8,8))
@@ -4424,6 +4424,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					proj:SetLifetime(1)
 					tab.proj = proj
 					ScavData.CollectFuncs["models/props_c17/furniturefridge001a.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),100,0) end
+					ScavData.CollectFuncs["models/props_interiors/refrigerator01a.mdl"] = ScavData.CollectFuncs["models/props_c17/furniturefridge001a.mdl"]
 					ScavData.CollectFuncs["models/props_wasteland/kitchen_fridge001a.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),150,0) end
 					ScavData.CollectFuncs["models/props_c17/display_cooler01a.mdl"] = ScavData.CollectFuncs["models/props_wasteland/kitchen_fridge001a.mdl"]
 					--Ep2
@@ -4450,6 +4451,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					ScavData.CollectFuncs["models/props/furniture/misc/fridge.mdl"] = ScavData.CollectFuncs["models/props_c17/furniturefridge001a.mdl"]
 				end
 			ScavData.RegisterFiremode(tab,"models/props_c17/furniturefridge001a.mdl")
+			ScavData.RegisterFiremode(tab,"models/props_interiors/refrigerator01a.mdl")
 			ScavData.RegisterFiremode(tab,"models/props_wasteland/kitchen_fridge001a.mdl")
 			ScavData.RegisterFiremode(tab,"models/props_c17/display_cooler01a.mdl")
 			--Ep2
