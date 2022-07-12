@@ -4005,6 +4005,11 @@ PrecacheParticleSystem("scav_exp_plasma")
 							local reduced = self.Owner:GetWeapon("scav_gun").nextfire - tab.Cooldown / 3
 							if self.hits == 0 then
 								self.Owner:GetWeapon("scav_gun").nextfire = reduced
+								if IsMounted(440) then --TF2
+									sound.Play("weapons/dragons_fury_impact_hit.wav",tr.HitPos,75,100,.75)
+								else
+									sound.Play("player/pl_burnpain2.wav",tr.HitPos,75,120,1)
+								end
 								self.hits = self.hits + 1
 							end
 							net.Start("scv_s_time")
@@ -4016,11 +4021,6 @@ PrecacheParticleSystem("scav_exp_plasma")
 							ent:TakeDamageInfo(dmg)
 							ent:Ignite(3,0)
 							ent.ignitedby = self.Owner
-							if IsMounted(440) then --TF2
-								sound.Play("weapons/dragons_fury_impact_hit.wav",tr.HitPos,75,100,.75)
-							else
-								sound.Play("player/pl_burnpain2.wav",tr.HitPos,75,120,1)
-							end
 						end
 						if not (ent:IsPlayer() or ent:IsNPC() or ent:IsNextBot()) then
 							if IsMounted(440) then --TF2
