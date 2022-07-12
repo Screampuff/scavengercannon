@@ -297,11 +297,12 @@ function s_proj.RunTraces()
 				tracep.start = v:GetPos()
 				tracep.filter = v.filter
 				tracep.endpos = v:GetPos()+vel
-				tracep.mask = MASK_SHOT-CONTENTS_SOLID --TODO: make this work with v:GetMask() Currently, that would lock up GMod either on initial fire, or when projectile breaks something.
+				tracep.mask = v:GetMask()
 				if v.mins then
 					tracep.mins = v.mins
 					tracep.maxs = v.maxs
 				end
+				local oldhits = hits
 				while (tr.Hit) do
 					if v.mins then
 						tr = util.TraceHull(tracep)
@@ -314,13 +315,18 @@ function s_proj.RunTraces()
 						end
 
 						v:callback(tr)
+						hits = hits + 1
 						if (tr.Entity:GetClass() == "npc_strider") then
+							break
+						end
+						if hits > EMERGENCY_HIT_CUTOFF then
 							break
 						end
 					else
 						v:SetPos(v:GetPos()+vel)
 					end
 				end
+				hits = oldhits
 				v.lasttrace = CurTime()
 			else
 				if tr.Hit then
