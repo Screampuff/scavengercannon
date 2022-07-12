@@ -114,7 +114,7 @@ end
 
 devskins = {
 	[74124770] = "models/weapons/scavenger/skins/anya/scav", --Anya
-	[36401654] = "models/weapons/scavenger/skins/anya/scav", --Sierra (testing)
+	[36401654] = "models/weapons/scavenger/skins/sierra/scav", --Sierra
 }
 
 function SWEP:Reskin(steamid)
