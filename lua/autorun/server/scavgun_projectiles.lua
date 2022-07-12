@@ -46,6 +46,7 @@ function Projectile:Constructor()
 	proj.mask 				= MASK_SHOT
 	proj.LagCompensated 	= true
 	proj.MaxRange 			= 0
+	proj.filter				= {}
 	
 	--INTERNAL VALUES-- 
 	proj.DistanceTraveled 	= 0
@@ -66,6 +67,7 @@ function Projectile:SetCallback(callback) -- You can do whatever you want in a c
 		error("bad argument #1 to 'SetCallback' (expected function, got "..type(callback)..")", 2)
 	end
 	self.callback = callback
+	return self:IsPiercing()
 end
 
 function Projectile:SetOwner(ent)	
@@ -126,7 +128,7 @@ function Projectile:SetPiercing(piercing)
 end
 
 function Projectile:IsPiercing()
-	return self.piercing
+	return self.pierce
 end
 
 function Projectile:SetGravity(grav)
@@ -147,7 +149,11 @@ function Projectile:SetFilter(filter) -- Takes an entity or a table containing e
 	if filter == NULL then
 		error("Tried to use a NULL entity!")
 	end
-	self.filter = filter
+	if type(filter) ~= "table" then
+		table.insert(self.filter,filter)
+	else
+		table.Add(self.filter,filter)
+	end
 end
 
 function Projectile:GetFilter()
@@ -283,14 +289,49 @@ function s_proj.RunTraces()
 		end
 		
 		if v.deathtime == 0 or CurTime() < v.deathtime then
-			if tr.Hit then
-				if v.callback and not v:callback(tr) then
-					hits = hits + 1
-					table.insert(rem, k)
-					v.valid = false
-				else
-					table.insert(rem, k)
-					v.valid = false
+			if v.pierce then
+				--MOVEMENT CODE
+				tr = {}
+				tr.Hit = true
+				tracep = {}
+				tracep.start = v:GetPos()
+				tracep.filter = v.filter
+				tracep.endpos = v:GetPos()+vel
+				tracep.mask = MASK_SHOT-CONTENTS_SOLID --TODO: make this work with v:GetMask() Currently, that would lock up GMod either on initial fire, or when projectile breaks something.
+				if v.mins then
+					tracep.mins = v.mins
+					tracep.maxs = v.maxs
+				end
+				while (tr.Hit) do
+					if v.mins then
+						tr = util.TraceHull(tracep)
+					else
+						tr = util.TraceLine(tracep)
+					end
+					if tr.Hit then
+						if IsValid(tr.Entity) then
+							table.insert(tracep.filter,tr.Entity)
+						end
+
+						v:callback(tr)
+						if (tr.Entity:GetClass() == "npc_strider") then
+							break
+						end
+					else
+						v:SetPos(v:GetPos()+vel)
+					end
+				end
+				v.lasttrace = CurTime()
+			else
+				if tr.Hit then
+					if v.callback and not v:callback(tr) then
+						hits = hits + 1
+						table.insert(rem, k)
+						v.valid = false
+					else
+						table.insert(rem, k)
+						v.valid = false
+					end
 				end
 			end
 		else
@@ -309,8 +350,10 @@ function s_proj.RunTraces()
 	end
 	
 	for i=1,#rem do
-		table.remove(s_proj.proj, rem[1])
-		table.remove(rem, 1)
+		if not s_proj.proj.pierce then
+			table.remove(s_proj.proj, rem[1])
+			table.remove(rem, 1)
+		end
 	end
 	
 	s_proj.CurrentProjectile = nil
