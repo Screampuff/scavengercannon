@@ -834,13 +834,20 @@ end
 			tab.Level = 6
 			if SERVER then
 				tab.FireFunc = function(self,item)
-						if item.ammo == "models/weapons/c_models/c_energy_drink/c_energy_drink.mdl" or
+						if item.ammo == "models/props_junk/garbage_energydrinkcan001a.mdl" or
+							item.ammo == "models/weapons/c_models/c_energy_drink/c_energy_drink.mdl" or
 							item.ammo == "models/weapons/c_models/c_xms_energy_drink/c_xms_energy_drink.mdl" then
 							self.Owner:InflictStatusEffect("Shock",30,40)
 							self.Owner:InflictStatusEffect("Speed",20,3)
-							self.Owner:EmitSound("player/pl_scout_dodge_can_open.wav")
-							self.Owner:EmitSound("player/pl_scout_dodge_can_drink_fast.wav")
-						elseif item.ammo == "models/w_models/weapons/w_eq_adrenaline.mdl" then
+							if IsMounted(440) then --TF2
+								self.Owner:EmitSound("player/pl_scout_dodge_can_open.wav")
+								self.Owner:EmitSound("player/pl_scout_dodge_can_drink_fast.wav")
+							else
+								self.Owner:EmitSound("hl1/fvox/hiss.wav",75,150)
+								self.Owner:EmitSound("ambient/levels/canals/toxic_slime_gurgle4.wav")
+							end
+						elseif item.ammo == "models/props_junk/garbage_syringeneedle001a.mdl" or
+							item.ammo == "models/w_models/weapons/w_eq_adrenaline.mdl" then
 							if self.Owner:GetStatusEffect("TemporaryHealth") then
 								self.Owner:EmitSound("buttons/button11.wav")
 								tab.Cooldown = 0.2
@@ -848,13 +855,15 @@ end
 							else
 								self.Owner:InflictStatusEffect("Shock",30,40)
 								self.Owner:InflictStatusEffect("Speed",20,3)
-								self.Owner:EmitSound("weapons/adrenaline/adrenaline_cap_off.wav")
-								--self.Owner:timer.Simple(0.75,self.Owner:EmitSound("weapons/adrenaline/adrenaline_needle_open.wav") end)
-								--self.Owner:timer.Simple(2.0,self.Owner:EmitSound("weapons/adrenaline/adrenaline_needle_in.wav") end)
+								if IsMounted(550) then --L4D2
+									self.Owner:EmitSound("weapons/adrenaline/adrenaline_cap_off.wav")
+								else
+									self.Owner:EmitSound("hl1/fvox/hiss.wav",75,180)
+								end
 								self.Owner:InflictStatusEffect("TemporaryHealth",25,1)
 							end
-							--self.Owner:SetHealth(math.min(self.Owner:GetMaxHealth(),self.Owner:Health()+25)) --temporary health
-						elseif item.ammo == "models/weapons/c_models/c_riding_crop/c_riding_crop.mdl" or item.ammo == "models/workshop/weapons/c_models/c_riding_crop/c_riding_crop.mdl" then
+						elseif item.ammo == "models/weapons/c_models/c_riding_crop/c_riding_crop.mdl" or
+							item.ammo == "models/workshop/weapons/c_models/c_riding_crop/c_riding_crop.mdl" then
 							self.Owner:InflictStatusEffect("Shock",2,40)
 							self.Owner:InflictStatusEffect("Speed",5,3)
 							self.Owner:EmitSound("weapons/discipline_device_impact_01.wav")
@@ -894,7 +903,10 @@ end
 			end
 			tab.Cooldown = 0.5
 		ScavData.RegisterFiremode(tab,"models/items/powerup_speed.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_syringeneedle001a.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_energydrinkcan001a.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_coffeemug001a.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_plasticbottle003a.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_junk/shoe001a.mdl")
 		--TF2
 		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_energy_drink/c_energy_drink.mdl")
@@ -3233,8 +3245,13 @@ end
 			tab.Cooldown = 2
 		ScavData.RegisterFiremode(tab,"models/food/burger.mdl")
 		ScavData.RegisterFiremode(tab,"models/food/hotdog.mdl")
+		ScavData.RegisterFiremode(tab,"models/noesis/donut.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_phx/misc/egg.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_phx/misc/potato.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_bag001a.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_milkcarton001a.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_milkcarton002a.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_takeoutcarton001a.mdl")
 		--CSS
 		ScavData.RegisterFiremode(tab,"models/props/cs_italy/bananna.mdl")
 		--TF2
@@ -3283,6 +3300,8 @@ end
 			end
 			tab.Cooldown = 2
 		ScavData.RegisterFiremode(tab,"models/weapons/w_package.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_metalcan001a.mdl") --Me spinich!
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_metalcan002a.mdl")
 		--TF2
 		ScavData.RegisterFiremode(tab,"models/props_halloween/pumpkin_loot.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_buffalo_steak/c_buffalo_steak.mdl")
@@ -3329,9 +3348,9 @@ end
 			tab.Name = "#scav.scavcan.whiskey"
 			tab.anim = ACT_VM_IDLE
 			tab.Level = 1
-			if SERVER then
-				tab.FireFunc = function(self,item)
-					if self.Owner:Health() >= self.Owner:GetMaxHealth() then
+			tab.FireFunc = function(self,item)
+				if self.Owner:Health() >= self.Owner:GetMaxHealth() then
+					if SERVER then
 						if item.ammo == "models/weapons/w_whiskey.mdl" or
 							item.ammo == "models/weapons/w_whiskey2.mdl" or
 							item.ammo == "models/items_fof/whiskey_world.mdl" then
@@ -3339,21 +3358,24 @@ end
 						else
 							self.Owner:EmitSound("ambient/levels/canals/drip1.wav")
 						end
-						return false
-					else
-						self.Owner:SetHealth(math.min(self.Owner:GetMaxHealth(),self.Owner:Health()+25))
-						if item.ammo == "models/weapons/w_whiskey.mdl" or
-							item.ammo == "models/weapons/w_whiskey2.mdl" or
-							item.ammo == "models/items_fof/whiskey_world.mdl" then
-							local rand = math.floor(math.Rand(1,5))
-							self.Owner:EmitSound("player/whiskey_glug" .. rand .. ".wav")
-						else
-							self.Owner:EmitSound("ambient/levels/canals/toxic_slime_gurgle4.wav")
-						end
-						self.Owner:InflictStatusEffect("Drunk",10,.25)
 					end
-					return true
+					tab.Cooldown = .5
+					return false
+				elseif SERVER then
+					self.Owner:SetHealth(math.min(self.Owner:GetMaxHealth(),self.Owner:Health()+25))
+					if item.ammo == "models/weapons/w_whiskey.mdl" or
+						item.ammo == "models/weapons/w_whiskey2.mdl" or
+						item.ammo == "models/items_fof/whiskey_world.mdl" then
+						local rand = math.floor(math.Rand(1,5))
+						self.Owner:EmitSound("player/whiskey_glug" .. rand .. ".wav")
+					else
+						self.Owner:EmitSound("ambient/levels/canals/toxic_slime_gurgle4.wav")
+					end
+					self.Owner:InflictStatusEffect("Drunk",10,.25)
 				end
+				return true
+			end
+			if SERVER then
 				--FoF
 				ScavData.CollectFuncs["models/weapons/w_whiskey.mdl"] = function(self,ent)
 					self:AddItem(ScavData.FormatModelname(ent:GetModel()),1,0,1)
@@ -3377,8 +3399,12 @@ end
 				end
 				ScavData.CollectFuncs["models/elpaso/barrel2_small.mdl"] = ScavData.CollectFuncs["models/elpaso/barrel2.mdl"]
 			end
-			tab.Cooldown = 2
+			tab.Cooldown = 1
 		ScavData.RegisterFiremode(tab,"models/props_junk/glassjug01.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_glassbottle001a.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_glassbottle002a.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/garbage_glassbottle003a.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_junk/glassbottle01a.mdl")
 		--TF2
 		ScavData.RegisterFiremode(tab,"models/weapons/w_models/w_bottle.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/c_models/c_bottle/c_bottle.mdl")
@@ -3534,13 +3560,12 @@ PrecacheParticleSystem("scav_exp_plasma")
 			tab.Name = "#scav.scavcan.syringes"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 4
-			tab.dmginfo = DamageInfo()
-			tab.Callback = function(self,tr)
+			local callback = function(self,tr)
 				if IsValid(tr.Entity) then
 					if tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot() then
 						tr.Entity:InflictStatusEffect("Disease",5,1)
 					end
-					local dmg = ScavData.models["models/weapons/w_models/w_syringegun.mdl"].dmginfo
+					local dmg = DamageInfo()
 						dmg:SetDamage(1)
 						dmg:SetDamageForce(vector_origin)
 						dmg:SetDamagePosition(tr.HitPos)
@@ -3556,7 +3581,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 			end
 			if SERVER then
 				tab.proj = GProjectile()
-					tab.proj:SetCallback(tab.Callback)
+					tab.proj:SetCallback(callback)
 					tab.proj:SetBBox(Vector(-1,-1,-1),Vector(1,1,1))
 					tab.proj:SetPiercing(false)
 					tab.proj:SetGravity(Vector(0,0,-96))
@@ -3576,10 +3601,11 @@ PrecacheParticleSystem("scav_exp_plasma")
 						proj:SetFilter(self.Owner)
 						proj:Fire()
 						self:TakeSubammo(item,1)
-						if self.currentmodel ~= item.ammo then
-							self:EmitSound("weapons/syringegun_reload_air1.wav")
-							timer.Simple(0.25,function() self.Owner:EmitSound("weapons/syringegun_reload_air2.wav") end)
+						if item.subammo == 0 then
+							self.Owner:EmitSound("weapons/syringegun_reload_air1.wav")
+							timer.Simple(0.25,function() if IsValid(self) and IsValid(self.Owner) then self.Owner:EmitSound("weapons/syringegun_reload_air2.wav") end end)
 						end
+					else
 						local ef = EffectData()
 							ef:SetOrigin(pos)
 							ef:SetStart(vel)
@@ -3719,6 +3745,9 @@ PrecacheParticleSystem("scav_exp_plasma")
 					elseif item.ammo == "models/props_junk/watermelon01.mdl" then
 						chunks = {"01a","01b","01c","02a","02b","02c","02a"}
 						mdl = "models/props_junk/watermelon01_chunk"
+					elseif item.ammo == "models/props_junk/vent001.mdl" then
+						chunks = {"1","2","3","4","5","6","7","8"}
+						mdl = "models/props_junk/vent001_chunk"
 					elseif item.ammo == "models/props_wasteland/prison_sink001a.mdl" or
 						item.ammo == "models/props_wasteland/prison_sink001b.mdl" then
 						chunks = {"b","c","d","e","f","g","h"}
@@ -3778,6 +3807,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 			ScavData.RegisterFiremode(tab,"models/props_junk/watermelon01.mdl")
 			ScavData.RegisterFiremode(tab,"models/props_wasteland/prison_sink001a.mdl")
 			ScavData.RegisterFiremode(tab,"models/props_wasteland/prison_sink001b.mdl")
+			ScavData.RegisterFiremode(tab,"models/props_junk/vent001.mdl")
 			--CSS
 			ScavData.RegisterFiremode(tab,"models/props/de_inferno/wine_barrel.mdl")
 			ScavData.RegisterFiremode(tab,"models/props/de_inferno/claypot01.mdl")
@@ -4845,7 +4875,21 @@ PrecacheParticleSystem("scav_exp_plasma")
 							dmg:SetDamagePosition(tr.HitPos)
 							dmg:SetAttacker(self.Owner)
 							dmg:SetInflictor(self)
-							tr.Entity:TakeDamageInfo(dmg)
+							if not game.SinglePlayer() and SERVER then
+								if IsValid(tr.Entity) and tr.Entity.Health then
+									if not (tr.Entity:IsPlayer() or tr.Entity:IsNPC() or tr.Entity:IsNextBot()) and tr.Entity:Health() ~= 0 and tr.Entity:Health() <= 5 then
+										if tr.Entity:GetClass() ~= "func_breakable_surf" then
+											tr.Entity:Fire("break","",0,self.Owner,self)
+										else
+											tr.Entity:Fire("shatter","(0.5,0.5,0)",0,self.Owner,self)
+										end
+									else
+										tr.Entity:TakeDamageInfo(dmg)
+									end
+								end
+							else
+								tr.Entity:TakeDamageInfo(dmg)
+							end
 						end
 						self:AddBarrelSpin(200)
 						self:TakeSubammo(item,1)
@@ -5518,6 +5562,84 @@ PrecacheParticleSystem("scav_exp_plasma")
 						self:AddItem("models/headcrab.mdl",1,0,1)
 					end
 				end
+				ScavData.CollectFuncs["models/props_junk/garbage128_composite001a.mdl"] = function(self,ent)
+					self:AddItem("models/props_junk/garbage_plasticbottle001a.mdl",50,0,1)
+					self:AddItem("models/props_junk/garbage_milkcarton002a.mdl",1,0,1)
+					if IsMounted(550) or IsMounted(500) then --L4D/L4D2
+						self:AddItem("models/props_junk/garbage_coffeecup01a.mdl",1,0,1)
+						self:AddItem("models/props_junk/garbage_spraypaintcan01a.mdl",30,0,1)
+						self:AddItem("models/props_junk/garbage_fastfoodcontainer01a.mdl",1,0,1)
+					end
+					self:AddItem("models/props_junk/garbage_metalcan001a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_syringeneedle001a.mdl",1,0,3)
+				end
+				ScavData.CollectFuncs["models/props_junk/garbage128_composite001b.mdl"] = function(self,ent)
+					self:AddItem("models/props_junk/garbage_metalcan002a.mdl",1,0,1)
+					self:AddItem("models/props_canal/mattpipe.mdl",1,0,2)
+					self:AddItem("models/props_junk/garbage_glassbottle003a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_glassbottle002a.mdl",1,0,1)
+					if IsMounted(550) or IsMounted(500) then --L4D/L4D2
+						self:AddItem("models/props_junk/garbage_fastfoodcontainer01a.mdl",1,0,1)
+					end
+					self:AddItem("models/props_junk/garbage_metalcan001a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_syringeneedle001a.mdl",1,0,1)
+				end
+				ScavData.CollectFuncs["models/props_junk/garbage128_composite001c.mdl"] = function(self,ent)
+					self:AddItem("models/props_junk/garbage_plasticbottle001a.mdl",50,0,1)
+					self:AddItem("models/props_junk/garbage_plasticbottle002a.mdl",50,0,2)
+					self:AddItem("models/props_junk/garbage_milkcarton001a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_energydrinkcan001a.mdl",1,0,3)
+					if IsMounted(550) or IsMounted(500) then --L4D/L4D2
+						self:AddItem("models/props_junk/garbage_coffeecup01a.mdl",1,0,2)
+					end
+					self:AddItem("models/props_junk/garbage_plasticbottle003a.mdl",1,0,3)
+					self:AddItem("models/props_junk/garbage_metalcan002a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_metalcan001a.mdl",1,0,2)
+					self:AddItem("models/props_junk/garbage_glassbottle003a.mdl",1,0,1)
+				end
+				ScavData.CollectFuncs["models/props_junk/garbage128_composite001d.mdl"] = function(self,ent)
+					self:AddItem("models/props_junk/garbage_plasticbottle001a.mdl",50,0,2)
+					self:AddItem("models/props_junk/garbage_plasticbottle002a.mdl",50,0,1)
+					self:AddItem("models/props_junk/garbage_milkcarton001a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_energydrinkcan001a.mdl",1,0,3)
+					if IsMounted(550) or IsMounted(500) then --L4D/L4D2
+						self:AddItem("models/props_junk/garbage_coffeecup01a.mdl",1,0,1)
+						self:AddItem("models/props_junk/garbage_spraypaintcan01a.mdl",30,0,2)
+					end
+					self:AddItem("models/props_junk/garbage_plasticbottle003a.mdl",1,0,2)
+				end
+				ScavData.CollectFuncs["models/props_junk/garbage256_composite001a.mdl"] = function(self,ent)
+					self:AddItem("models/props_junk/garbage_metalcan002a.mdl",1,0,3)
+					self:AddItem("models/props_junk/garbage_glassbottle003a.mdl",1,0,2)
+					self:AddItem("models/props_vehicles/carparts_muffler01a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_syringeneedle001a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_energydrinkcan001a.mdl",1,0,1)
+					if IsMounted(550) or IsMounted(500) then --L4D/L4D2
+						self:AddItem("models/props_junk/garbage_spraypaintcan01a.mdl",30,0,1)
+					end
+					self:AddItem("models/props_junk/garbage_glassbottle002a.mdl",1,0,1)
+				end
+				ScavData.CollectFuncs["models/props_junk/garbage256_composite001b.mdl"] = function(self,ent)
+					self:AddItem("models/props_junk/garbage_metalcan002a.mdl",1,0,3)
+					self:AddItem("models/props_junk/garbage_plasticbottle002a.mdl",50,0,1)
+					self:AddItem("models/props_junk/garbage_glassbottle003a.mdl",1,0,2)
+					self:AddItem("models/props_junk/garbage_takeoutcarton001a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_syringeneedle001a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_plasticbottle003a.mdl",1,0,1)
+					if IsMounted(550) or IsMounted(500) then --L4D/L4D2
+						self:AddItem("models/props_junk/garbage_coffeecup01a.mdl",1,0,1)
+						self:AddItem("models/props_junk/garbage_fastfoodcontainer01a.mdl",1,0,2)
+						self:AddItem("models/props_junk/garbage_frenchfrycup01a.mdl",1,0,1)
+					end
+					self:AddItem("models/props_junk/garbage_glassbottle002a.mdl",1,0,1)
+					self:AddItem("models/props_junk/garbage_milkcarton002a.mdl",1,0,1)
+				end
+				ScavData.CollectFuncs["models/props_junk/garbage256_composite002a.mdl"] = function(self,ent)
+					for i=1,4 do
+						self:AddItem("models/props_junk/garbage_carboard00" .. tostring(math.Round(math.random(2))) .. "a.mdl",1,0,1)
+					end
+				end
+				ScavData.CollectFuncs["models/props_junk/garbage256_composite002b.mdl"] = ScavData.CollectFuncs["models/props_junk/garbage256_composite002a.mdl"]
 				ScavData.CollectFuncs["models/props_junk/ibeam01a_cluster01.mdl"] = function(self,ent) self:AddItem("models/props_junk/ibeam01a.mdl",1,0,4) end
 				--Ep2
 				ScavData.CollectFuncs["models/props_silo/tirestack.mdl"] = function(self,ent)
