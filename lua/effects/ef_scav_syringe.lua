@@ -1,3 +1,5 @@
+AddCSLuaFile()
+
 function EFFECT:Init(data)
 	self.Created = UnPredictedCurTime()
 	self.vel = data:GetStart()
