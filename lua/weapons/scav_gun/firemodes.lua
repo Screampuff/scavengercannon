@@ -1250,7 +1250,10 @@ end
 			end
 			if SERVER then
 				ScavData.CollectFuncs["models/alyx_emptool_prop.mdl"] = ScavData.GiveOneOfItemInf
-				ScavData.CollectFuncs["models/alyx.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname("models/alyx_emptool_prop.mdl"), SCAV_SHORT_MAX, ent:GetSkin()) end
+				ScavData.CollectFuncs["models/alyx.mdl"] = function(self,ent)
+					self:AddItem(ScavData.FormatModelname("models/alyx_emptool_prop.mdl"),SCAV_SHORT_MAX,0)
+					self:AddItem(ScavData.FormatModelname("models/weapons/w_alyx_gun.mdl"),30,0)
+				end
 				ScavData.CollectFuncs["models/alyx_interior.mdl"] = ScavData.CollectFuncs["models/alyx.mdl"]
 				ScavData.CollectFuncs["models/alyx_ep2.mdl"] = ScavData.CollectFuncs["models/alyx.mdl"]
 				ScavData.CollectFuncs["models/player/alyx.mdl"] = ScavData.CollectFuncs["models/alyx.mdl"]
