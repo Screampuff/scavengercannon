@@ -801,6 +801,7 @@ if CLIENT then
 	PANEL.wep 		= NULL
 
 	function PANEL:Init()
+		self:SetSkin("sg_menu")
 		self.Preview = vgui.Create("SpawnIcon",self)
 		self.Preview:SetSize(64,64)
 		self.Preview.parent = self
@@ -845,6 +846,10 @@ if CLIENT then
 			end
 
 		end
+	end
+
+	function PANEL:Paint()
+		SKIN:PaintFrame(self,self:GetWide(),self:GetTall())
 	end
 
 	function PANEL:PaintOver()
@@ -1523,6 +1528,9 @@ if CLIENT then
 		if not self.Initialized then
 			return
 		end
+	end
+
+	function PANEL:Paint() --removes background from inventory
 	end
 
 	function PANEL:Think()
