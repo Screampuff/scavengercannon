@@ -1,5 +1,3 @@
-AddCSLuaFile()
-
 if not CLIENT then return end
 
 local surface = surface
@@ -343,6 +341,8 @@ function SKIN:PaintFrame( panel, w, h )
 		self.tex.Shadow( -4, -4, w+10, h+10 )
 		DisableClipping( wasEnabled )
 	end
+
+	self.tex.Tree( 0, 0, w, h, panel.m_bgColor )
 
 	if ( panel:HasHierarchicalFocus() ) then
 
