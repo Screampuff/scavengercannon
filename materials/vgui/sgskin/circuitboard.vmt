@@ -1,6 +1,0 @@
-"UnlitGeneric" 
- { 
- "$basetexture" "vgui/sgskin/circuitboard" 
- $vertexcolor 1
- $vertexalpha 0
- }

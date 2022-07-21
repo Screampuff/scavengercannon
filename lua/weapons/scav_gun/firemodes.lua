@@ -5157,6 +5157,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 			end
 			if SERVER then
 				ScavData.CollectFuncs["models/scav/rad_hl2.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,ent:GetSkin(),1) end
+				ScavData.CollectFuncs["models/props_lab/workspace001.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname("models/scav/rad_hl2.mdl"),10,0,2) end -- 2 cases from workstation
 				ScavData.CollectFuncs["models/props_lab/workspace004.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname("models/scav/rad_hl2.mdl"),10,0,3) end -- 3 cases from workstation
 				ScavData.CollectFuncs["models/props_lab/crystalbulk.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,ent:GetSkin(),1) end
 				--Ep2
