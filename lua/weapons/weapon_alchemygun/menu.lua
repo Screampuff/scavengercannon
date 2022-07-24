@@ -1,11 +1,66 @@
 AddCSLuaFile()
 
 local SWEP = SWEP or weapons.GetStored("weapon_alchemygun")
-local PANEL = {}
 local color_red = Color(255,0,0,255)
 local color_red_colorblind = Color(190,76,0,255)
 local color_green = Color(0,255,0,255)
 local color_green_colorblind = Color(124,218,255,255)
+
+local function PlayerColor(self)
+	local bgcol = Vector(0,0,0)
+	if IsValid(LocalPlayer()) then
+		if LocalPlayer():Team() == 1001 then --unassigned
+			bgcol = LocalPlayer():GetPlayerColor()
+			self.BGColor = Color(bgcol.r * 255, bgcol.g * 255, bgcol.b * 255, 255)
+		else
+			self.BGColor = team.GetColor(LocalPlayer():Team())
+		end
+		if (self.BGColor.r + self.BGColor.g + self.BGColor.b) / 3 < 150 then
+			self.TextColor = Color(255,255,255,255)
+		else
+			self.TextColor = Color(0,0,0,255)
+		end
+	end
+	for i=1,4 do
+		if self.items then
+			self.items[i].Type:SetTextColor(self.TextColor)
+			self.items[i].Cost:SetTextColor(self.TextColor)
+		end
+	end
+	if self.HaveLabel then
+		self.HaveLabel:SetTextColor(self.TextColor)
+	end
+	if self.CostLabel then
+		self.CostLabel:SetTextColor(self.TextColor)
+	end
+
+	self:SetBackgroundColor(self.BGColor)
+end
+
+--Preview panel border
+
+local PANEL = {}
+
+PANEL.BGColor 	= Color(255,255,255,255)
+
+function PANEL:Paint()
+	SKIN:PaintPreview(self,self:GetWide(),self:GetTall())
+end
+
+vgui.Register( "DPanelPreview", PANEL, "DPanel" )
+
+-------------------------------------------------------------------------------
+--								MENU
+-------------------------------------------------------------------------------
+
+local PANEL = {}
+
+PANEL.BGColor 	= Color(50,50,50,255)
+PANEL.TextColor = Color(255,255,255,255)
+
+function PANEL:Paint()
+	SKIN:PaintFrame(self,self:GetWide(),self:GetTall())
+end
 
 function PANEL:SetWeapon(wep)
 	if self.wep ~= wep then
@@ -34,6 +89,7 @@ function PANEL:OpenMenu()
 		self.DoAutoSetup = false
 		self:AutoSetup()
 	end
+	PlayerColor(self)
 	self:SetVisible(true)
 	self:MakePopup()
 	self:SetKeyboardInputEnabled(false)
@@ -45,7 +101,10 @@ function PANEL:CloseMenu()
 end
 
 function PANEL:Init()
-	self.PreviewFrame = vgui.Create("DPanel",self)
+	include("autorun/scavgun_skins.lua")
+	self:SetSkin("sg_menu")
+	PlayerColor(self)
+	self.PreviewFrame = vgui.Create("DPanelPreview",self)
 	self.PreviewBox = vgui.Create("DModelPanel",self.PreviewFrame)
 	self.PreviewBox:SetModel("models/Items/car_battery01.mdl")
 	self.PreviewBox:SetFOV(90)
@@ -68,6 +127,8 @@ function PANEL:PerformLayout()
 	if not self.Initialized then
 		return
 	end
+	self:SetSkin("sg_menu")
+	PlayerColor(self)
 	local pbsize = self:GetWide()/2-16
 	self.PreviewFrame:SetPos(16,24)
 	self.PreviewFrame:SetSize(pbsize,pbsize)
@@ -92,12 +153,29 @@ local siconglow = surface.GetTextureID("vgui/spawnmenu/hover")
 local siconglowmat = Material("vgui/spawnmenu/hover")
 local glowcolvec = Vector(1,1,1)
 
+--paint selection border
 local function siconpaintover(panel)
 	if panel.Menu.selectedicon == panel then
-		--surface.SetDrawColor(255,0,255,200)
-		glowcolvec.x = 0.8
-		glowcolvec.y = 0
-		glowcolvec.z = 1
+		local playercolor = LocalPlayer():GetPlayerColor()
+		local brightest = 0
+		if playercolor.x > brightest then
+			brightest = playercolor.x
+		end
+		if playercolor.y > brightest then
+			brightest = playercolor.y
+		end
+		if playercolor.z > brightest then
+			brightest = playercolor.z
+		end
+		if brightest == 0 then
+			glowcolvec.x = 1
+			glowcolvec.y = 1
+			glowcolvec.z = 1
+		else
+			glowcolvec.x = playercolor.r / brightest
+			glowcolvec.y = playercolor.g / brightest
+			glowcolvec.z = playercolor.b / brightest
+		end
 		siconglowmat:SetVector("$color",glowcolvec)
 		surface.SetTexture(siconglow)
 		surface.DrawTexturedRect(0,0,panel:GetWide(),panel:GetTall())
@@ -108,20 +186,9 @@ local function siconpaintover(panel)
 	end
 end
 
+--insufficient ammo, paint icon red
 local function siconpaintoverred(panel)
-	if panel.Menu.selectedicon == panel then
-		--surface.SetDrawColor(255,0,255,200)
-		glowcolvec.x = 0.8
-		glowcolvec.y = 0
-		glowcolvec.z = 1
-		siconglowmat:SetVector("$color",glowcolvec)
-		surface.SetTexture(siconglow)
-		surface.DrawTexturedRect(0,0,panel:GetWide(),panel:GetTall())
-		glowcolvec.x = 1
-		glowcolvec.y = 1
-		glowcolvec.z = 1
-		siconglowmat:SetVector("$color",glowcolvec)
-	end
+	siconpaintover(panel)
 	surface.SetDrawColor(255,0,0,100)
 	surface.DrawRect(0,0,panel:GetWide(),panel:GetTall())
 end
@@ -180,9 +247,23 @@ end
 
 vgui.Register("alchmenu",PANEL,"DPanel")
 
+-------------------------------------------------------------------------------
+--								COST BOARD
+-------------------------------------------------------------------------------
+
 local PANEL = {}
 
+PANEL.BGColor 	= Color(50,50,50,255)
+PANEL.TextColor = Color(255,255,255,255)
+
+function PANEL:Paint()
+	SKIN:PaintFrame(self,self:GetWide(),self:GetTall())
+end
+
 function PANEL:Init()
+	include("autorun/scavgun_skins.lua")
+	self:SetSkin("sg_menu")
+	PlayerColor(self)
 	self.OldAmmo = {}
 	self.OldAmmo[1] = 0
 	self.OldAmmo[2] = 0
@@ -192,29 +273,29 @@ function PANEL:Init()
 	self.HaveLabel = vgui.Create("DLabel",self)
 		self.HaveLabel:SetFont("Scav_ConsoleText")
 		self.HaveLabel:SetText("#scav.alchemy.have")
-		self.HaveLabel:SetTextColor(color_white)
+		self.HaveLabel:SetTextColor(self.TextColor)
 		self.HaveLabel:SizeToContents()
 	self.CostLabel = vgui.Create("DLabel",self)
 		self.CostLabel:SetFont("Scav_ConsoleText")
 		self.CostLabel:SetText("#scav.alchemy.cost")
-		self.CostLabel:SetTextColor(color_white)
+		self.CostLabel:SetTextColor(self.TextColor)
 		self.CostLabel:SizeToContents()
 	self.items = {}
 	for i=1,4 do
 		local panel = vgui.Create("DPanel",self)
 		panel.Type = vgui.Create("DLabel",panel)
 		panel.Type:SetFont("Scav_ConsoleText")
-		panel.Type:SetTextColor(color_white)
+		panel.Type:SetTextColor(self.TextColor)
 		panel.Image = vgui.Create("DImage",panel)
 		panel.Image:SetSize(16,16)
 		panel.Have = vgui.Create("DLabel",panel)
 		panel.Have:SetFont("Scav_ConsoleText")
 		panel.Have:SetText("0")
-		panel.Have:SetTextColor(color_white)
+		panel.Have:SetTextColor(self.TextColor)
 		panel.Cost = vgui.Create("DLabel",panel)
 		panel.Cost:SetFont("Scav_ConsoleText")
 		panel.Cost:SetText("0")
-		panel.Cost:SetTextColor(color_white)
+		panel.Cost:SetTextColor(self.TextColor)
 		panel.RealCost = 0
 		table.insert(self.items,panel)
 	end
@@ -233,6 +314,8 @@ function PANEL:PerformLayout()
 	if not self.Initialized then
 		return
 	end
+	self:SetSkin("sg_menu")
+	PlayerColor(self)
 	self.HaveLabel:SizeToContents()
 	self.CostLabel:SizeToContents()
 	self.CostLabel:SetPos(self:GetWide()-self.CostLabel:GetWide()-32,6)
@@ -351,53 +434,68 @@ end
 
 vgui.Register("alchmenu_costboard",PANEL,"DPanel")
 
-local PANEL = {}
-		function PANEL:Paint(w,h)
-		end
-		function PANEL:SetWeapon(wep)
-			if self.wep ~= wep then
-				self.wep = wep
-				self.CostBoard:SetWeapon(wep)
-				wep:ResetMenu()
-			end
-		end
-		
-		function PANEL:AutoSetup()
-			self:SetSize(296,120)
-			self:SetPos(ScrW()-self:GetWide()-32,ScrH()-self:GetTall()-16)
-		end
+-------------------------------------------------------------------------------
+--								AMMO HUD
+-------------------------------------------------------------------------------
 
-		function PANEL:Init()
-			self.CostBoard = vgui.Create("alchmenu_costboard",self)
-			self.PreviewFrame = vgui.Create("DPanel",self)
-			self.PreviewIcon = vgui.Create("SpawnIcon",self.PreviewFrame)
-			self.PreviewIcon:SetSize(64,64)
-			self.Initialized = true
-		end
-		
-		function PANEL:PerformLayout()
-			if not self.Initialized then
-				return
-			end
-			self.PreviewFrame:SetSize(96,self:GetTall())
-			self.PreviewIcon:SetPos((self.PreviewFrame:GetWide()-self.PreviewIcon:GetWide())/2,(self:GetTall()-self.PreviewIcon:GetTall())/2)
-			self.CostBoard:SetPos(self.PreviewFrame:GetWide(),0)
-			self.CostBoard:SetSize(self:GetWide()-self.PreviewFrame:GetWide(),self:GetTall())
-		end
-		
-		function PANEL:Think()
-			local wep = LocalPlayer():GetActiveWeapon()
-			if not IsValid(wep) or (wep:GetClass() ~= "weapon_alchemygun") then
-				self:SetVisible(false)
-			end
-		end
-		
-		function PANEL:Update()
-			local model = GetConVar("scav_ag_model"):GetString()
-			local skin = GetConVar("scav_ag_skin"):GetInt()
-			self.PreviewIcon:SetModel(model,skin)
-			self.CostBoard:AutoCosts()
-		end
+local PANEL = {}
+
+PANEL.BGColor 	= Color(50,50,50,255)
+PANEL.TextColor = Color(255,255,255,255)
+
+function PANEL:Paint()
+	--SKIN:PaintFrame(self,self:GetWide(),self:GetTall())
+end
+
+function PANEL:SetWeapon(wep)
+	if self.wep ~= wep then
+		self.wep = wep
+		self.CostBoard:SetWeapon(wep)
+		wep:ResetMenu()
+	end
+end
+
+function PANEL:AutoSetup()
+	self:SetSize(296,120)
+	self:SetPos(ScrW()-self:GetWide()-32,ScrH()-self:GetTall()-16)
+end
+
+function PANEL:Init()
+	include("autorun/scavgun_skins.lua")
+	self:SetSkin("sg_menu")
+	PlayerColor(self)
+	self.CostBoard = vgui.Create("alchmenu_costboard",self)
+	self.PreviewFrame = vgui.Create("DPanelPreview",self)
+	self.PreviewIcon = vgui.Create("SpawnIcon",self.PreviewFrame)
+	self.PreviewIcon:SetSize(64,64)
+	self.Initialized = true
+end
+
+function PANEL:PerformLayout()
+	if not self.Initialized then
+		return
+	end
+	self:SetSkin("sg_menu")
+	PlayerColor(self)
+	self.PreviewFrame:SetSize(96,self:GetTall())
+	self.PreviewIcon:SetPos((self.PreviewFrame:GetWide()-self.PreviewIcon:GetWide())/2,(self:GetTall()-self.PreviewIcon:GetTall())/2)
+	self.CostBoard:SetPos(self.PreviewFrame:GetWide(),0)
+	self.CostBoard:SetSize(self:GetWide()-self.PreviewFrame:GetWide(),self:GetTall())
+end
+
+function PANEL:Think()
+	local wep = LocalPlayer():GetActiveWeapon()
+	if not IsValid(wep) or (wep:GetClass() ~= "weapon_alchemygun") then
+		self:SetVisible(false)
+	end
+end
+
+function PANEL:Update()
+	local model = GetConVar("scav_ag_model"):GetString()
+	local skin = GetConVar("scav_ag_skin"):GetInt()
+	self.PreviewIcon:SetModel(model,skin)
+	self.CostBoard:AutoCosts()
+end
 
 vgui.Register("alch_HUD",PANEL,"DPanel")
 

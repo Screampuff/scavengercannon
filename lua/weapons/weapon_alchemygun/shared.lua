@@ -69,11 +69,20 @@ function SWEP:Initialize()
 	self:SetHoldType("melee2") --TODO: change its model up and get this on a more reasonable 3rd person anim (shotgun, ar2, etc)
 	if SERVER then
 		self.CreatedItems = {}
-	elseif LocalPlayer () == self.Owner then
-		self:Deploy()
+	else
+		if LocalPlayer () == self.Owner then
+			self:Deploy()
+		end
 	end
 	if game.SinglePlayer() then
 		self:CallOnClient("Initialize")
+	end
+	if self.Menu == nil and CLIENT then
+		print("no menu, creating!")
+		self.Menu = vgui.Create("alchmenu")
+		self.Menu:SetSkin("sg_menu")
+		self.Menu:SetVisible(false)
+		self.Menu.DoAutoSetup = true
 	end
 end
 
@@ -348,8 +357,12 @@ end
 function SWEP:OnRemove()
 	if CLIENT then
 		self:DestroyWModel()
-		self.Menu:ForgetModels()
-		self.HUD:SetVisible(false)
+		if self.Menu then
+			self.Menu:ForgetModels()
+		end
+		if self.HUD then
+			self.HUD:SetVisible(false)
+		end
 	else
 		self:DestroyAllItems()
 	end
@@ -388,7 +401,9 @@ function SWEP:LearnItem(model,skin)
 				net.WriteInt(skin,9)
 			net.Send(self.Owner)
 		else
-			self.Menu:AddModel(model,skin,false)
+			if self.Menu then
+				self.Menu:AddModel(model,skin,false)
+			end
 		end
 	end
 end

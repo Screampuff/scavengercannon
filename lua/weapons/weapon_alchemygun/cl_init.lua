@@ -124,8 +124,10 @@ end
 
 function SWEP:ResetMenu()
 	if CLIENT and (self:GetOwner() == LocalPlayer()) then
-		self.Menu:PopulateWithStock()
-		self.Menu:SelectIcon(self.Menu.StockBox.Items[1])
+		if self.Menu then
+			self.Menu:PopulateWithStock()
+			self.Menu:SelectIcon(self.Menu.StockBox.Items[1])
+		end
 		self.HUD:Update()
 	end
 end
