@@ -54,13 +54,43 @@ function SWEP:DrawWorldModel()
 end
 
 local PANEL = {}
+PANEL.BGColor 	= Color(50,50,50,255)
+PANEL.TextColor = Color(255,255,255,255)
 PANEL.Weapon = NULL
 
+
+function PANEL:PlayerColor()
+	local bgcol = Vector(0,0,0)
+	if IsValid(LocalPlayer()) then
+		if LocalPlayer():Team() == 1001 then --unassigned
+			bgcol = LocalPlayer():GetPlayerColor()
+			self.BGColor = Color(bgcol.r * 255, bgcol.g * 255, bgcol.b * 255, 255)
+		else
+			self.BGColor = team.GetColor(LocalPlayer():Team())
+		end
+		if (self.BGColor.r + self.BGColor.g + self.BGColor.b) / 3 < 150 then
+			self.TextColor = Color(255,255,255,255)
+		else
+			self.TextColor = Color(0,0,0,255)
+		end
+	end
+
+	self:SetBackgroundColor(self.BGColor)
+end
+
 function PANEL:Init()
+	include("autorun/scavgun_skins.lua")
+	self:SetSkin("sg_menu")
+	self:PlayerColor()
 	self.AmmoLabel = vgui.Create("DLabel",self)
 	self.AmmoLabel:SetFont("Scav_HUDNumber5")
-	self.AmmoLabel:SetTextColor(color_white)
+	self.AmmoLabel:SetTextColor(self.TextColor)
 	self.Initialized = true
+end
+
+
+function PANEL:Paint()
+	SKIN:PaintFrame(self,self:GetWide(),self:GetTall())
 end
 
 function PANEL:SetWeapon(wep)
@@ -86,7 +116,7 @@ function PANEL:InvalidateLayout()
 		return
 	end
 	self.AmmoLabel:SizeToContents()
-	self.AmmoLabel:SetTextColor(color_white)
+	self.AmmoLabel:SetTextColor(self.TextColor)
 	self.AmmoLabel:SetPos((self:GetWide()-self.AmmoLabel:GetWide())/2,(self:GetTall()-self.AmmoLabel:GetTall())/2)
 end
 

@@ -85,6 +85,7 @@ SKIN.tex.Panels.Normal			= GWEN.CreateTextureBorder( 256,	0, 63, 63, 16, 16, 16,
 SKIN.tex.Panels.Bright			= GWEN.CreateTextureBorder( 256+64, 0, 63, 63, 16, 16, 16, 16 )
 SKIN.tex.Panels.Dark			= GWEN.CreateTextureBorder( 256,	64, 63, 63, 16, 16, 16, 16 )
 SKIN.tex.Panels.Highlight		= GWEN.CreateTextureBorder( 256+64, 64, 63, 63, 16, 16, 16, 16 )
+SKIN.tex.Panels.Preview			= GWEN.CreateTextureBorder( 320,	448, 63, 63, 16, 16, 16, 16 )
 
 SKIN.tex.Button					= GWEN.CreateTextureBorder( 480, 0, 31, 31, 8, 8, 8, 8 )
 SKIN.tex.Button_Hovered			= GWEN.CreateTextureBorder( 480, 32, 31, 31, 8, 8, 8, 8 )
@@ -313,6 +314,16 @@ SKIN.Colours.Category.LineAlt.Button_Selected	= GWEN.TextureColor( 4 + 8 * 25, 5
 SKIN.Colours.TooltipText = GWEN.TextureColor( 4 + 8 * 26, 500 )
 
 --[[---------------------------------------------------------
+	Preview
+-----------------------------------------------------------]]
+function SKIN:PaintPreview( panel, w, h )
+
+	if ( !panel.m_bBackground ) then return end
+	self.tex.Panels.Preview( 0, 0, w, h, panel.m_bgColor )
+
+end
+
+--[[---------------------------------------------------------
 	Panel
 -----------------------------------------------------------]]
 function SKIN:PaintPanel( panel, w, h )
@@ -387,6 +398,7 @@ function SKIN:PaintTree( panel, w, h )
 	if ( !panel.m_bBackground ) then return end
 
 	self.tex.Tree( 0, 0, w, h, panel.m_bgColor )
+	self.tex.Window.Normal( 0, 0, w, h )
 
 end
 

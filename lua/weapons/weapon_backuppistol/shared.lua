@@ -69,6 +69,9 @@ function SWEP:CanFire(amt)
 end
 
 function SWEP:Initialize()
+	if CLIENT then	
+		self.HUD:PlayerColor()
+	end
 end
 
 function SWEP:Think()
