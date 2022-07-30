@@ -3622,6 +3622,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					if SERVER then
 						self:SetChargeAttack()
 					end
+					return 0.25
 				end
 				return 0.1
 			end
@@ -3893,6 +3894,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						self.ef_fthrow:Kill()
 					end
 					self:SetChargeAttack()
+					return 0.25
 				end
 				return 0.1
 			end
@@ -4231,6 +4233,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 							self.ef_exting:Kill()
 						end
 						self:SetChargeAttack()
+						return 0.25
 					end
 					return 0.1
 				end
@@ -4285,6 +4288,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 							self.ef_aspray:Kill()
 						end
 						self:SetChargeAttack()
+						return 0.25
 					end
 					return 0.1
 				end
@@ -4376,6 +4380,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 							self.ef_frzgas:Kill()
 						end
 						self:SetChargeAttack()
+						return 0.25
 					end
 					return 0.1
 				end
@@ -4903,7 +4908,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 							self.ef_beam:Kill()
 						end
 						self:SetChargeAttack()
-						return 0.05
+						return 0.25
 					end
 					return 0.05
 				end
@@ -4949,7 +4954,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						end
 						self:SetChargeAttack()
 						--tab.anim = ACT_VM_IDLE
-						return 0.05
+						return 0.25
 					end
 					--tab.anim = ACT_VM_FIDGET
 					return 0.05

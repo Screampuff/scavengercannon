@@ -873,20 +873,20 @@ local eject = "brass"
 			--tab.anim = ACT_VM_RECOIL3
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 3
-			tab.bullet = {}
-				tab.bullet.Num = 1
-				tab.bullet.Spread = Vector(0.01,0.01,0)
-				tab.bullet.Tracer = 1
-				tab.bullet.Force = 0
-				tab.bullet.Damage = 5
-				tab.bullet.TracerName = "ef_scav_tr_b"
 			tab.FireFunc = function(self,item)
 				local tab = ScavData.models[self.inv.items[1].ammo]
+				local bullet = {}
+					bullet.Num = 1
+					bullet.Spread = Vector(0.01,0.01,0)
+					bullet.Tracer = 1
+					bullet.Force = 0
+					bullet.Damage = 5
+					bullet.TracerName = "ef_scav_tr_b"
 				self.Owner:ScavViewPunch(Angle(math.Rand(-1,1),math.Rand(-1,1),0),0.5)
-				tab.bullet.Src = self.Owner:GetShootPos()
-				tab.bullet.Dir = self:GetAimVector()
-				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
-					self.Owner:FireBullets(tab.bullet)
+				bullet.Src = self.Owner:GetShootPos()
+				bullet.Dir = self:GetAimVector()
+				if not game.SinglePlayer() or SERVER then
+					self.Owner:FireBullets(bullet)
 				end
 				if SERVER then self.Owner:SetAnimation(PLAYER_ATTACK1) end
 				self:MuzzleFlash2()
@@ -948,6 +948,7 @@ local eject = "brass"
 				end
 				self.nextfireearly = CurTime()+0.1
 				if SERVER then return self:TakeSubammo(item,1) end
+				return false
 			end
 			function tab.OnArmed(self,item,olditemname)
 				if SERVER then
@@ -1452,7 +1453,7 @@ local eject = "brass"
 						fullBeep(self,item)
 					end
 
-					return 0.05
+					return 0.25
 				else
 					if SERVER and target:GetMaxHealth() > target:Health() then
 						self.soundloops.healthCharger:Play()
@@ -1561,7 +1562,7 @@ local eject = "brass"
 						fullBeep(self,item)
 					end
 
-					return 0.05
+					return 0.25
 				else
 					if SERVER and target:GetMaxArmor() > target:Armor() then self.soundloops.suitCharger:Play() end
 					return 0.1
@@ -1611,7 +1612,7 @@ local eject = "brass"
 				bullet.Force = 5
 				bullet.Damage = 40
 				bullet.TracerName = "ef_scav_tr_b"
-				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+				if not game.SinglePlayer() or SERVER then
 					self.Owner:FireBullets(bullet)
 				end
 				self:MuzzleFlash2()

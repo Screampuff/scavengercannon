@@ -10,7 +10,6 @@ function EFFECT:Init(data)
 	self.Created = UnPredictedCurTime()
 	self.vel = data:GetStart()
 	self:SetAngles((self.vel:GetNormalized()):Angle())
-	ParticleEffectAttach("scav_plasma_1",PATTACH_ABSORIGIN_FOLLOW,self,0)
 	self.Owner = data:GetEntity()
 	self.lasttrace = UnPredictedCurTime()-0.1
 	self.TracePos = self:GetPos()
@@ -19,6 +18,7 @@ function EFFECT:Init(data)
 	--self:SetPos(self.Owner:GetShootPos()+self.Owner:GetAimVector()-self.Owner:GetAimVector():Angle():Up()*10)
 	self.LastPos = self:GetPos()
 	self:SetColor(color_yellowgreen)
+	ParticleEffectAttach("scav_plasma_1",PATTACH_ABSORIGIN_FOLLOW,self,0)
 end
 
 function EFFECT:SetTracePos(pos)

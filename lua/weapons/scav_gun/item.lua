@@ -531,14 +531,14 @@ function ITEM:Remove(silent,pl,ignoredelay) --Calling this on the server will se
 							newfiremode = newitem:GetFiremodeTable().Name
 						end
 
-						local delaybuffer = self.parent.Owner.Owner:GetInfoNum("cl_scav_autoswitchdelay",.375)
-						if oldfiremode ~= newfiremode and oldfiremodedelay < delaybuffer then
+						local delaybuffer = self.parent.Owner.Owner:GetInfoNum("cl_scav_autoswitchdelay",.375) - oldfiremodedelay
+						if oldfiremode ~= newfiremode and delaybuffer > 0 then
 							net.Start("scv_s_time")
 								net.WriteEntity(self.parent.Owner)
 								net.WriteInt(math.floor(delaybuffer),32)
 								net.WriteFloat(delaybuffer - math.floor(delaybuffer))
 							net.Send(self.parent.Owner.Owner)
-							self.parent.Owner.nextfire = self.parent.Owner.nextfire - oldfiremodedelay + delaybuffer
+							self.parent.Owner.nextfire = self.parent.Owner.nextfire + delaybuffer
 							if self.parent.Owner:IsValid() and self.parent.Owner.Owner:Alive() then
 								self.parent.Owner.Owner:EmitSound("npc/dog/dog_pneumatic1.wav",75,80,1)
 							end
