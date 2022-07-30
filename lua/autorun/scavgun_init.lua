@@ -205,7 +205,7 @@ end
 game.AddParticles("particles/scav_altguns4.pcf")
 game.AddParticles("particles/scav_deaths.pcf")
 game.AddParticles("particles/scav_muzzleflashes.pcf")
-game.AddParticles("particles/scav_particles93.pcf")
+game.AddParticles("particles/scav_particles94.pcf")
 game.AddParticles("particles/scav_weather.pcf")
 game.AddParticles("particles/water_impacts.pcf") --blast shower
 if IsMounted(440) then --TF2

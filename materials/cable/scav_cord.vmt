@@ -1,0 +1,6 @@
+"Cable"
+{
+	"$basetexture"		"cable/scav_cord"
+	"$nocull"			1
+	"$alphatest"		1
+}
