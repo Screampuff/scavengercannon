@@ -9,6 +9,88 @@ SCAV_SHORT_MAX = 32767
 CreateClientConVar("cl_scav_high",0,true,false,"Enable/disable Backup Pistol shot dynamic lighting",0,1)
 CreateClientConVar("cl_scav_colorblindmode",0,true,true,"Enable/disable colorblindness assistance",0,1)
 
+Scav_DisableTouchPickup2_weapons = {
+	["weapon_crowbar"] = true,
+	["weapon_stunstick"] = true,
+	["weapon_physgun"] = true,
+	["weapon_physcannon"] = true,
+	["weapon_pistol"] = true,
+	["weapon_357"] = true,
+	["weapon_smg1"] = true,
+	["weapon_ar2"] = true,
+	["weapon_shotgun"] = true,
+	["weapon_crossbow"] = true,
+	["weapon_frag"] = true,
+	["weapon_rpg"] = true,
+	["weapon_slam"] = true,
+	["weapon_bugbait"] = true,
+	["gmod_tool"] = true,
+	["gmod_camera" ] = true,
+	["weapon_alyxgun"] = true,
+	["weapon_annabelle"] = true,
+	["weapon_oldmanharpoon"] = true,
+	["weapon_citizenpackage"] = true,
+	["weapon_citizensuitcase"] = true,
+	["scav_gun"] = true,
+	["weapon_blackholegun"] = true,
+	["weapon_backuppistol"] = true,
+	["weapon_alchemygun"] = true,
+}
+
+Scav_DisableTouchPickup2_items = {
+	["item_healthkit"] = true,
+	["item_healthvial"] = true,
+	["item_grubnugget"] = true,
+	["item_battery"] = true,
+	["item_box_srounds"] = true,
+	["item_ammo_pistol"] = true,
+	["item_ammo_pistol_large"] = true,
+	["item_ammo_357"] = true,
+	["item_ammo_357_large"] = true,
+	["item_box_mrounds"] = true,
+	["item_ammo_smg1"] = true,
+	["item_ammo_smg1_large"] = true,
+	["item_ar2_grenade"] = true,
+	["item_ammo_smg1_grenade"] = true,
+	["item_box_lrounds"] = true,
+	["item_ammo_ar2"] = true,
+	["item_ammo_ar2_large"] = true,
+	["item_ammo_ar2_altfire"] = true,
+	["item_box_buckshot"] = true,
+	["item_ammo_crossbow"] = true,
+	["item_rpg_round"] = true,
+}
+
+ScavDropUsefulRagdoll_npcs = {
+	["npc_poisonzombie"] = true, --disease shot collection
+	["npc_headcrab_black"] = true, --disease shot
+	["npc_headcrab_poison"] = true, --"
+	["npc_alyx"] = true, --universal remote
+	["npc_dog"] = true, --gravity gun
+	["npc_vortigaunt"] = true, --vortigaunt beam
+	["VortigauntUriah"] = true, --vortigaunt beam
+	["VortigauntSlave"] = true, --vortigaunt beam
+	["npc_antlionguard"] = true, --bugbait
+	["npc_antlion_worker"] = true, --acid spit
+	["npc_zombine"] = true, --grenade
+	["npc_hunter"] = true, --flechettes
+	["npc_stalker"] = true, --laser beam
+	["npc_manhack"] = true, --buzzsaw
+	["npc_helicopter"] = true, --helicopter gun
+	["npc_combinegunship"] = true, --airboat gun
+	["npc_strider"] = true, --strider cannon/minigun
+	["monster_bullchicken"] = true, --bullsquid spit
+	["monster_alien_controller"] = true, --controller balls
+	["monster_human_grunt"] = true, --smg/shotgun
+	["monster_houndeye"] = true, --supersonic shockwave
+	["monster_scientist"] = true, --medkit
+	["monster_barney"] = true, --pistol
+	["monster_sentry"] = true, --auto-target rifle
+	["monster_alien_grunt"] = true, --hornets
+	["monster_alien_slave"] = true, --vortigaunt beam
+	["monster_human_assassin"] = true, --cloak/silenced USPs
+}
+
 local function SetupScavPickupOverrides(state)
 	for i=1,game.MaxPlayers() do
 		if IsValid(Entity(i)) then
@@ -31,66 +113,20 @@ local function SetupScavPickupOverrides(state)
 			timer.Simple(0,function() ply.SWEPSpawned = "nil" end)
 		end)
 		hook.Add("PlayerCanPickupWeapon","Scav_DisableTouchPickup", function(ply,weapon)
-			local wepname = weapon:GetClass()
 			if SERVER then
 				if weapon:IsPlayerHolding() == false and --cheeky way to allow +USE to still let the player pick up the weapon normally
 					ply.JustSpawned == false and
 					ply.SWEPSpawned ~= wepname and
-					(wepname == "weapon_crowbar" or
-					wepname == "weapon_stunstick" or
-					wepname == "weapon_physgun" or
-					wepname == "weapon_physcannon" or
-					wepname == "weapon_pistol" or
-					wepname == "weapon_357" or
-					wepname == "weapon_smg1" or
-					wepname == "weapon_ar2" or
-					wepname == "weapon_shotgun" or
-					wepname == "weapon_crossbow" or
-					wepname == "weapon_frag" or
-					wepname == "weapon_rpg" or
-					wepname == "weapon_slam" or
-					wepname == "weapon_bugbait" or
-					wepname == "gmod_tool" or
-					wepname == "gmod_camera" or
-					wepname == "weapon_alyxgun" or
-					wepname == "weapon_annabelle" or
-					wepname == "weapon_oldmanharpoon" or
-					wepname == "weapon_citizenpackage" or
-					wepname == "weapon_citizensuitcase" or
-					wepname == "scav_gun" or
-					wepname == "weapon_blackholegun" or
-					wepname == "weapon_backuppistol" or
-					wepname == "weapon_alchemygun") then
+					Scav_DisableTouchPickup2_weapons[weapon:GetClass()] then
 					return false
 				end
 			end
 		end)
 		hook.Add("PlayerCanPickupItem","Scav_DisableTouchPickup", function(ply,item)
 			if SERVER then
-				local itemname = item:GetClass()
 				if item:IsPlayerHolding() == false and
 					ply.JustSpawned == false and
-					(itemname == "item_healthkit" or
-					itemname == "item_healthvial" or
-					itemname == "item_grubnugget" or
-					itemname == "item_battery" or
-					itemname == "item_box_srounds" or
-					itemname == "item_ammo_pistol" or
-					itemname == "item_ammo_pistol_large" or --keeping things explicit in case other addons use "item_ammo_XXX" as names
-					itemname == "item_ammo_357" or
-					itemname == "item_ammo_357_large" or
-					itemname == "item_box_mrounds" or
-					itemname == "item_ammo_smg1" or
-					itemname == "item_ammo_smg1_large" or
-					itemname == "item_ar2_grenade" or
-					itemname == "item_ammo_smg1_grenade" or
-					itemname == "item_box_lrounds" or
-					itemname == "item_ammo_ar2" or
-					itemname == "item_ammo_ar2_large" or
-					itemname == "item_ammo_ar2_altfire" or
-					itemname == "item_box_buckshot" or
-					itemname == "item_ammo_crossbow" or
-					itemname == "item_rpg_round") then
+					Scav_DisableTouchPickup2_items[item:GetClass()] then
 					return false
 				end
 			end
@@ -139,35 +175,7 @@ local function SetupScavRagdollOverrides(state)
 	if tobool(state) then
 		hook.Add("OnNPCKilled","ScavDropUsefulRagdoll",function(npc,attacker,inflictor)
 			if npc:GetShouldServerRagdoll() then return end --we're already making a server ragdoll
-			local class = npc:GetClass()
-			--ugly, but, not really a better way to go about it
-			if class == "npc_poisonzombie" or --disease shot collection
-				class == "npc_headcrab_black" or --disease shot
-				class == "npc_headcrab_poison" or --"
-				class == "npc_alyx" or --universal remote
-				class == "npc_dog" or --gravity gun
-				class == "npc_vortigaunt" or --vortigaunt beam
-				class == "VortigauntUriah" or --vortigaunt beam
-				class == "VortigauntSlave" or --vortigaunt beam
-				class == "npc_antlionguard" or --bugbait
-				class == "npc_antlion_worker" or --acid spit
-				class == "npc_zombine" or --grenade
-				class == "npc_hunter" or --flechettes
-				class == "npc_stalker" or --laser beam
-				class == "npc_manhack" or --buzzsaw
-				class == "npc_helicopter" or --helicopter gun
-				class == "npc_combinegunship" or --airboat gun
-				class == "npc_strider" or --strider cannon/minigun
-				class == "monster_bullchicken" or --bullsquid spit
-				class == "monster_alien_controller" or --controller balls
-				class == "monster_human_grunt" or --smg/shotgun
-				class == "monster_houndeye" or --supersonic shockwave
-				class == "monster_scientist" or --medkit
-				class == "monster_barney" or --pistol
-				class == "monster_sentry" or --auto-target rifle
-				class == "monster_alien_grunt" or --hornets
-				class == "monster_alien_slave" or --vortigaunt beam
-				class == "monster_human_assassin" then --cloak/silenced USPs
+			if ScavDropUsefulRagdoll_npcs[npc:GetClass()] then
 				npc:SetShouldServerRagdoll(true)
 			end
 		end)
