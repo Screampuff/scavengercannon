@@ -342,7 +342,7 @@ if SERVER then
 						ice:SetRenderMode(RENDERMODE_TRANSALPHA)
 						ice:Spawn()
 						ice.StatusImmunities = {["Frozen"] = true}
-						ice.noscav = true
+						ice.NoScav = true
 						ice:GetPhysicsObject():SetMaterial("gmod_ice")
 						ice:SetMoveType(MOVETYPE_NONE)
 					end
