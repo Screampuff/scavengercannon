@@ -448,7 +448,7 @@ if SERVER then
 	function ScavData.GetNewInfoParticleSystem(particlesystemname,pos,parent)
 	
 		local ent = ents.Create("info_particle_system")
-		ent:GetInternalVariable("SetNoScav") == 1
+
 		ent:SetPos(pos)
 		
 		if parent then
@@ -900,7 +900,7 @@ function ENTITY:IsFriendlyToPlayer(pl)
 			return false
 		end
 	elseif self:IsNextBot() and self:GetClass() == "npc_zetaplayer" and _ZetasInstalled then
-		if (self.IsFriendswith and self:IsFriendswith(pl)) or (self.IsInTeam and self:IsInTeam(pl)) thenv --Zeta compatibility
+		if (self.IsFriendswith and self:IsFriendswith(pl)) or (self.IsInTeam and self:IsInTeam(pl)) then --Zeta compatibility
 			return true
 		else
 			return false
