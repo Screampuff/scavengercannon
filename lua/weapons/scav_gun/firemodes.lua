@@ -1096,6 +1096,10 @@ end
 	--Remote
 ==============================================================================================]]--
 		
+if SERVER then
+	util.AddNetworkString("scav_hackdone")
+end
+
 	do
 		local tab = {}
 			tab.Name = "#scav.scavcan.remote"
@@ -1156,7 +1160,7 @@ end
 				end
 				}
 			interactions["npc_rollermine"] = {
-				["HackTime"]=.5,
+				["HackTime"]=2,
 				["Action"]= function(self,ent)
 					ent:SetSaveValue("m_bHackedByAlyx",not ent:GetInternalVariable("m_bHackedByAlyx"))
 					ent:Fire("InteractivePowerDown",nil,15,self.Owner,self)
@@ -1190,35 +1194,57 @@ end
 			interactions["prop_vehicle_airboat"] = interactions["prop_vehicle_jeep"]
 			function tab.ChargeAttack(self,item)
 				self.HackingProgress = (self.HackingProgress or 0)+0.05
-				--if SERVER then --SERVER
-					tracep.start = self.Owner:GetShootPos()
-					tracep.endpos = tracep.start+self.Owner:GetAimVector()*1000
-					tracep.filter = self.Owner
-					local tr = util.TraceHull(tracep)
-				--end
 				self.BarrelRotation = self.BarrelRotation+math.random(-17,17)
-				if not self.Owner:KeyDown(IN_ATTACK) or (self.HackingProgress > self.HackTime) or not IsValid(self.HackTarget) or (tr.Entity ~= self.HackTarget) then
-					if IsValid(self.ef_radio) then
-						self.ef_radio:Kill()
+				if SERVER then
+					local dist = 9999999
+					if IsValid(self.HackTarget) then
+						dist = self.Owner:GetShootPos():DistToSqr(self.HackTarget:GetPos())
 					end
-					if tr.Entity ~= self.HackTarget then
-						self:EmitSound("buttons/combine_button_locked.wav")
-					elseif IsValid(self.HackTarget) and (self.HackingProgress > self.HackTime) then
-						if SERVER then
-							self.Owner:EmitSound("buttons/combine_button1.wav")
+					if not self.Owner:KeyDown(IN_ATTACK) or (self.HackingProgress > self.HackTime) or not IsValid(self.HackTarget) or dist > 1000000 then
+						local success = false
+						if IsValid(self.ef_radio) then
+							self.ef_radio:Kill()
+						end
+						--if IsValid(self.ef_wires) then
+						--	self.ef_wires:Kill()
+						--end
+						if dist > 1000000 then
+							self:EmitSound("buttons/combine_button_locked.wav")
+						elseif IsValid(self.HackTarget) and (self.HackingProgress > self.HackTime) then
+							self:EmitSound("buttons/combine_button1.wav")
+							success = true
 							local interaction = interactions[string.lower(self.HackTarget:GetClass())]
 							if interaction then
 								interaction.Action(self,self.HackTarget)
 							else
 								self.HackTarget:Fire("Use",nil,0)
 							end
+						else
+							self:EmitSound("buttons/combine_button_locked.wav")
 						end
-					else
-						self:EmitSound("buttons/combine_button_locked.wav")
+						self:SetChargeAttack()
+						self.HackingProgress = 0
+						net.Start("scav_hackdone")
+							net.WriteEntity(self)
+							net.WriteBool(success)
+						net.Send(self.Owner)
+						return 1
 					end
-					self:SetChargeAttack()
-					self.HackingProgress = 0
-					return 1
+				else
+					net.Receive("scav_hackdone",function()
+						local wep = net.ReadEntity()
+						local success = net.ReadBool()
+						if IsValid(wep) then
+							wep:SetChargeAttack()
+							wep.HackingProgress = 0
+							if success then
+								wep:EmitSound("buttons/combine_button1.wav")
+							else
+								wep:EmitSound("buttons/combine_button_locked.wav")
+							end
+							wep.nextfire = CurTime() + 1 * wep:GetCooldownScale()
+						end
+					end)
 				end
 				return 0.05
 			end
@@ -1244,6 +1270,10 @@ end
 				end
 				if SERVER then
 					self.ef_radio = self:CreateToggleEffect("scav_stream_radio")
+					--self.ef_wires = self:CreateToggleEffect("scav_stream_cord")
+					--if IsValid(self.ef_wires) and IsValid(self.HackTarget) then
+					--	self.ef_wires:Setendent(self.HackTarget)
+					--end
 				end
 				self:SetChargeAttack(tab.ChargeAttack,item)
 				return false
