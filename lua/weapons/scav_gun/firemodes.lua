@@ -5134,10 +5134,36 @@ PrecacheParticleSystem("scav_exp_plasma")
 				tracep.mask = MASK_SHOT
 				tracep.mins = tab.vmin
 				tracep.maxs = tab.vmax
+				local isspot = false
 				if SERVER then
 					for i=1,32 do
 						tr = util.TraceHull(tracep)
 						local ent = tr.Entity
+						--prevent a bunch of radioactive spots from being spammed on top of one another
+						if not isspot then
+							local nearby = ents.FindInSphere(tr.HitPos,300)
+							for k,v in ipairs(nearby) do
+								if v:GetName() == "ScavGun_GammaRay_WorldSpot" then
+									isspot = true
+									break
+								end
+							end
+						end
+						--make a spot on the world for us to make radioactive
+						if not isspot and (not IsValid(ent) or ent:IsWorld()) then
+							ent = ents.Create("prop_physics")
+							if IsValid(ent) then
+								isspot = true
+								ent:SetModel("models/props_junk/popcan01a.mdl")
+								ent:SetPos(tr.HitPos)
+								ent:SetRenderMode(RENDERMODE_NONE)
+								ent:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+								ent:Spawn()
+								ent:PhysicsDestroy()
+								ent:SetName("ScavGun_GammaRay_WorldSpot")
+								ent:Fire("kill",nil,5)
+							end
+						end
 						if IsValid(ent) and not ent:IsWorld() then
 							if not ent:IsFriendlyToPlayer(self.Owner) then
 								ent:InflictStatusEffect("Radiation",10,3,self.Owner)

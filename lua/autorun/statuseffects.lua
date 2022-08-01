@@ -834,7 +834,7 @@ local STATUS = {}
 	end
 	if SERVER then
 		hook.Add("EntityTakeDamage","FireDmg",function(ent,dmginfo)
-			if dmginfo:GetDamageType() == DMG_FREEZE then
+			if ent:GetStatusEffect("Burning") and dmginfo:GetDamageType() == DMG_FREEZE and not dmginfo:GetInflictor():IsVehicle() then --Note that DMG_FREEZE is the same as DMG_VEHICLE!
 				ent:InflictStatusEffect("Burning",-1,1)
 				ent:InflictStatusEffect("Acid",1,0.025) --sizzle
 				return true
@@ -1214,6 +1214,7 @@ local STATUS = {}
 	STATUS.nextclick = 0
 	
 	function STATUS:Initialize()
+		if self.Value == 0 then self.Value = 1 end
 		if CLIENT then
 			self.dlight = DynamicLight(0)
 			self.dlight.Pos = self.Owner:GetPos()
@@ -1237,14 +1238,23 @@ local STATUS = {}
 			end
 			dmg:SetDamageForce(vector_origin)
 			dmg:SetDamageType(DMG_RADIATION)
-			local ents = ents.FindInSphere(self.Owner:GetPos(),300)
-			for k,v in ipairs(ents) do
+			local nearby = ents.FindInSphere(self.Owner:GetPos(),300)
+			for k,v in ipairs(nearby) do
 				if v ~= self.Owner then
-					dmg:SetDamage(100/(v:GetPos():Distance(self.Owner:GetPos())+1))
+					local vpos = v:GetPos()
+					local radpos = self.Owner:GetPos()
+					--Mostly for players/NPCs, this both ensures that a spot right at our feet isn't incredibly damaging, while also making spots on walls or ceilings generally more effective
+					vpos.z = 0
+					radpos.z = 16
+					dmg:SetDamage(math.min(20,10000/(vpos:DistToSqr(radpos))))
 				else
 					dmg:SetDamage(0.5)
 				end
 				dmg:SetDamagePosition(v:GetPos())
+				--airboats block radiation damage, get around that
+				if v:GetClass() == "prop_vehicle_airboat" then
+					dmg:SetDamageType(DMG_VEHICLE)
+				end
 				v:TakeDamageInfo(dmg)
 			end
 		else
