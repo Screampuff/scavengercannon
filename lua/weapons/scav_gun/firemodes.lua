@@ -787,7 +787,7 @@ end
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					local tr = self.Owner:GetEyeTraceNoCursor()
-						if ((tr.HitPos-tr.StartPos):Length() > 64) or (not tr.HitWorld and (tr.Entity:GetMoveType() ~= MOVETYPE_VPHYSICS)) then
+						if ((tr.HitPos-tr.StartPos):Length() > 64) or tr.Entity:GetClass() == "scav_tripmine" or (not tr.HitWorld and IsValid(tr.Entity) and (tr.Entity:GetMoveType() ~= MOVETYPE_VPHYSICS and tr.Entity:GetMoveType() ~= MOVETYPE_NONE and tr.Entity:GetMoveType() ~= MOVETYPE_PUSH)) then
 							self.Owner:EmitSound("buttons/button11.wav")
 							return false
 						end	
