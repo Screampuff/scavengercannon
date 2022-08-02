@@ -53,7 +53,13 @@ function ENT:Think()
 		if self:GetIsArmed() then
 			local tr = self:GetBeamTrace()
 			if IsValid(tr.Entity) and (tr.Entity:IsNPC() or tr.Entity:IsPlayer() or tr.Entity:IsNextBot()) and not tr.Entity:IsFriendlyToPlayer(self.Owner) then
-				self:OnBeamCrossedByEnemy(tr)
+				--spawn protection, disable for five seconds if a player just spawned in our beam
+				if tr.Entity:IsPlayer() and tr.Entity.JustSpawned and self:GetIsArmed() then
+					self:SetArmed(false)
+					timer.Simple(5,function() if IsValid(self) then self:SetArmed(true) end end)
+				else
+					self:OnBeamCrossedByEnemy(tr)
+				end
 			end
 		end
 		

@@ -90,6 +90,12 @@ ScavDropUsefulRagdoll_npcs = {
 	["monster_alien_slave"] = true, --vortigaunt beam
 	["monster_human_assassin"] = true, --cloak/silenced USPs
 }
+if SERVER then
+	hook.Add("PlayerSpawn","Scav_JustSpawned",function(ply,transition)
+		ply.JustSpawned = true
+		timer.Simple(0.125,function() if IsValid(ply) then ply.JustSpawned = false end end)
+	end)
+end
 
 local function SetupScavPickupOverrides(state)
 	for i=1,game.MaxPlayers() do
@@ -104,10 +110,6 @@ local function SetupScavPickupOverrides(state)
 		hook.Remove("PlayerSpawn","Scav_DisableTouchPickup")
 		hook.Remove("PlayerGiveSWEP","Scav_DisableTouchPickup")
 	elseif tonumber(state) < 3 then
-		hook.Add("PlayerSpawn","Scav_DisableTouchPickup",function(ply,transition) --stops checks from denying weapons/items on spawn
-			ply.JustSpawned = true
-			timer.Simple(0,function() ply.JustSpawned = false end)
-		end)
 		hook.Add("PlayerGiveSWEP","Scav_DisableTouchPickup",function(ply,weapon,sweptable) --stops checks from denying weapons from spawnmenu
 			ply.SWEPSpawned = weapon
 			timer.Simple(0,function() ply.SWEPSpawned = "nil" end)
@@ -132,10 +134,6 @@ local function SetupScavPickupOverrides(state)
 			end
 		end)
 	else
-		hook.Add("PlayerSpawn","Scav_DisableTouchPickup",function(ply,transition)
-			ply.JustSpawned = true
-			timer.Simple(0,function() ply.JustSpawned = false end)
-		end)
 		hook.Add("PlayerGiveSWEP","Scav_DisableTouchPickup",function(ply,weapon,sweptable)
 			ply.SWEPSpawned = weapon
 			timer.Simple(0,function() ply.SWEPSpawned = "nil" end)
