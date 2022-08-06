@@ -1100,6 +1100,10 @@ end
 						return false
 					end
 				end
+				-- ScavData.CollectFuncs["models/lostcoast/fisherman/fisherman.mdl"] = function(self,ent) --effect
+				-- 	self:AddItem(ScavData.FormatModelname("models/lostcoast/fisherman/keys.mdl"),1,0)
+				-- 	self:AddItem(ScavData.FormatModelname("models/lostcoast/fisherman/harpoon.mdl"),1,0)
+				-- end
 			end
 			tab.Cooldown = 2
 		ScavData.RegisterFiremode(tab,"models/props_lab/keypad.mdl")

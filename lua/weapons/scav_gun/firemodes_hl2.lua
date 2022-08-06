@@ -9,6 +9,7 @@ local eject = "brass"
 		local tab = {}
 			tab.Name = "#scav.scavcan.turret"
 			tab.Level = 4
+			tab.MaxAmmo = 100
 			tab.anim = ACT_VM_RECOIL1
 			tab.tracep = {}
 			tab.tracep.mask = MASK_SHOT
@@ -122,6 +123,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.magnusson"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 7
+			tab.MaxAmmo = 3
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
@@ -161,6 +163,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.hopper"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 4
+			tab.MaxAmmo = 4
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
@@ -181,9 +184,9 @@ local eject = "brass"
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound(self.shootsound)
 					--gamemode.Call("ScavFired",self.Owner,proj)
-					return true
+					return self:TakeSubammo(item,1)
 				end
-				ScavData.CollectFuncs["models/shield_scanner.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname("models/props_combine/combine_mine01.mdl"),1,0,2) end
+				ScavData.CollectFuncs["models/shield_scanner.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname("models/props_combine/combine_mine01.mdl"),2,0,1) end
 			end
 			tab.Cooldown = 0.75
 		ScavData.RegisterFiremode(tab,"models/props_combine/combine_mine01.mdl")
@@ -196,6 +199,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.smg1nade"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 6
+			tab.MaxAmmo = 10
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
@@ -223,7 +227,7 @@ local eject = "brass"
 					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					--gamemode.Call("ScavFired",self.Owner,proj)
-					return true
+					return self:TakeSubammo(item,1)
 				end
 				ScavData.CollectFuncs["models/items/ammocrate_smg2.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname("models/items/ar2_grenade.mdl"),1,0,3) end
 				--DoD:S
@@ -376,6 +380,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.acidspit"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 4
+			tab.MaxAmmo = 30
 			tab.models = {"models/spitball_large.mdl","models/spitball_medium.mdl","models/spitball_small.mdl"}
 			if SERVER then
 				tab.FireFunc = function(self,item)
@@ -450,7 +455,7 @@ local eject = "brass"
 						proj:SetVelocity((self:GetAimVector()+vector_up*0.1)*1000)
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						self.Owner:EmitSound(self.shootsound)
-					return false
+					return self:TakeSubammo(item,1)
 				end
 				ScavData.CollectFuncs["models/weapons/w_bugbait.mdl"] = function(self,ent) ScavData.GiveOneOfItemInf(self,ent) ScavData.models["models/weapons/w_bugbait.mdl"].allantlions() end
 				hook.Add("OnEntityCreated","scav_bugbait",tab.antlionfriend)
@@ -571,6 +576,7 @@ local eject = "brass"
 			tab.Name = "#weapon_frag"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 4
+			tab.MaxAmmo = 10
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
@@ -587,7 +593,7 @@ local eject = "brass"
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound(self.shootsound)
 					--gamemode.Call("ScavFired",self.Owner,proj)
-					return true
+					return self:TakeSubammo(item,1)
 				end
 				ScavData.CollectFuncs["models/items/ammocrate_grenade.mdl"] = function(self,ent) self:AddItem("models/weapons/w_grenade.mdl",1,0,5) end --5 frag grenades from a grenade crate
 				ScavData.CollectFuncs["models/items/grenadeammo.mdl"] = function(self,ent) self:AddItem("models/weapons/w_grenade.mdl",1,0,1) end --convert to grenade w_model
@@ -622,6 +628,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.helinade"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 4
+			tab.MaxAmmo = 5
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
@@ -636,7 +643,7 @@ local eject = "brass"
 					proj:SetPhysicsAttacker(self.Owner)
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound(self.shootsound)
-					return true
+					return self:TakeSubammo(item,1)
 				end
 			end
 			tab.Cooldown = 1
@@ -650,6 +657,7 @@ local eject = "brass"
 			tab.Name = "#item_battery"
 			tab.anim = ACT_VM_FIDGET
 			tab.Level = 1
+			tab.MaxAmmo = 6
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					if self.Owner:Armor() >= self.Owner:GetMaxArmor() then
@@ -670,7 +678,7 @@ local eject = "brass"
 					end
 					self.Owner:EmitSound("items/battery_pickup.wav")
 					self.Owner:SendHUDOverlay(Color(0,100,255,100),0.25)
-					return true
+					return self:TakeSubammo(item,1)
 				end
 				ScavData.CollectFuncs["models/player/american_assault.mdl"] = function(self,ent) self:AddItem("models/helmets/helmet_american.mdl",1,0,1) end
 				ScavData.CollectFuncs["models/player/american_mg.mdl"] = ScavData.CollectFuncs["models/player/american_assault.mdl"]
@@ -705,6 +713,7 @@ local eject = "brass"
 			--tab.anim = ACT_VM_RECOIL3
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 3
+			tab.MaxAmmo = 125
 
 			local bullet = {}
 				bullet.Num = 10
@@ -873,6 +882,7 @@ local eject = "brass"
 			--tab.anim = ACT_VM_RECOIL3
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 3
+			tab.MaxAmmo = 250
 			tab.FireFunc = function(self,item)
 				local tab = ScavData.models[self.inv.items[1].ammo]
 				local bullet = {}
@@ -1007,6 +1017,7 @@ local eject = "brass"
 			tab.Name = "#weapon_ar2"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 3
+			tab.MaxAmmo = 90 --60 + 30
 			tab.Callback = function(attacker,tr,dmg)
 				local ef = EffectData()
 				ef:SetOrigin(tr.HitPos)
@@ -1078,6 +1089,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.stridergun"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 7
+			tab.MaxAmmo = 100
 			tab.Callback = function(attacker,tr,dmg)
 				local ef = EffectData()
 				ef:SetOrigin(tr.HitPos)
@@ -1153,13 +1165,14 @@ local eject = "brass"
 			tab.anim = ACT_VM_IDLE
 			tab.chargeanim = ACT_VM_RECOIL1
 			tab.Level = 9
+			tab.MaxAmmo = 100
 			local returnval = {false,true}
 			local function rechargeairboatgun(self,item)
 				if IsValid(item) then
 					if not item.isfiring then
 						if item:GetSubammo() < 100 then
 							if SERVER then
-								item:SetSubammo(math.min(item:GetSubammo()+1,100))
+								item:SetSubammo(math.min(item:GetSubammo()+1,self.MaxAmmo))
 								net.Start("scv_setsubammo")
 									net.WriteEntity(self)
 									net.WriteInt(item.subammo,16)
@@ -1253,6 +1266,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.pulseorb"
 			tab.anim = ACT_VM_FIDGET
 			tab.Level = 4
+			tab.MaxAmmo = 3
 			tab.chargeanim = ACT_VM_SECONDARYATTACK
 			if SERVER then
 				tab.ChargeAttack = function(self,item)
@@ -1282,7 +1296,7 @@ local eject = "brass"
 					self.soundloops.cballcharge:Play()
 					self:SetPanelPose(1,1.5)
 					timer.Simple(0.5,function() self:SetPanelPose(0,10) end)
-					return true
+					return self:TakeSubammo(item,1)
 				end
 				ScavData.CollectFuncs["models/effects/combineball.mdl"] = function(self,ent) self:AddItem("models/items/combine_rifle_ammo01.mdl",1,0) end
 			else
@@ -1318,6 +1332,7 @@ local eject = "brass"
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_RECOIL1
 			tab.Level = 8
+			tab.MaxAmmo = 100
 			tab.ChargeAttack = function(self,item)
 				local bullet = {}
 					bullet.Num = 5
@@ -1382,6 +1397,7 @@ local eject = "brass"
 			tab.Name = "#item_healthcharger"
 			tab.anim = ACT_VM_IDLE
 			tab.Level = 1
+			tab.MaxAmmo = 100
 			tab.vmin = Vector(-12,-12,-12)
 			tab.vmax = Vector(12,12,12)
 			tab.Cooldown = .1
@@ -1496,6 +1512,7 @@ local eject = "brass"
 			tab.Name = "#item_suitcharger"
 			tab.anim = ACT_VM_IDLE
 			tab.Level = 1
+			tab.MaxAmmo = 200
 			tab.Cooldown = .1
 			tab.StopBeep = false
 			local nextBeep = CurTime()
@@ -1602,6 +1619,7 @@ local eject = "brass"
 			tab.Name = "#weapon_357"
 			tab.anim = ACT_VM_RECOIL2
 			tab.Level = 4
+			tab.MaxAmmo = 42 -- 36 + 6
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 				bullet.Num = 1
@@ -1737,6 +1755,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.smg"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 3
+			tab.MaxAmmo = 270 --225 + 45
 			tab.ChargeAttack = function(self,item)
 				local tf2 = item.ammo == "models/weapons/w_models/w_smg.mdl" or item.ammo == "models/weapons/c_models/c_smg/c_smg.mdl"
 				local cleanerscarbine = item.ammo == "models/weapons/c_models/c_pro_smg/c_pro_smg.mdl" or item.ammo == "models/workshop/weapons/c_models/c_pro_smg/c_pro_smg.mdl"
@@ -1898,6 +1917,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.flechettes"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 5
+			tab.MaxAmmo = 50
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					local proj = self:CreateEnt("hunter_flechette")
@@ -1912,7 +1932,7 @@ local eject = "brass"
 					self.Owner:ViewPunch(Angle(math.Rand(-1,0),math.Rand(-0.1,0.1),0))
 					return self:TakeSubammo(item,1)
 				end
-				ScavData.CollectFuncs["models/hunter.mdl"] = function(self,ent) self:AddItem("models/weapons/hunter_flechette.mdl",50,0) end
+				ScavData.CollectFuncs["models/hunter.mdl"] = function(self,ent) self:AddItem("models/weapons/hunter_flechette.mdl",25,0) end
 				ScavData.CollectFuncs["models/renderng_regression_test_hunter.mdl"] = ScavData.CollectFuncs["models/hunter.mdl"]
 				--Ep1
 				ScavData.CollectFuncs["models/ministrider.mdl"] = ScavData.CollectFuncs["models/hunter.mdl"]
@@ -1928,6 +1948,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.hornets"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 5
+			tab.MaxAmmo = 8
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					local proj = self:CreateEnt("hornet")
@@ -1955,6 +1976,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.aliencontroller"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 5
+			tab.MaxAmmo = 50
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					local proj = self:CreateEnt("controller_energy_ball")
@@ -1982,6 +2004,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.bullsquid"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 5
+			tab.MaxAmmo = 50
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					local proj = self:CreateEnt("squidspit")
@@ -1996,7 +2019,7 @@ local eject = "brass"
 					self.Owner:ViewPunch(Angle(math.Rand(-1,0),math.Rand(-0.1,0.1),0))
 					return self:TakeSubammo(item,1)
 				end
-				ScavData.CollectFuncs["models/bullsquid.mdl"] = function(self,ent) self:AddItem("models/bullsquid.mdl",50,0) end
+				ScavData.CollectFuncs["models/bullsquid.mdl"] = function(self,ent) self:AddItem("models/bullsquid.mdl",5,0) end
 			end
 			tab.Cooldown = 0.6
 		ScavData.RegisterFiremode(tab,"models/bullsquid.mdl") 
@@ -2012,6 +2035,7 @@ local eject = "brass"
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_SECONDARYATTACK
 			tab.Level = 4
+			tab.MaxAmmo = 10
 			local dmg = DamageInfo()
 			local tracep = {}
 			tracep.mask = MASK_SHOT
@@ -2095,7 +2119,7 @@ local eject = "brass"
 					end
 				end
 			if SERVER then
-				ScavData.CollectFuncs["models/vortigaunt.mdl"] = function(self,ent) self:AddItem(ent:GetModel(),10,ent:GetSkin()) end
+				ScavData.CollectFuncs["models/vortigaunt.mdl"] = function(self,ent) self:AddItem(ent:GetModel(),4,ent:GetSkin()) end
 				ScavData.CollectFuncs["models/vortigaunt_slave.mdl"] = ScavData.CollectFuncs["models/vortigaunt.mdl"]
 				--Ep1
 				ScavData.CollectFuncs["models/vortigaunt_blue.mdl"] = ScavData.CollectFuncs["models/vortigaunt.mdl"]

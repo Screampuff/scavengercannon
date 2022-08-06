@@ -81,6 +81,7 @@ local eject = "brass"
 			PrecacheParticleSystem("scav_exp_smoke_1")
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 7
+			tab.MaxAmmo = 3
 			if SERVER then
 				tab.FireFunc = function(self,item)
 						if not IsValid(self.smokegrenade) then
@@ -102,7 +103,7 @@ local eject = "brass"
 							timer.Simple(0, function() proj:GetPhysicsObject():AddAngleVelocity(Vector(0,10000,0)) end)
 							self.Owner:SetAnimation(PLAYER_ATTACK1)
 							self.Owner:EmitSound(self.shootsound)				
-							return true
+							return self:TakeSubammo(item,1)
 						else
 							self.Owner:EmitSound("buttons/button18.wav")
 							return false
@@ -126,6 +127,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.p90"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 150
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -190,6 +192,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.ak47"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -258,6 +261,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.aug"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -322,6 +326,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.awp"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 40
 			
 				local bullet = {}
 						bullet.Num = 1
@@ -379,6 +384,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.deagle"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 42
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.015,0.015,0)
@@ -431,6 +437,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.elites"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 150
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -502,6 +509,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.famas"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 115
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -566,6 +574,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.fiveseven"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 120
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -617,6 +626,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.galil"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 125
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -681,6 +691,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.glock"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 140
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -734,6 +745,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m3super90"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 40
 			local bullet = {}
 					bullet.Num = 9
 					bullet.Spread = Vector(0.1,0.1,0)
@@ -782,6 +794,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m4a1"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -850,6 +863,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m4a1sil"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -914,6 +928,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m249"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 300
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -984,6 +999,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.mac10"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 130
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1054,6 +1070,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.mp5"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 150
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1122,6 +1139,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.p228"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 65
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -1177,6 +1195,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.scoutsnipe"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 100
 			
 				local bullet = {}
 						bullet.Num = 1
@@ -1232,6 +1251,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.sg550"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1299,6 +1319,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.sg552"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1367,6 +1388,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.tmp"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 150
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1431,6 +1453,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.ump45"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 125
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1495,6 +1518,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.usp"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 112
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -1546,6 +1570,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.uspsil"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 112
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -1627,6 +1652,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.xm1014"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 39
 			local bullet = {}
 					bullet.Num = 6
 					bullet.Spread = Vector(0.1,0.1,0)
@@ -1683,6 +1709,7 @@ local eject = "brass"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.chargeanim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 420
 				local bullet = {}
 					bullet.Num = 1
 					bullet.Spread = Vector(0.015,0.015,0)

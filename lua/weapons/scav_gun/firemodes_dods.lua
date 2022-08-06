@@ -48,6 +48,7 @@ end
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 300
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -118,6 +119,7 @@ end
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 60
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -183,6 +185,7 @@ end
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 60
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -242,6 +245,7 @@ end
 			tab.Name = "#scav.scavcan.kar98"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 15
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 					bullet.Num = 1
@@ -291,6 +295,7 @@ end
 			tab.Name = "#scav.scavcan.carbine"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 45
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 					bullet.Num = 1
@@ -335,6 +340,7 @@ end
 			tab.Name = "#scav.scavcan.garand"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 24
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 						bullet.Num = 1
@@ -402,6 +408,7 @@ end
 			tab.Name = "#scav.scavcan.springfield"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 15
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 					bullet.Num = 1
@@ -449,6 +456,7 @@ end
 			tab.Name = "#scav.scavcan.m1911"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 21
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 						bullet.Num = 1
@@ -499,6 +507,7 @@ end
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_IDLE
 			tab.Level = 2
+			tab.MaxAmmo = 500
 			tab.Heat = 0
 			tab.Overheated = false
 			--tab.Particle = nil
@@ -671,6 +680,7 @@ end
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 96
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -731,6 +741,7 @@ end
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 90
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -790,6 +801,7 @@ end
 			tab.Name = "#scav.scavcan.p38"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 24
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 					bullet.Num = 1
@@ -832,6 +844,7 @@ end
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 90
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
