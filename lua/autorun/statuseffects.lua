@@ -894,7 +894,11 @@ local STATUS = {}
 			self.Owner:EmitSound("ambient/levels/canals/toxic_slime_sizzle"..math.random(2,4)..".wav")
 			dmg:SetDamageForce(vector_origin)
 			dmg:SetDamagePosition(self.Owner:GetPos())
-			dmg:SetDamageType(DMG_ACID)
+			if not string.find(self.Owner:GetClass(),"npc_headcrab",1,true) then
+				dmg:SetDamageType(DMG_ACID)
+			else
+				dmg:SetDamageType(DMG_SLOWBURN)
+			end
 			self.Owner:TakeDamageInfo(dmg)
 		else
 			local mins = self.Owner:OBBMins()

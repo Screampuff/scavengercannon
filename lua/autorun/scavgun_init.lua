@@ -272,6 +272,7 @@ ScavData.OKClasses = {
 	prop_physics = 1,
 	prop_physics_respawnable = 1,
 	prop_physics_multiplayer = 1,
+	simple_physics_prop = 1, --created by phys_convert
 	prop_ragdoll = 1,
 	helicopter_chunk = 1,
 	gib = 1,
