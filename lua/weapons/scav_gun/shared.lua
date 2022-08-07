@@ -1963,31 +1963,69 @@ if SERVER then
 
 	function SWEP:AddItem(--[[string]] modelname, --[[int]] subammo, --[[int]] data, --[[int]] number, --[[int, optional, if nil then the entry will be added to the end of the list]] pos)
 
+		number = number or 1
+
+		--subammo stacking handling
+
+		local subammocounts = {}
+
+		for i=1,number do
+
+			subammocounts[i] = subammo
+
+			for k,v in ipairs(self.inv.items) do
+
+				local maxammo = false
+				if ScavData.models[v.ammo] then
+					maxammo = ScavData.models[v.ammo].MaxAmmo
+				end
+
+				--TODO: currently, only exact model matches work. Want to eventually allow them to be added to other models with the same functionality
+				if v.ammo == modelname and v.data == data and maxammo and --items are the same, and have a max subammo amount defined
+				v.subammo < maxammo and --the item's subammo is less than its max
+				v.subammo ~= SCAV_SHORT_MAX and subammo ~= SCAV_SHORT_MAX then --neither item is infinite uses
+
+					local maxtoadd = maxammo - v.subammo
+
+					if subammocounts[i] > 0 then
+						v:SetSubammo(math.min(maxammo, v.subammo + subammocounts[i]))
+					end
+					subammocounts[i] = subammocounts[i] - maxtoadd
+
+				end
+
+			end
+
+		end
+	
 		local availableslots = self:GetCapacity() - self.inv:GetItemCount()
 
 		if availableslots <= 0 then
 			return
 		end
 
-		number = number or 1
 
 		for i=1,math.min(number, availableslots) do
 
-			local item = ScavItem(self.inv, pos)
+			if subammocounts[i] and subammocounts[i] > 0 then
 
-			if item then
-				item:SetAmmoType(modelname)
-				item:SetSubammo(subammo)
-				item:SetData(data)
-				item:SetMass(lookupmass(modelname))
-				item:FinishSetup()
-			end
+				local item = ScavItem(self.inv, pos)
 
-			item:AddOnClient(self.Owner)
+				if item then
+					item:SetAmmoType(modelname)
+					item:SetSubammo(subammocounts[i])
+					item:SetData(data)
+					item:SetMass(lookupmass(modelname))
+					item:FinishSetup()
+				end
 
-			local modeinfo = ScavData.models[item.ammo]
-			if modeinfo and modeinfo.OnPickup then
-				modeinfo.OnPickup(self,item)
+				item:AddOnClient(self.Owner)
+
+				local modeinfo = ScavData.models[item.ammo]
+				if modeinfo and modeinfo.OnPickup then
+					modeinfo.OnPickup(self,item)
+				end
+
 			end
 
 		end

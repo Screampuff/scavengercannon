@@ -1183,6 +1183,7 @@ end
 				["HackTime"]=2,
 				["Action"]= function(self,ent)
 					ent:SetSaveValue("m_bHackedByAlyx",not ent:GetInternalVariable("m_bHackedByAlyx"))
+					ent:Fire("Skin",1,0) --for whatever reason GMod doesn't have a rollermine model with skins in it (and the hack status doesn't automatically apply it) but in case the player has a fixed model, make it appear correctly
 					ent:Fire("InteractivePowerDown",nil,15,self.Owner,self)
 				end
 				}
@@ -2576,7 +2577,7 @@ end
 					return self:TakeSubammo(item,1)
 				end
 				ScavData.CollectFuncs["models/zombie/poison.mdl"] = function(self,ent)
-					self:AddItem("models/headcrabblack.mdl",1,0,ent:GetBodygroup(1)+ent:GetBodygroup(2)+ent:GetBodygroup(3)+ent:GetBodygroup(4))
+					self:AddItem("models/headcrabblack.mdl",ent:GetBodygroup(1)+ent:GetBodygroup(2)+ent:GetBodygroup(3)+ent:GetBodygroup(4),0)
 					self:AddItem("models/zombie/poison.mdl",1,0,1)
 				end
 				ScavData.CollectFuncs["models/player/corpse1.mdl"] = function(self,ent) self:AddItem("models/humans/corpse1.mdl",1,0,1) end --playermodel conversion
