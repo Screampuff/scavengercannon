@@ -3775,12 +3775,16 @@ PrecacheParticleSystem("scav_exp_plasma")
 					local randvec = Vector(math.Rand(-0.1,0.1),math.Rand(-0.1,0.1),math.Rand(-0.1,0.1))
 					local pos = self.Owner:GetShootPos()+self:GetAimVector()*30+(randvec)
 					local mass = 10
+					local drag = true
 					if item.ammo == "models/props_combine/breenbust.mdl" then
 						chunks = {"1","2","3","4","5","6","7"}
 						mdl = "models/props_combine/breenbust_Chunk0"
+						mass = 15
 					elseif item.ammo == "models/props_debris/concrete_spawnplug001a.mdl" then
 						chunks = {"a","b","c","d","e","f","g","h","i","j","k"}
 						mdl = "models/props_debris/concrete_spawnchunk001"
+						mass = 25
+						drag = false
 						ang:Add(Angle(90,0,0))
 					elseif item.ammo == "models/props/cs_office/plant01.mdl" then
 						chunks = {"1","2","3","4","5","6","7"}
@@ -3799,7 +3803,13 @@ PrecacheParticleSystem("scav_exp_plasma")
 						chunks = {"1","2","3","4","5","6","7","8","9"}
 						mdl = "models/props_unique/airport/atlas_break0"
 						pos:Add(Vector(0,0,-32))
-						mass = 1000
+						mass = 25
+						drag = false
+					elseif item.ammo == "models/props_debris/concrete_column001a_core.mdl" then
+						chunks = {"1","2","3","4","5","6","7","8","9"}
+						mdl = "models/props_debris/concrete_column001a_chunk0"
+						ang:Add(Angle(0,0,90)) --horizontal spread
+						mass = 25
 					end
 					for i=1,#chunks,1 do
 						local proj = self:CreateEnt("prop_physics")
@@ -3811,9 +3821,10 @@ PrecacheParticleSystem("scav_exp_plasma")
 						proj:Spawn()
 						proj:SetOwner(self.Owner)
 						proj:GetPhysicsObject():SetMass(mass)
-						proj:GetPhysicsObject():AddGameFlag(FVPHYSICS_PENETRATING)
+						proj:GetPhysicsObject():AddGameFlag(bit.bor(FVPHYSICS_PENETRATING,FVPHYSICS_WAS_THROWN))
 						proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500+self.Owner:GetVelocity())
 						proj:GetPhysicsObject():SetBuoyancyRatio(0)
+						proj:GetPhysicsObject():EnableDrag(drag)
 						proj:Fire("kill",1,"3")
 						--gamemode.Call("ScavFired",self.Owner,proj)
 					end
@@ -3831,6 +3842,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 			tab.Cooldown = 2
 		ScavData.RegisterFiremode(tab,"models/props_combine/breenbust.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_debris/concrete_spawnplug001a.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_debris/concrete_column001a_core.mdl")
 		--CSS
 		ScavData.RegisterFiremode(tab,"models/props/cs_office/plant01.mdl")
 		ScavData.RegisterFiremode(tab,"models/props/de_inferno/flower_barrel.mdl")
@@ -3904,7 +3916,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						proj:Spawn()
 						proj:SetOwner(self.Owner)
 						proj:GetPhysicsObject():SetMass(7)
-						
+						proj:GetPhysicsObject():AddGameFlag(FVPHYSICS_WAS_THROWN)
 						proj:GetPhysicsObject():SetVelocity((self:GetAimVector()+randvec)*2500)
 						proj:GetPhysicsObject():SetBuoyancyRatio(0)
 						proj:Fire("kill",1,"2")

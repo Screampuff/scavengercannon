@@ -137,6 +137,7 @@ if SERVER then
 		end
 		hitent:TakeDamageInfo(dmg)
 		--self:SetNetworkedVector("vel",self.vel)
+		hitent:Fire("StartRagdollBoogie",2,0) --TODO: a bug in ragdoll code means the duration is stuck at 5 seconds. Find a way to manually spawn a env_ragdoll_boogie?
 		return true
 	end
 
