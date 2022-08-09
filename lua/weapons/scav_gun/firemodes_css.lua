@@ -33,15 +33,13 @@ local eject = "brass"
 						--gamemode.Call("ScavFired",self.Owner,proj)
 						return true
 					end
-				--ScavData.CollectFuncs["models/weapons/w_suitcase_passenger.mdl"] = ScavData.GiveOneOfItem
 				ScavData.CollectFuncs["models/weapons/w_c4.mdl"] = function(self,ent) self:AddItem("models/weapons/w_c4_planted.mdl",1,0) end
-				--ScavData.CollectFuncs["models/weapons/w_c4_planted.mdl"] = ScavData.GiveOneOfItem
 				--DoD:S
 				ScavData.CollectFuncs["models/props_crates/tnt_crate1.mdl"] = function(self,ent) self:AddItem("models/weapons/w_tnt.mdl",1,0,3) end
 				ScavData.CollectFuncs["models/props_crates/tnt_crate2.mdl"] = function(self,ent) self:AddItem("models/weapons/w_tnt.mdl",1,0,3) end
 				ScavData.CollectFuncs["models/props_crates/tnt_dump.mdl"] = function(self,ent) self:AddItem("models/weapons/w_tnt.mdl",1,0,6) end
 				--L4D/2
-				ScavData.CollectFuncs["models/props_waterfront/suitcase_open.mdl"] = function(self,ent) self:AddItem("models/props_unique/airport/luggage2.mdl",1,1,1) end
+				ScavData.CollectFuncs["models/props_waterfront/suitcase_open.mdl"] = function(self,ent) self:AddItem("models/props_unique/airport/luggage2.mdl",1,1) end
 				ScavData.CollectFuncs["models/props_unique/airport/luggage_pile1.mdl"] = function(self,ent)
 					for i=1,5 do
 						self:AddItem("models/props_unique/airport/luggage".. tostring(math.Round(math.random(4))) ..".mdl",1,math.Round(math.random()),1)
@@ -84,31 +82,31 @@ local eject = "brass"
 			tab.MaxAmmo = 3
 			if SERVER then
 				tab.FireFunc = function(self,item)
-						if not IsValid(self.smokegrenade) then
-							self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
-							local proj = ents.Create("scav_projectile_smoke")
-							self.smokegrenade = proj
-							proj:SetModel(item.ammo)
-							proj.Owner = self.Owner
-							proj:SetOwner(self.Owner)
-							proj:SetPos(self.Owner:GetShootPos())
-							proj:SetAngles((self:GetAimVector():Angle():Up()*-1):Angle())
-							proj:Spawn()
-							proj:SetSkin(item.data)
-							proj:GetPhysicsObject():Wake()
-							proj:GetPhysicsObject():SetMass(1)
-							proj:GetPhysicsObject():EnableDrag(true)
-							proj:GetPhysicsObject():EnableGravity(true)
-							proj:GetPhysicsObject():ApplyForceOffset((self:GetAimVector()+Vector(0,0,0.1))*5000,Vector(0,0,3)) --self:GetAimVector():Angle():Up()*0.1
-							timer.Simple(0, function() proj:GetPhysicsObject():AddAngleVelocity(Vector(0,10000,0)) end)
-							self.Owner:SetAnimation(PLAYER_ATTACK1)
-							self.Owner:EmitSound(self.shootsound)				
-							return self:TakeSubammo(item,1)
-						else
-							self.Owner:EmitSound("buttons/button18.wav")
-							return false
-						end
+					if not IsValid(self.smokegrenade) then
+						self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
+						local proj = ents.Create("scav_projectile_smoke")
+						self.smokegrenade = proj
+						proj:SetModel(item.ammo)
+						proj.Owner = self.Owner
+						proj:SetOwner(self.Owner)
+						proj:SetPos(self.Owner:GetShootPos())
+						proj:SetAngles((self:GetAimVector():Angle():Up()*-1):Angle())
+						proj:Spawn()
+						proj:SetSkin(item.data)
+						proj:GetPhysicsObject():Wake()
+						proj:GetPhysicsObject():SetMass(1)
+						proj:GetPhysicsObject():EnableDrag(true)
+						proj:GetPhysicsObject():EnableGravity(true)
+						proj:GetPhysicsObject():ApplyForceOffset((self:GetAimVector()+Vector(0,0,0.1))*5000,Vector(0,0,3)) --self:GetAimVector():Angle():Up()*0.1
+						timer.Simple(0, function() proj:GetPhysicsObject():AddAngleVelocity(Vector(0,10000,0)) end)
+						self.Owner:SetAnimation(PLAYER_ATTACK1)
+						self.Owner:EmitSound(self.shootsound)				
+						return self:TakeSubammo(item,1)
+					else
+						self.Owner:EmitSound("buttons/button18.wav")
+						return false
 					end
+				end
 			end
 			tab.Cooldown = 0.75
 		ScavData.RegisterFiremode(tab,"models/weapons/w_eq_smokegrenade.mdl")
@@ -141,7 +139,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -151,7 +149,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_P90.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -206,7 +205,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.3,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -216,7 +215,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_AK47.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -275,7 +275,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.3,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -285,7 +285,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_AUG.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -339,7 +340,7 @@ local eject = "brass"
 						self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-						if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						if SERVER or not game.SinglePlayer() then
 							self.Owner:FireBullets(bullet)
 						end
 						self:MuzzleFlash2()
@@ -347,7 +348,8 @@ local eject = "brass"
 						if SERVER then
 							self.Owner:EmitSound("Weapon_AWP.Single")
 							self:AddBarrelSpin(300)
-						else
+						end
+						if CLIENT ~= game.SinglePlayer() then
 							timer.Simple(.4,function() 
 								self.Owner:EmitSound("weapons/awp/awp_bolt.wav",75,100,1)
 								local ef = EffectData()
@@ -397,7 +399,7 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -405,7 +407,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_Deagle.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -450,7 +453,7 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -458,7 +461,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_Elite.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -523,7 +527,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -533,7 +537,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_FAMAS.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -587,7 +592,7 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -595,7 +600,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_FiveSeven.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -640,7 +646,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -650,7 +656,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_Galil.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -710,7 +717,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_Glock.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -757,14 +765,15 @@ local eject = "brass"
 					self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
 						self.Owner:EmitSound("Weapon_M3.Single")
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.5,function() 
 							if IsValid(self) then
 								local ef = EffectData()
@@ -808,7 +817,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -818,7 +827,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_M4A1.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -877,7 +887,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					--self:MuzzleFlash2() --no flash on silenced weapon!
@@ -887,7 +897,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_M4A1.Silenced")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -942,7 +953,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -954,7 +965,8 @@ local eject = "brass"
 						self:SetBlockPoseInstant(1,4)
 						self:SetPanelPoseInstant(0.25,2)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1013,7 +1025,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1023,7 +1035,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_MAC10.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1084,7 +1097,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-1,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1094,7 +1107,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_MP5Navy.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1152,7 +1166,7 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1160,7 +1174,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_P228.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1208,7 +1223,7 @@ local eject = "brass"
 						self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-						if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						if SERVER or not game.SinglePlayer() then
 							self.Owner:FireBullets(bullet)
 						end
 						self:MuzzleFlash2()
@@ -1216,7 +1231,8 @@ local eject = "brass"
 						if SERVER then
 							self.Owner:EmitSound("Weapon_Scout.Single")
 							self:AddBarrelSpin(300)
-						else
+						end
+						if CLIENT ~= game.SinglePlayer() then
 							timer.Simple(.5,function()
 								self.Owner:EmitSound("weapons/scout/scout_bolt.wav",75,100,1)
 								local ef = EffectData()
@@ -1265,7 +1281,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1274,7 +1290,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_SG550.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1333,7 +1350,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1343,7 +1360,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_SG552.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1402,7 +1420,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					--self:MuzzleFlash2() --no flash on silenced weapon!
@@ -1412,7 +1430,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_TMP.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1467,7 +1486,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1477,7 +1496,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_UMP45.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1531,7 +1551,7 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1539,7 +1559,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_USP.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1583,19 +1604,16 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					--self:MuzzleFlash2() --no flash on silenced weapon!
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
-						if item.ammo == "models/w_silencer.mdl" then --HL:S
-							self.Owner:EmitSound("weapons/pl_gun2.wav")
-						else
-							self.Owner:EmitSound("Weapon_USP.SilencedShot")
-						end
+						self.Owner:EmitSound(item.ammo == "models/w_silencer.mdl" and "weapons/pl_gun2.wav" or "Weapon_USP.SilencedShot")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						if item.ammo == "models/w_silencer.mdl" then --HL:S
 							timer.Simple(.025,function()
 								if not self.Owner:GetViewModel() then return end
@@ -1664,14 +1682,15 @@ local eject = "brass"
 					self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
 						self.Owner:EmitSound("Weapon_XM1014.Single")
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1720,7 +1739,7 @@ local eject = "brass"
 				tab.ChargeAttack = function(self,item)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self.Owner:GetAimVector()
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)

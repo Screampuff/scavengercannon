@@ -39,11 +39,7 @@ local eject = "brass"
 						bullet.Damage = 4
 					if string.find(item.ammo,"models/buildables/sentry") then
 						if SERVER then
-							if item.ammo == "models/buildables/sentry1.mdl" then
-								self.Owner:EmitSound("weapons/sentry_shoot.wav")
-							else
-								self.Owner:EmitSound("weapons/sentry_shoot2.wav")
-							end
+							self.Owner:EmitSound(item.ammo == "models/buildables/sentry1.mdl" and "weapons/sentry_shoot.wav" or "weapons/sentry_shoot2.wav")
 						end
 						bullet.TracerName = "ef_scav_tr_b"
 					elseif item.ammo == "models/sentry.mdl" then
@@ -53,7 +49,7 @@ local eject = "brass"
 						if SERVER then self.Owner:EmitSound("npc/turret_floor/shoot"..math.random(1,3)..".wav") end
 						bullet.TracerName = "AR2Tracer"
 					end
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -67,11 +63,7 @@ local eject = "brass"
 				if not continuefiring and SERVER then
 					self:SetChargeAttack()
 				end
-				if item.ammo == "models/buildables/sentry1.mdl" then
-					return 0.25
-				else
-					return 0.1
-				end
+				return "models/buildables/sentry1.mdl" and 0.25 or 0.1
 			end
 			tab.FireFunc = function(self,item)
 				self:SetChargeAttack(ScavData.models["models/combine_turrets/floor_turret.mdl"].ChargeAttack,item)						
@@ -352,8 +344,8 @@ local eject = "brass"
 				end
 
 				ScavData.CollectFuncs["models/combine_strider.mdl"] = function(self,ent)
-					self:AddItem("models/gibs/strider_weapon.mdl",1,0,1) --strider cannon
-					self:AddItem("models/gibs/strider_head.mdl",100,0,1) --strider minigun
+					self:AddItem("models/gibs/strider_weapon.mdl",1,0) --strider cannon
+					self:AddItem("models/gibs/strider_head.mdl",100,0) --strider minigun
 				end
 				ScavData.CollectFuncs["models/combine_strider_vsdog.mdl"] = ScavData.CollectFuncs["models/combine_strider.mdl"]
 			else
@@ -400,7 +392,7 @@ local eject = "brass"
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
 						return self:TakeSubammo(item,1)
 					end
-				ScavData.CollectFuncs["models/antlion_worker.mdl"] = function(self,ent) self:AddItem("models/spitball_large.mdl",6,0,1) end --6 spit rounds from an antlion worker
+				ScavData.CollectFuncs["models/antlion_worker.mdl"] = function(self,ent) self:AddItem("models/spitball_large.mdl",6,0) end --6 spit rounds from an antlion worker
 				ScavData.CollectFuncs["models/spitball_large.mdl"] = ScavData.GiveOneOfItem
 				ScavData.CollectFuncs["models/spitball_medium.mdl"] = ScavData.GiveOneOfItem
 				ScavData.CollectFuncs["models/spitball_small.mdl"] = ScavData.GiveOneOfItem
@@ -553,11 +545,7 @@ local eject = "brass"
 							ef:SetOrigin(tr.HitPos)
 							ef:SetEntity(self)
 						local dmg = tab.dmginfo
-						if item.data == 0 then
-							util.Effect("ef_scav_tr3",ef)
-						else
-							util.Effect("ef_scav_tr4",ef)
-						end
+						util.Effect(item.data == 0 and "ef_scav_tr3" or "ef_scav_tr4",ef)
 					else
 						self.Owner:EmitSound("weapons/physcannon/physcannon_dryfire.wav")
 					end
@@ -595,15 +583,15 @@ local eject = "brass"
 					--gamemode.Call("ScavFired",self.Owner,proj)
 					return self:TakeSubammo(item,1)
 				end
-				ScavData.CollectFuncs["models/items/ammocrate_grenade.mdl"] = function(self,ent) self:AddItem("models/weapons/w_grenade.mdl",1,0,5) end --5 frag grenades from a grenade crate
-				ScavData.CollectFuncs["models/items/grenadeammo.mdl"] = function(self,ent) self:AddItem("models/weapons/w_grenade.mdl",1,0,1) end --convert to grenade w_model
+				ScavData.CollectFuncs["models/items/ammocrate_grenade.mdl"] = function(self,ent) self:AddItem("models/weapons/w_grenade.mdl",5,0) end --5 frag grenades from a grenade crate
+				ScavData.CollectFuncs["models/items/grenadeammo.mdl"] = function(self,ent) self:AddItem("models/weapons/w_grenade.mdl",1,0) end --convert to grenade w_model
 				--Ep2
 				ScavData.CollectFuncs["models/zombie/zombie_soldier.mdl"] = function(self,ent)
-					self:AddItem("models/zombie/zombie_soldier_legs.mdl",1,0,1)
-					self:AddItem("models/weapons/w_grenade.mdl",1,0,2)
-					self:AddItem("models/zombie/zombie_soldier_torso.mdl",1,0,1)
+					self:AddItem("models/zombie/zombie_soldier_legs.mdl",1,0)
+					self:AddItem("models/weapons/w_grenade.mdl",2,0)
+					self:AddItem("models/zombie/zombie_soldier_torso.mdl",1,0)
 					if tobool(ent:GetBodygroup(ent:FindBodygroupByName("headcrab1"))) then
-						self:AddItem("models/headcrabclassic.mdl",1,0,1)
+						self:AddItem("models/headcrabclassic.mdl",1,0)
 					end
 				end
 			end
@@ -680,13 +668,13 @@ local eject = "brass"
 					self.Owner:SendHUDOverlay(Color(0,100,255,100),0.25)
 					return self:TakeSubammo(item,1)
 				end
-				ScavData.CollectFuncs["models/player/american_assault.mdl"] = function(self,ent) self:AddItem("models/helmets/helmet_american.mdl",1,0,1) end
+				ScavData.CollectFuncs["models/player/american_assault.mdl"] = function(self,ent) self:AddItem("models/helmets/helmet_american.mdl",1,0) end
 				ScavData.CollectFuncs["models/player/american_mg.mdl"] = ScavData.CollectFuncs["models/player/american_assault.mdl"]
 				ScavData.CollectFuncs["models/player/american_rifleman.mdl"] = ScavData.CollectFuncs["models/player/american_assault.mdl"]
 				ScavData.CollectFuncs["models/player/american_rocket.mdl"] = ScavData.CollectFuncs["models/player/american_assault.mdl"]
 				ScavData.CollectFuncs["models/player/american_sniper.mdl"] = ScavData.CollectFuncs["models/player/american_assault.mdl"]
 				ScavData.CollectFuncs["models/player/american_support.mdl"] = ScavData.CollectFuncs["models/player/american_assault.mdl"]
-				ScavData.CollectFuncs["models/player/german_assault.mdl"] = function(self,ent) self:AddItem("models/helmets/helmet_german.mdl",1,0,1) end
+				ScavData.CollectFuncs["models/player/german_assault.mdl"] = function(self,ent) self:AddItem("models/helmets/helmet_german.mdl",1,0) end
 				ScavData.CollectFuncs["models/player/german_mg.mdl"] = ScavData.CollectFuncs["models/player/german_assault.mdl"]
 				ScavData.CollectFuncs["models/player/german_rifleman.mdl"] = ScavData.CollectFuncs["models/player/german_assault.mdl"]
 				ScavData.CollectFuncs["models/player/german_rocket.mdl"] = ScavData.CollectFuncs["models/player/german_assault.mdl"]
@@ -742,31 +730,26 @@ local eject = "brass"
 				self.Owner:ScavViewPunch(Angle(-10,math.Rand(-0.1,0.1),0),0.3)
 				bullet.Src = self.Owner:GetShootPos()
 				bullet.Dir = self:GetAimVector()
-				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+				if SERVER or not game.SinglePlayer() then
 					self.Owner:FireBullets(bullet)
 				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				if item.ammo == "models/weapons/shells/shell_shotgun.mdl" then --TF2
 					if SERVER then
-						if self.Owner:GetStatusEffect("DamageX") then
-							self.Owner:EmitSound("weapons/shotgun_shoot_crit.wav") --crit sound
-						else
-							self.Owner:EmitSound("weapons/shotgun_shoot.wav")
-						end
+						self.Owner:EmitSound(self.Owner:GetStatusEffect("DamageX") and "weapons/shotgun_shoot_crit.wav" or "weapons/shotgun_shoot.wav")
 					end
 					timer.Simple(0.4,function()
 						if SERVER then
 							self.Owner:EmitSound("weapons/shotgun_cock_back.wav")
 							timer.Simple(.25,function() if IsValid(self) then self.Owner:EmitSound("weapons/shotgun_cock_forward.wav") end end)
-						else
-							tf2shelleject(self,"shotgun")
 						end
+						tf2shelleject(self,"shotgun")
 					end)
 				else
 					if item.ammo == "models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" or
 					item.ammo == "models/workshop_partner/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl" then --Widowmaker
-						if SERVER then self.Owner:EmitSound("weapons/widow_maker_shot_02.wav") end
+						if SERVER then self.Owner:EmitSound(self.Owner:GetStatusEffect("DamageX") and "weapons/widow_maker_shot_crit_0".. math.floor(math.Rand(1,4)) ..".wav" or "weapons/widow_maker_shot_0".. math.floor(math.Rand(1,4)) ..".wav") end
 					elseif item.ammo == "models/shotgunshell.mdl" then --HL1
 						if SERVER then
 							self.Owner:EmitSound("weapons/sbarrel1.wav")
@@ -806,7 +789,8 @@ local eject = "brass"
 							if IsValid(self) then
 								if SERVER then
 									self.Owner:EmitSound("weapons/shotgun/shotgun_cock.wav")
-								else
+								end
+								if CLIENT ~= game.SinglePlayer() then
 									local ef = EffectData()
 									local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 									if attach then
@@ -823,40 +807,40 @@ local eject = "brass"
 				if SERVER then return self:TakeSubammo(item,1) end
 			end
 			if SERVER then		
-				ScavData.CollectFuncs["models/items/boxbuckshot.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",20,0,1) end --20 shotgun shells from a box of shells
-				ScavData.CollectFuncs["models/weapons/w_shotgun.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",6,0,1) end --6 shotgun shells from a shotgun
-				ScavData.CollectFuncs["models/scav/shells/shell_shotgun_tf2.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",1,0,1) end --convert Scav TF2 shell
+				ScavData.CollectFuncs["models/items/boxbuckshot.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",20,0) end --20 shotgun shells from a box of shells
+				ScavData.CollectFuncs["models/weapons/w_shotgun.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",6,0) end --6 shotgun shells from a shotgun
+				ScavData.CollectFuncs["models/scav/shells/shell_shotgun_tf2.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",1,0) end --convert Scav TF2 shell
 				--Ep2
-				ScavData.CollectFuncs["models/items/ammocrate_buckshot.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",6,0,5) end --5 x 6 shotgun shells from a shotgun crate
+				ScavData.CollectFuncs["models/items/ammocrate_buckshot.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",30,0) end --30 shotgun shells from a shotgun crate
 				--TF2
-				ScavData.CollectFuncs["models/weapons/w_models/w_shotgun.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0,1) end --6 shotgun shells from a shotgun (TF2)
+				ScavData.CollectFuncs["models/weapons/w_models/w_shotgun.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0) end --6 shotgun shells from a shotgun (TF2)
 				ScavData.CollectFuncs["models/weapons/c_models/c_shotgun/c_shotgun.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_shotgun.mdl"] --6 shotgun shells from a shotgun(TF2)
 				ScavData.CollectFuncs["models/weapons/c_models/c_scattergun.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_shotgun.mdl"] --6 shotgun shells from a shotgun(TF2)
 				ScavData.CollectFuncs["models/weapons/w_models/w_scattergun.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_shotgun.mdl"] --6 shotgun shells from a shotgun(TF2)
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_trenchgun/c_trenchgun.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_shotgun.mdl"] --6 shotgun shells from a Panic Attack
-				ScavData.CollectFuncs["models/weapons/c_models/c_double_barrel.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",2,0,1) end --2 shotgun shells from the FaN
+				ScavData.CollectFuncs["models/weapons/c_models/c_double_barrel.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",2,0) end --2 shotgun shells from the FaN
 				ScavData.CollectFuncs["models/weapons/c_models/c_xms_double_barrel.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_double_barrel.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_soda_popper/c_soda_popper.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_double_barrel.mdl"]
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_soda_popper/c_soda_popper.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_soda_popper/c_soda_popper.mdl"]
-				ScavData.CollectFuncs["models/weapons/c_models/c_pep_scattergun.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",4,0,1) end --4 shotgun shells from the BFB
+				ScavData.CollectFuncs["models/weapons/c_models/c_pep_scattergun.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",4,0) end --4 shotgun shells from the BFB
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_pep_scattergun/c_pep_scattergun.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_pep_scattergun.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_reserve_shooter/c_reserve_shooter.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_pep_scattergun.mdl"]
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_reserve_shooter/c_reserve_shooter.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_reserve_shooter/c_reserve_shooter.mdl"]
-				ScavData.CollectFuncs["models/weapons/c_models/c_russian_riot/c_russian_riot.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",8,0,1) end --8 shotgun shells from the Family Business
+				ScavData.CollectFuncs["models/weapons/c_models/c_russian_riot/c_russian_riot.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",8,0) end --8 shotgun shells from the Family Business
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_russian_riot/c_russian_riot.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_russian_riot/c_russian_riot.mdl"]
-				ScavData.CollectFuncs["models/weapons/c_models/c_shortstop/c_shortstop.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",4,0,1) end --4 shotgun shells from the Shortstop
+				ScavData.CollectFuncs["models/weapons/c_models/c_shortstop/c_shortstop.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",4,0) end --4 shotgun shells from the Shortstop
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_shortstop/c_shortstop.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_shortstop/c_shortstop.mdl"]
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_scatterdrum/c_scatterdrum.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_shortstop/c_shortstop.mdl"]
-				ScavData.CollectFuncs["models/weapons/c_models/c_frontierjustice/c_frontierjustice.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",3,0,1) end --3 shotgun shells from the Frontier Justice
+				ScavData.CollectFuncs["models/weapons/c_models/c_frontierjustice/c_frontierjustice.mdl"] = function(self,ent) self:AddItem("models/weapons/shells/shell_shotgun.mdl",3,0) end --3 shotgun shells from the Frontier Justice
 				ScavData.CollectFuncs["models/weapons/c_models/c_frontierjustice/c_frontierjustice_xmas.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_frontierjustice/c_frontierjustice.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_models/w_frontierjustice.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_frontierjustice/c_frontierjustice.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl"] = ScavData.GiveOneOfItemInf --infinite shotgun shells from a Widowmaker
 				ScavData.CollectFuncs["models/workshop_partner/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_dex_shotgun/c_dex_shotgun.mdl"]
 				--L4D/2
-				ScavData.CollectFuncs["models/w_models/weapons/w_pumpshotgun_a.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",8,0,1) end --8 shotgun shells from a L4D pump shotgun
-				ScavData.CollectFuncs["models/w_models/weapons/w_shotgun.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",8,0,1) end --8 shotgun shells from a L4D pump shotgun
+				ScavData.CollectFuncs["models/w_models/weapons/w_pumpshotgun_a.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",8,0) end --8 shotgun shells from a L4D pump shotgun
+				ScavData.CollectFuncs["models/w_models/weapons/w_shotgun.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell.mdl",8,0) end --8 shotgun shells from a L4D pump shotgun
 				--FoF
-				ScavData.CollectFuncs["models/weapons/w_sawed_shotgun.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell2.mdl",2,0,1) end --2 shotgun shells from a sawed off
+				ScavData.CollectFuncs["models/weapons/w_sawed_shotgun.mdl"] = function(self,ent) self:AddItem("models/weapons/shotgun_shell2.mdl",2,0) end --2 shotgun shells from a sawed off
 				ScavData.CollectFuncs["models/weapons/w_sawed_shotgun2.mdl"] = ScavData.CollectFuncs["models/weapons/w_sawed_shotgun.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_coachgun.mdl"] = ScavData.CollectFuncs["models/weapons/w_sawed_shotgun.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_ghostgun.mdl"] = ScavData.CollectFuncs["models/weapons/w_sawed_shotgun.mdl"]
@@ -903,8 +887,9 @@ local eject = "brass"
 				if item.ammo == "models/items/boxsrounds.mdl" or item.ammo == "models/weapons/w_pistol.mdl" then
 					if SERVER then
 						self.Owner:EmitSound("Weapon_Pistol.Single")
-					else
-						timer.Simple(.025,function()
+					end
+					timer.Simple(.025,function()
+						if CLIENT ~= game.SinglePlayer() then
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -914,13 +899,14 @@ local eject = "brass"
 								ef:SetEntity(self)
 								util.Effect("ShellEject",ef)
 							end
-						end)
-					end
+						end
+					end)
 				elseif item.ammo == "models/w_9mmhandgun.mdl" then --HL:S
 					if SERVER then
 						self.Owner:EmitSound("weapons/pl_gun3.wav")
-					else
-						timer.Simple(.025,function()
+					end
+					timer.Simple(.025,function()
+						if CLIENT ~= game.SinglePlayer() then
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
@@ -941,20 +927,15 @@ local eject = "brass"
 								ef:SetFlags(0) --pistol shell
 								util.Effect("HL1ShellEject",ef)
 							end
-						end)
-					end
+						end
+					end)
 				else --TF2
 					if SERVER then
-						if self.Owner:GetStatusEffect("DamageX") then
-							self.Owner:EmitSound("weapons/pistol_shoot_crit.wav",75,100) --crit sound
-						else
-							self.Owner:EmitSound("weapons/pistol_shoot.wav",75,100)
-						end
-					else
-						timer.Simple(.025,function()
-							tf2shelleject(self)
-						end)
+						self.Owner:EmitSound(self.Owner:GetStatusEffect("DamageX") and "weapons/pistol_shoot_crit.wav" or "weapons/pistol_shoot.wav")
 					end
+					timer.Simple(.025,function()
+						tf2shelleject(self)
+					end)
 				end
 				self.nextfireearly = CurTime()+0.1
 				if SERVER then return self:TakeSubammo(item,1) end
@@ -986,7 +967,7 @@ local eject = "brass"
 				--HLS
 				ScavData.CollectFuncs["models/hl1bar.mdl"] = function(self,ent) self:AddItem("models/w_9mmhandgun.mdl",17,0) end --17 pistol rounds from a HL1 pistol
 				--FoF
-				ScavData.CollectFuncs["models/weapons/w_deringer.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),2,0,1) end --2 pistol rounds from the Deringer
+				ScavData.CollectFuncs["models/weapons/w_deringer.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),2,0) end --2 pistol rounds from the Deringer
 				ScavData.CollectFuncs["models/weapons/w_deringer2.mdl"] = ScavData.CollectFuncs["models/weapons/w_deringer.mdl"]
 			end
 			tab.Cooldown = 0.4
@@ -1041,7 +1022,7 @@ local eject = "brass"
 						bullet.Spread = Vector(0.02*scale1,0.02*scale1,0)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -1074,7 +1055,7 @@ local eject = "brass"
 				end
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/items/ammocrate_ar2.mdl"] = function(self,ent) self:AddItem("models/items/combine_rifle_cartridge01.mdl",30,0,3) end
+				ScavData.CollectFuncs["models/items/ammocrate_ar2.mdl"] = function(self,ent) self:AddItem("models/items/combine_rifle_cartridge01.mdl",60,0) end -- 60 pulse rounds from ammo crate
 				ScavData.CollectFuncs["models/items/combine_rifle_cartridge01.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end				
 				ScavData.CollectFuncs["models/weapons/w_irifle.mdl"] = ScavData.CollectFuncs["models/items/combine_rifle_cartridge01.mdl"]
 			end
@@ -1119,7 +1100,7 @@ local eject = "brass"
 					bullet.Spread = Vector(0.02*scale1,0.02*scale1,0)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					ef:SetEntity(self)
@@ -1149,7 +1130,7 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/gibs/strider_head.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),100,0,1) end
+				ScavData.CollectFuncs["models/gibs/strider_head.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),100,0) end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/gibs/strider_head.mdl")
@@ -1225,7 +1206,7 @@ local eject = "brass"
 				end
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -1246,10 +1227,10 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then	
-				ScavData.CollectFuncs["models/airboat.mdl"] = function(self,ent) self:AddItem("models/airboatgun.mdl",100,0,1) end
-				ScavData.CollectFuncs["models/props_combine/bunker_gun01.mdl"] = function(self,ent) self:AddItem("models/props_combine/bunker_gun01.mdl",100,0,1) end
+				ScavData.CollectFuncs["models/airboat.mdl"] = function(self,ent) self:AddItem("models/airboatgun.mdl",100,0) end
+				ScavData.CollectFuncs["models/props_combine/bunker_gun01.mdl"] = function(self,ent) self:AddItem("models/props_combine/bunker_gun01.mdl",100,0) end
 				--HLDM:S
-				ScavData.CollectFuncs["models/mp/turret.mdl"] = function(self,ent) self:AddItem("models/mp/turret.mdl",100,0,1) end
+				ScavData.CollectFuncs["models/mp/turret.mdl"] = function(self,ent) self:AddItem("models/mp/turret.mdl",100,0) end
 			end
 			tab.Cooldown = 0.05
 		ScavData.RegisterFiremode(tab,"models/airboatgun.mdl")
@@ -1344,7 +1325,7 @@ local eject = "brass"
 					bullet.Damage = 6
 					bullet.TracerName = "HelicopterTracer"
 					bullet.Callback = ScavData.models[self.chargeitem.ammo].Callback
-				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+				if SERVER or not game.SinglePlayer() then
 					self.Owner:FireBullets(bullet)
 				end
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -1645,7 +1626,8 @@ local eject = "brass"
 						timer.Simple(0.5,function()
 							if SERVER then
 								self.Owner:EmitSound("weapons/357/357_reload1.wav",75,100,1,CHAN_WEAPON)
-							else
+							end
+							if CLIENT ~= game.SinglePlayer() then
 								local ef = EffectData()
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 								if attach then
@@ -1663,7 +1645,8 @@ local eject = "brass"
 					timer.Simple(0.4,function() --lever action
 						if SERVER then
 							self.Owner:EmitSound("weapons/smg1/switch_burst.wav",75,85,1,CHAN_WEAPON)
-						else
+						end
+						if CLIENT ~= game.SinglePlayer() then
 							local ef = EffectData()
 							local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 							if attach then
@@ -1692,10 +1675,10 @@ local eject = "brass"
 			end
 			if SERVER then
 				--TODO: give these their own models/sounds where appropriate
-				ScavData.CollectFuncs["models/weapons/w_357.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",6,0,1) end --6 .357 rounds from a box of bullets
+				ScavData.CollectFuncs["models/weapons/w_357.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",6,0) end --6 .357 rounds from a box of bullets
 				ScavData.CollectFuncs["models/items/357ammo.mdl"] = ScavData.CollectFuncs["models/weapons/w_357.mdl"]
 				ScavData.CollectFuncs["models/items/357ammobox.mdl"] = ScavData.CollectFuncs["models/items/357ammo.mdl"]
-				ScavData.CollectFuncs["models/weapons/w_annabelle.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",2,0,1) end --2 .357 rounds from the Annabelle
+				ScavData.CollectFuncs["models/weapons/w_annabelle.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",2,0) end --2 .357 rounds from the Annabelle
 				--TF2
 				ScavData.CollectFuncs["models/weapons/w_models/w_revolver.mdl"] = ScavData.CollectFuncs["models/items/357ammo.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_ambassador/c_ambassador.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_revolver.mdl"]
@@ -1708,16 +1691,16 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_ttg_sam_gun/c_ttg_sam_gun.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_ttg_sam_gun/c_ttg_sam_gun.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_letranger/c_letranger.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_revolver.mdl"]
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_letranger/c_letranger.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_letranger/c_letranger.mdl"]
-				ScavData.CollectFuncs["models/weapons/c_models/c_dex_revolver/c_dex_revolver.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",5,0,1) end --5 .357 rounds from the Diamondback
+				ScavData.CollectFuncs["models/weapons/c_models/c_dex_revolver/c_dex_revolver.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",5,0) end --5 .357 rounds from the Diamondback
 				--CSS
-				ScavData.CollectFuncs["models/props/cs_militia/gun_cabinet.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",2,0,2) end --2 x 2 .357 rounds from the gun cabinet
+				ScavData.CollectFuncs["models/props/cs_militia/gun_cabinet.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",4,0) end --2 x 2 .357 rounds from the gun cabinet
 				--FoF
-				ScavData.CollectFuncs["models/weapons/w_carbine.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",1,0,1) end --1 .357 round from the Carbine
-				ScavData.CollectFuncs["models/weapons/w_dualnavy.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",6,0,2) end --2 x 6 .357 round from the duals
-				ScavData.CollectFuncs["models/weapons/w_henryrifle.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",16,0,1) end --16 .357 rounds from the Henry Rifle
-				ScavData.CollectFuncs["models/weapons/w_maresleg.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",8,0,1) end --8 .357 rounds from the Mare's Leg
-				ScavData.CollectFuncs["models/weapons/w_spencer.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",7,0,1) end --7 .357 rounds from the Spencer
-				ScavData.CollectFuncs["models/weapons/w_volcanic.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",9,0,1) end --9 .357 rounds from the Volcanic
+				ScavData.CollectFuncs["models/weapons/w_carbine.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",1,0) end --1 .357 round from the Carbine
+				ScavData.CollectFuncs["models/weapons/w_dualnavy.mdl"] = function(self,ent) self:AddItem("models/weapons/w_357.mdl",12,0) end --2 x 6 .357 round from the duals
+				ScavData.CollectFuncs["models/weapons/w_henryrifle.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",16,0) end --16 .357 rounds from the Henry Rifle
+				ScavData.CollectFuncs["models/weapons/w_maresleg.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",8,0) end --8 .357 rounds from the Mare's Leg
+				ScavData.CollectFuncs["models/weapons/w_spencer.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",7,0) end --7 .357 rounds from the Spencer
+				ScavData.CollectFuncs["models/weapons/w_volcanic.mdl"] = function(self,ent) self:AddItem("models/weapons/w_annabelle.mdl",9,0) end --9 .357 rounds from the Volcanic
 				ScavData.CollectFuncs["models/weapons/w_volcanic2.mdl"] = ScavData.CollectFuncs["models/weapons/w_volcanic.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_mauser.mdl"] = ScavData.CollectFuncs["models/weapons/w_volcanic.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_mauser2.mdl"] = ScavData.CollectFuncs["models/weapons/w_mauser.mdl"]
@@ -1738,9 +1721,8 @@ local eject = "brass"
 				ScavData.CollectFuncs["models/weapons/w_sharps.mdl"] = ScavData.CollectFuncs["models/weapons/w_carbine.mdl"]
 				ScavData.CollectFuncs["models/props/gun_cabinet/gun_cabinet.mdl"] = ScavData.CollectFuncs["models/props/cs_militia/gun_cabinet.mdl"] --2 x 2 .357 rounds from the gun cabinet
 				ScavData.CollectFuncs["models/props/gun_cabinet/gun_cabinet_gold.mdl"] = function(self,ent) --8 x 1, 6 x 2 .357 rounds from the gun cabinet
-					self:AddItem("models/weapons/w_357.mdl",6,0,1)
-					self:AddItem("models/weapons/w_annabelle.mdl",8,0,1)
-					self:AddItem("models/weapons/w_357.mdl",6,0,1)
+					self:AddItem("models/weapons/w_annabelle.mdl",8,0)
+					self:AddItem("models/weapons/w_357.mdl",12,0)
 				end
 			end
 			tab.Cooldown = 1
@@ -1770,7 +1752,7 @@ local eject = "brass"
 						bullet.Force = 5
 						bullet.Damage = 4
 						bullet.TracerName = "ef_scav_tr_b"
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1781,33 +1763,24 @@ local eject = "brass"
 					end
 					if tf2 then --TF2
 						if SERVER then
-							if self.Owner:GetStatusEffect("DamageX") then
-								self.Owner:EmitSound("weapons/smg_shoot_crit.wav",75,100) --crit sound
-							else
-								self.Owner:EmitSound("weapons/smg_shoot.wav",75,100)
-							end
-						else
-							timer.Simple(.025,function()
-								tf2shelleject(self)
-							end)
+							self.Owner:EmitSound(self.Owner:GetStatusEffect("DamageX") and "weapons/smg_shoot_crit.wav" or "weapons/smg_shoot.wav")
 						end
+						timer.Simple(.025,function()
+							tf2shelleject(self)
+						end)
 					elseif cleanerscarbine then --Cleaner's Carbine
 						if SERVER then
-							if self.Owner:GetStatusEffect("DamageX") then
-								self.Owner:EmitSound("weapons/doom_sniper_smg_crit.wav",75,100) --crit sound
-							else
-								self.Owner:EmitSound("weapons/doom_sniper_smg.wav",75,100)
-							end
-						else
-							timer.Simple(.025,function()
-								tf2shelleject(self)
-							end)
+							self.Owner:EmitSound(self.Owner:GetStatusEffect("DamageX") and "weapons/doom_sniper_smg_crit.wav" or "weapons/doom_sniper_smg.wav")
 						end
+						timer.Simple(.025,function()
+							tf2shelleject(self)
+						end)
 					else
 						if item.ammo == "models/w_9mmar.mdl" then --HL:S
 							if SERVER then
 								self.Owner:EmitSound("weapons/hks"..math.floor(math.Rand(1,4))..".wav")
-							else
+							end
+							if CLIENT ~= game.SinglePlayer() then
 								timer.Simple(.025,function()
 									if not self.Owner:GetViewModel() then return end
 									local ef = EffectData()
@@ -1831,7 +1804,8 @@ local eject = "brass"
 						elseif item.ammo == "models/weapons/w_alyx_gun.mdl" then
 							if SERVER then
 								self.Owner:EmitSound("Weapon_Alyx_Gun.Single")
-							else
+							end
+							if CLIENT ~= game.SinglePlayer() then
 								timer.Simple(.025,function()
 									if not self.Owner:GetViewModel() then return end
 									local ef = EffectData()
@@ -1847,7 +1821,8 @@ local eject = "brass"
 						else--if item.ammo == "models/items/boxmrounds.mdl" or item.ammo == "models/weapons/w_smg1.mdl" then
 							if SERVER then
 								self.Owner:EmitSound("Weapon_SMG1.Single")
-							else
+							end
+							if CLIENT ~= game.SinglePlayer() then
 								timer.Simple(.025,function()
 									if not self.Owner:GetViewModel() then return end
 									local ef = EffectData()
@@ -1887,7 +1862,7 @@ local eject = "brass"
 				end
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/items/ammocrate_smg1.mdl"] = function(self,ent) self:AddItem("models/weapons/w_smg1.mdl",45,0,3) end
+				ScavData.CollectFuncs["models/items/ammocrate_smg1.mdl"] = function(self,ent) self:AddItem("models/weapons/w_smg1.mdl",135,0) end
 				ScavData.CollectFuncs["models/items/boxmrounds.mdl"] = function(self,ent) self:AddItem("models/items/boxmrounds.mdl",20,0) end
 				ScavData.CollectFuncs["models/weapons/w_smg1.mdl"] = function(self,ent) self:AddItem("models/weapons/w_smg1.mdl",45,0) end
 				ScavData.CollectFuncs["models/weapons/w_alyx_gun.mdl"] = function(self,ent) self:AddItem("models/weapons/w_alyx_gun.mdl",30,0) end
@@ -1948,7 +1923,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.hornets"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 5
-			tab.MaxAmmo = 8
+			tab.MaxAmmo = 50 --8
 			if SERVER then
 				tab.FireFunc = function(self,item)
 					local proj = self:CreateEnt("hornet")

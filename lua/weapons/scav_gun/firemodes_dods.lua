@@ -6,38 +6,78 @@ util.PrecacheModel("models/scav/shells/shell_medium.mdl")
 util.PrecacheModel("models/scav/shells/shell_small.mdl")
 
 local dodsshelleject = function(self,shellsize)
-	if not self.Owner:GetViewModel() then return end
-	local size = shellsize or "large"
-	local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
-	if attach == nil then
-		attach = self:GetAttachment(self:LookupAttachment(eject))
-	end
-	if attach then
-		local brass = ents.CreateClientProp("models/scav/shells/shell_".. size ..".mdl")
-		if IsValid(brass) then
-			brass:SetPos(attach.Pos)
-			brass:SetAngles(attach.Ang)
-			brass:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
-			brass:AddCallback("PhysicsCollide",function(ent,data)
-				if ( data.Speed > 50 ) then ent:EmitSound(Sound("Weapon.Shell")) end
-			end)
-			brass:Spawn()
-			brass:DrawShadow(false)
-			local angShellAngles = self.Owner:EyeAngles()
-			--angShellAngles:RotateAroundAxis(Vector(0,0,1),90)
-			local vecShellVelocity = self.Owner:GetAbsVelocity()
-			vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
-			vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 );
-			vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
-			local phys = brass:GetPhysicsObject()
-			if IsValid(phys) then
-				phys:SetVelocity(vecShellVelocity)
-				phys:SetAngleVelocity(angShellAngles:Forward()*1000)
+	if not game.SinglePlayer() and CLIENT then
+		if not self.Owner:GetViewModel() then return end
+		local size = shellsize or "large"
+		local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+		if attach == nil then
+			attach = self:GetAttachment(self:LookupAttachment(eject))
+		end
+		if attach then
+			local brass = ents.CreateClientProp("models/scav/shells/shell_".. size ..".mdl")
+			if IsValid(brass) then
+				brass:SetPos(attach.Pos)
+				brass:SetAngles(attach.Ang)
+				brass:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+				brass:AddCallback("PhysicsCollide",function(ent,data)
+					if ( data.Speed > 50 ) then ent:EmitSound(Sound("Weapon.Shell")) end
+				end)
+				brass:Spawn()
+				brass:DrawShadow(false)
+				local angShellAngles = self.Owner:EyeAngles()
+				--angShellAngles:RotateAroundAxis(Vector(0,0,1),90)
+				local vecShellVelocity = self.Owner:GetAbsVelocity()
+				vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 )
+				vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 )
+				vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25
+				local phys = brass:GetPhysicsObject()
+				if IsValid(phys) then
+					phys:SetVelocity(vecShellVelocity)
+					phys:SetAngleVelocity(angShellAngles:Forward()*1000)
+				end
+				timer.Simple(10,function() if IsValid(brass) then brass:Remove() end end)
 			end
-			timer.Simple(10,function() if IsValid(brass) then brass:Remove() end end)
+		end
+	elseif game.SinglePlayer() and SERVER then
+		if not self.Owner:GetViewModel() then return end
+		local size = shellsize or "large"
+		local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+		if attach then
+			local brass = ents.Create("prop_physics")
+			if IsValid(brass) then
+				brass:SetModel("models/scav/shells/shell_".. size ..".mdl")
+				brass:PhysicsInit(SOLID_VPHYSICS)
+				brass:SetPos(attach.Pos)
+				brass:SetAngles(attach.Ang)
+				brass:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+				brass:AddCallback("PhysicsCollide",function(ent,data)
+					if ( data.Speed > 50 ) then ent:EmitSound(Sound("Weapon.Shell")) end
+				end)
+				brass:Spawn()
+				brass:DrawShadow(false)
+				brass.NoScav = true
+				if CLIENT then
+					brass:SetupBones()
+				end
+				local angShellAngles = self.Owner:EyeAngles()
+				--angShellAngles:RotateAroundAxis(Vector(0,0,1),90)
+				local vecShellVelocity = self.Owner:GetAbsVelocity()
+				vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 )
+				vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 100, 150 )
+				vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25
+				local phys = brass:GetPhysicsObject()
+				if IsValid(phys) then
+					phys:SetVelocity(vecShellVelocity)
+					phys:SetAngleVelocity(angShellAngles:Forward()*1000)
+				end
+				timer.Simple(10,function() if IsValid(brass) then brass:Remove() end end)
+			end
 		end
 	end
 end
+
+local WALK_SPEED = 20000
+local PRONE_SPEED = 800 --900 would be crouching with walk key held
 
 --[[==============================================================================================
 	--.30 cal
@@ -53,8 +93,8 @@ end
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
 						bullet.Num = 1
-						if self.Owner:GetVelocity():LengthSqr() < 20000 then
-							if self.Owner:Crouching() and self.Owner:GetVelocity():LengthSqr() < 800 then --900 would be crouching with walk key held
+						if self.Owner:GetVelocity():LengthSqr() < WALK_SPEED then
+							if self.Owner:Crouching() and self.Owner:GetVelocity():LengthSqr() < PRONE_SPEED then 
 								bullet.Spread = Vector(0.1,0.1,0) --"true" spread for bipod is .01 in DoD, but this player has a lot more freedom of movement
 								if CLIENT then self.Owner:SetEyeAngles((vector_up*0.01+self:GetAimVector()):Angle()) end
 							else
@@ -72,15 +112,14 @@ end
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_30cal.Shoot")
-					if CLIENT then
-						dodsshelleject(self)
-					else
+					dodsshelleject(self)
+					if SERVER then
 						--self:SetBlockPoseInstant(1,4)
 						self:SetPanelPoseInstant(0.25,2)
 						self:TakeSubammo(item,1)
@@ -124,8 +163,8 @@ end
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
 						bullet.Num = 1
-						if self.Owner:GetVelocity():LengthSqr() < 20000 then
-							if self.Owner:Crouching() and self.Owner:GetVelocity():LengthSqr() < 800 then --900 would be crouching with walk key held
+						if self.Owner:GetVelocity():LengthSqr() < WALK_SPEED then
+							if self.Owner:Crouching() and self.Owner:GetVelocity():LengthSqr() < PRONE_SPEED then
 								bullet.Spread = Vector(0.02,0.02,0)
 							else
 								bullet.Spread = Vector(0.025,0.025,0)
@@ -141,15 +180,14 @@ end
 						bullet.Dir = self:GetAimVector()
 						self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
 						if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_Bar.Shoot")
-					if CLIENT then
-						dodsshelleject(self)
-					else
+					dodsshelleject(self)
+					if SERVER then
 						self:SetPanelPoseInstant(0.125,2)
 						self:TakeSubammo(item,1)
 					end
@@ -190,11 +228,7 @@ end
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
 						bullet.Num = 1
-						if self.Owner:GetVelocity():LengthSqr() < 20000 then
-							bullet.Spread = Vector(0.065,0.065,0)
-						else
-							bullet.Spread = Vector(0.165,0.165,0)
-						end
+						bullet.Spread = self.Owner:GetVelocity():LengthSqr() < WALK_SPEED and Vector(0.065,0.065,0) or Vector(0.165,0.165,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 40
@@ -203,15 +237,14 @@ end
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
 					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_C96.Shoot")
-					if CLIENT then
-						dodsshelleject(self,"small")
-					else
+					dodsshelleject(self,"small")
+					if SERVER then
 						self:TakeSubammo(item,1)
 					end
 				end
@@ -249,11 +282,7 @@ end
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 					bullet.Num = 1
-					if self.Owner:GetVelocity():LengthSqr() < 20000 then
-						bullet.Spread = Vector(0.014,0.014,0)
-					else
-						bullet.Spread = Vector(0.164,0.164,0)
-					end
+					bullet.Spread = self.Owner:GetVelocity():LengthSqr() < WALK_SPEED and Vector(0.014,0.014,0) or Vector(0.164,0.164,0)
 					bullet.Tracer = 1
 					bullet.Force = 5
 					bullet.Damage = 110
@@ -262,20 +291,21 @@ end
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+				if SERVER or not game.SinglePlayer() then
 					self.Owner:FireBullets(bullet)
 				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_Kar.Shoot")
-				if CLIENT then
-					timer.Simple(.375,function()
+				timer.Simple(.375,function()
+					if SERVER then
 						self.Owner:EmitSound("Weapon_K98.BoltBack1")
 						timer.Simple(.2,function() self.Owner:EmitSound("Weapon_K98.BoltBack2") end)
 						timer.Simple(.6,function() self.Owner:EmitSound("Weapon_K98.BoltForward2") end)
-						dodsshelleject(self)
-					end)
-				else
+					end
+					dodsshelleject(self)
+				end)
+				if SERVER then
 					return self:TakeSubammo(item,1)
 				end
 			end
@@ -299,11 +329,7 @@ end
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 					bullet.Num = 1
-					if self.Owner:GetVelocity():LengthSqr() < 20000 then
-						bullet.Spread = Vector(0.019,0.019,0)
-					else
-						bullet.Spread = Vector(0.119,0.119,0)
-					end
+					bullet.Spread = self.Owner:GetVelocity():LengthSqr() < WALK_SPEED and Vector(0.019,0.019,0) or Vector(0.119,0.119,0)
 					bullet.Tracer = 1
 					bullet.Force = 5
 					bullet.Damage = 40
@@ -312,16 +338,15 @@ end
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+				if SERVER or not game.SinglePlayer() then
 					self.Owner:FireBullets(bullet)
 				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_Carbine.Shoot")
 				self.nextfireearly = CurTime()+0.1
-				if CLIENT then
-					dodsshelleject(self,"medium")
-				else
+				dodsshelleject(self,"medium")
+				if SERVER then
 					return self:TakeSubammo(item,1)
 				end
 			end
@@ -344,11 +369,7 @@ end
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 						bullet.Num = 1
-						if self.Owner:GetVelocity():LengthSqr() < 20000 then
-							bullet.Spread = Vector(0.014,0.014,0)
-						else
-							bullet.Spread = Vector(0.114,0.114,0)
-						end
+						bullet.Spread = self.Owner:GetVelocity():LengthSqr() < WALK_SPEED and Vector(0.014,0.014,0) or Vector(0.114,0.114,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 80
@@ -357,26 +378,50 @@ end
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_Garand.Shoot")
 					self.nextfireearly = CurTime()+0.37
-					if CLIENT then
-						dodsshelleject(self)
-					end
+					dodsshelleject(self)
 					if (item.subammo <= 1 and SERVER) or (item.subammo <= 0 and CLIENT) then --garand ping
 						timer.Simple(0.025,function()
 							self.Owner:EmitSound("Weapon_Garand.ClipDing")
-							if CLIENT then
+							if not game.SinglePlayer() and CLIENT then
 								local ping = ents.CreateClientProp("models/scav/shells/garand_clip.mdl")
 								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 								if attach then
 									ping:SetPos(attach.Pos)
 									ping:SetAngles(attach.Ang)
 									ping:Spawn()
+									local angShellAngles = self.Owner:EyeAngles()
+									local vecShellVelocity = self.Owner:GetAbsVelocity()
+									vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
+									vecShellVelocity = vecShellVelocity + angShellAngles:Up() * math.Rand( 200, 250 );
+									vecShellVelocity = vecShellVelocity + angShellAngles:Forward() * 25;
+									local phys = ping:GetPhysicsObject()
+									if IsValid(phys) then
+										phys:SetVelocity(vecShellVelocity)
+										phys:SetAngleVelocity(angShellAngles:Forward()*1000)
+									end
+									timer.Simple(10,function() if IsValid(ping) then ping:Remove() end end)
+								end
+							elseif game.SinglePlayer() and SERVER then
+								local ping = ents.Create("prop_physics")
+								local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
+								if attach then
+									ping:SetModel("models/scav/shells/garand_clip.mdl")
+									ping:PhysicsInit(SOLID_VPHYSICS)
+									ping:SetPos(attach.Pos)
+									ping:SetAngles(attach.Ang)
+									ping:Spawn()
+									ping:DrawShadow(false)
+									ping.NoScav = true
+									if CLIENT then
+										ping:SetupBones()
+									end
 									local angShellAngles = self.Owner:EyeAngles()
 									local vecShellVelocity = self.Owner:GetAbsVelocity()
 									vecShellVelocity = vecShellVelocity + angShellAngles:Right() * math.Rand( 50, 70 );
@@ -412,11 +457,7 @@ end
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 					bullet.Num = 1
-					if self.Owner:GetVelocity():LengthSqr() < 20000 then
-						bullet.Spread = Vector(0.06,0.06,0)
-					else
-						bullet.Spread = Vector(0.16,0.16,0)
-					end
+					bullet.Spread = self.Owner:GetVelocity():LengthSqr() < WALK_SPEED and Vector(0.06,0.06,0) or Vector(0.16,0.16,0)
 					bullet.Tracer = 1
 					bullet.Force = 5
 					bullet.Damage = 120
@@ -425,20 +466,21 @@ end
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+				if SERVER or not game.SinglePlayer() then
 					self.Owner:FireBullets(bullet)
 				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_Springfield.Shoot")
-				if CLIENT then
-					timer.Simple(.5,function()
+				timer.Simple(.5,function()
+					if CLIENT then
 						self.Owner:EmitSound("Weapon_K98.BoltBack1")
 						timer.Simple(.2,function() self.Owner:EmitSound("Weapon_K98.BoltBack2") end)
 						timer.Simple(.6,function() self.Owner:EmitSound("Weapon_K98.BoltForward2") end)
-						dodsshelleject(self)
-					end)
-				else
+					end
+					dodsshelleject(self)
+				end)
+				if SERVER then
 					return self:TakeSubammo(item,1)
 				end
 			end
@@ -460,11 +502,7 @@ end
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 						bullet.Num = 1
-						if self.Owner:GetVelocity():LengthSqr() < 20000 then
-							bullet.Spread = Vector(0.055,0.055,0)
-						else
-							bullet.Spread = Vector(0.155,0.155,0)
-						end
+						bullet.Spread = self.Owner:GetVelocity():LengthSqr() < WALK_SPEED and Vector(0.055,0.055,0) or Vector(0.155,0.155,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 40
@@ -473,16 +511,15 @@ end
 				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
 				bullet.Src = self.Owner:GetShootPos()
 				bullet.Dir = self:GetAimVector()
-				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+				if SERVER or not game.SinglePlayer() then
 					self.Owner:FireBullets(bullet)
 				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_Colt.Shoot")
 				self.nextfireearly = CurTime()+0.1
-				if CLIENT then
-					dodsshelleject(self,"small")
-				else
+				dodsshelleject(self,"small")
+				if SERVER then
 					return self:TakeSubammo(item,1)
 				end
 			end
@@ -591,8 +628,8 @@ end
 					if overheated == false then
 						local bullet = {}
 							bullet.Num = 1
-							if self.Owner:GetVelocity():LengthSqr() < 20000 then
-								if self.Owner:Crouching() and self.Owner:GetVelocity():LengthSqr() < 800 then --900 would be crouching with walk key held
+							if self.Owner:GetVelocity():LengthSqr() < WALK_SPEED then
+								if self.Owner:Crouching() and self.Owner:GetVelocity():LengthSqr() < PRONE_SPEED then
 									bullet.Spread = Vector(0.1,0.1,0) --"true" spread for bipod is .025 in DoD, but this player has a lot more freedom of movement and can aim anywhere
 									if CLIENT then self.Owner:SetEyeAngles((vector_up*0.01+self:GetAimVector()):Angle()) end
 								else
@@ -611,13 +648,13 @@ end
 							bullet.Dir = self:GetAimVector()
 						--self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true) --TODO: DoD:S viewpunch
 						self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
-						if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						if SERVER or not game.SinglePlayer() then
 							self.Owner:FireBullets(bullet)
 						end
 						self:MuzzleFlash2()
 						self.Owner:SetAnimation(PLAYER_ATTACK1)
+						dodsshelleject(self)
 						if CLIENT then
-							dodsshelleject(self)
 							hook.Add("ScavScreenDrawOverridePost","Cooldown",function()
 								surface.SetDrawColor(0,0,0)
 								surface.DrawOutlinedRect(75,78,106,14,2)
@@ -685,11 +722,7 @@ end
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
 						bullet.Num = 1
-						if self.Owner:GetVelocity():LengthSqr() < 20000 then
-							bullet.Spread = Vector(0.055,0.055,0)
-						else
-							bullet.Spread = Vector(0.155,0.155,0)
-						end
+						bullet.Spread = self.Owner:GetVelocity():LengthSqr() < WALK_SPEED and Vector(0.055,0.055,0) or Vector(0.155,0.155,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 40
@@ -698,15 +731,14 @@ end
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_MP40.Shoot")
-					if CLIENT then
-						dodsshelleject(self,"small")
-					else
+					dodsshelleject(self,"small")
+					if SERVER then
 						self:TakeSubammo(item,1)
 					end
 				end
@@ -746,11 +778,7 @@ end
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
 						bullet.Num = 1
-						if self.Owner:GetVelocity():LengthSqr() < 20000 then
-							bullet.Spread = Vector(0.025,0.025,0)
-						else
-							bullet.Spread = Vector(0.125,0.125,0)
-						end
+						bullet.Spread = self.Owner:GetVelocity():LengthSqr() < WALK_SPEED and Vector(0.025,0.025,0) or Vector(0.125,0.125,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 50
@@ -759,15 +787,14 @@ end
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_MP44.Shoot")
-					if CLIENT then
-						dodsshelleject(self,"medium")
-					else
+					dodsshelleject(self,"medium")
+					if SERVER then
 						self:TakeSubammo(item,1)
 					end
 				end
@@ -805,11 +832,7 @@ end
 			tab.FireFunc = function(self,item)
 				local bullet = {}
 					bullet.Num = 1
-					if self.Owner:GetVelocity():LengthSqr() < 20000 then
-						bullet.Spread = Vector(0.055,0.055,0)
-					else
-						bullet.Spread = Vector(0.155,0.155,0)
-					end
+					bullet.Spread = self.Owner:GetVelocity():LengthSqr() < WALK_SPEED and Vector(0.055,0.055,0) or Vector(0.155,0.155,0)
 					bullet.Tracer = 1
 					bullet.Force = 5
 					bullet.Damage = 40
@@ -818,16 +841,17 @@ end
 					bullet.Dir = self:GetAimVector()
 				self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.2)
 				if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-				if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+				if SERVER or not game.SinglePlayer() then
 					self.Owner:FireBullets(bullet)
 				end
 				self:MuzzleFlash2()
 				self.Owner:SetAnimation(PLAYER_ATTACK1)
 				self.Owner:EmitSound("Weapon_Luger.Shoot")
 				self.nextfireearly = CurTime()+0.1
-				if CLIENT then
-					dodsshelleject(self,"small")
-				else return self:TakeSubammo(item,1) end
+				dodsshelleject(self,"small")
+				if SERVER then
+					return self:TakeSubammo(item,1)
+				end
 			end
 			if SERVER then
 				ScavData.CollectFuncs["models/weapons/w_p38.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),8,0) end
@@ -849,11 +873,7 @@ end
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
 						bullet.Num = 1
-						if self.Owner:GetVelocity():LengthSqr() < 20000 then
-							bullet.Spread = Vector(0.055,0.055,0)
-						else
-							bullet.Spread = Vector(0.155,0.155,0)
-						end
+						bullet.Spread = self.Owner:GetVelocity():LengthSqr() < WALK_SPEED and Vector(0.055,0.055,0) or Vector(0.155,0.155,0)
 						bullet.Tracer = 1
 						bullet.Force = 5
 						bullet.Damage = 40
@@ -862,15 +882,14 @@ end
 						bullet.Dir = self:GetAimVector()
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
 					if CLIENT then self.Owner:SetEyeAngles((vector_up*0.05+self:GetAimVector()):Angle()) end
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound("Weapon_Thompson.Shoot")
-					if CLIENT then
-						dodsshelleject(self,"small")
-					else
+					dodsshelleject(self,"small")
+					if SERVER then
 						self:TakeSubammo(item,1)
 					end
 				end

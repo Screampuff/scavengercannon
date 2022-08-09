@@ -1403,10 +1403,12 @@ if CLIENT then
 		if not IsValid(self) then return end
 		self:DestroyWModel()
 		self.wmodel = ClientsideModel(self.WorldModel, RENDERGROUP_OPAQUE)
-		self.wmodel:SetParent(self:GetOwner()) --just a heads up, if you parent it to the weapon its pose parameters won't work because of bonemerging to existing bones
-		local meffects = bit.bor(EF_BONEMERGE,EF_NODRAW,EF_NOSHADOW)
-		self.wmodel:AddEffects(meffects)
-		self.wmodel:SetSkin(self:GetSkin())
+		if IsValid(self.wmodel) then
+			self.wmodel:SetParent(self:GetOwner()) --just a heads up, if you parent it to the weapon its pose parameters won't work because of bonemerging to existing bones
+			local meffects = bit.bor(EF_BONEMERGE,EF_NODRAW,EF_NOSHADOW)
+			self.wmodel:AddEffects(meffects)
+			self.wmodel:SetSkin(self:GetSkin())
+		end
 	end
 
 	function SWEP:DrawWorldModel()
