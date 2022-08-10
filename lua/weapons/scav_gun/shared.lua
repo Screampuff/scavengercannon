@@ -1466,8 +1466,10 @@ if CLIENT then
 		"#scav.scavtips.inf",
 		"#scav.scavtips.passive",
 		"#scav.scavtips.acid2",
+		"#scav.scavtips.physshotgun",
 		"#scav.scavtips.rocketjump",
 		"#scav.scavtips.superphysjump",
+		"#scav.scavtips.flamethrowerjump",
 		"#scav.scavtips.shower",
 		"#scav.scavtips.crossfire"
 	}
@@ -1968,36 +1970,49 @@ if SERVER then
 		number = number or 1
 
 		--subammo stacking handling
-
 		local subammocounts = {}
-
 		for i=1,number do
-
 			subammocounts[i] = subammo
-
 			for k,v in ipairs(self.inv.items) do
+				if ScavData.models[v.ammo] and ScavData.models[modelname] then
+					local maxammo = ScavData.models[v.ammo].MaxAmmo or ScavData.models[v.ammo].GetMaxAmmo(wep,data)
+					local identify = ScavData.models[v.ammo].Identify or false
 
-				local maxammo = false
-				if ScavData.models[v.ammo] then
-					maxammo = ScavData.models[v.ammo].MaxAmmo
-				end
-
-				--TODO: currently, only exact model matches work. Want to eventually allow them to be added to other models with the same functionality
-				if v.ammo == modelname and v.data == data and maxammo and --items are the same, and have a max subammo amount defined
-				v.subammo < maxammo and --the item's subammo is less than its max
-				v.subammo ~= SCAV_SHORT_MAX and subammo ~= SCAV_SHORT_MAX then --neither item is infinite uses
-
-					local maxtoadd = maxammo - v.subammo
-
-					if subammocounts[i] > 0 then
-						v:SetSubammo(math.min(maxammo, v.subammo + subammocounts[i]))
+					--most of this is for the couple models that have different firemodes depending on skins
+					local itemtab = ScavData.models[v.ammo]
+					local vname = nil
+					if itemtab then
+						if itemtab.Name then
+							vname = itemtab.Name
+						elseif itemtab.GetName then
+							vname = itemtab.GetName(wep,v)
+						end
 					end
-					subammocounts[i] = subammocounts[i] - maxtoadd
+					itemtab = ScavData.models[modelname]
+					local modelnamename = nil
+					if itemtab then
+						if itemtab.Name then
+							modelnamename = itemtab.Name
+						elseif itemtab.GetName then
+							modelnamename = itemtab.GetName(wep,data)
+						end
+					end
 
+					if vname and modelnamename and vname == modelnamename and									--firemodes are the same,
+						((identify and identify[v.ammo] == ScavData.models[modelname].Identify[modelname]) or	--items have identify tables that match, or...
+						(not identify and v.ammo == modelname)) and	 											--...no identify table but the same models,
+						maxammo and v.subammo < maxammo and														--items have max ammo values, and the item can still be added to,
+						v.subammo ~= SCAV_SHORT_MAX and subammo ~= SCAV_SHORT_MAX then							--neither item is infinite uses
+
+						local maxtoadd = maxammo - v.subammo
+
+						if subammocounts[i] > 0 then
+							v:SetSubammo(math.min(maxammo, v.subammo + subammocounts[i]))
+						end
+						subammocounts[i] = subammocounts[i] - maxtoadd
+					end
 				end
-
 			end
-
 		end
 	
 		local availableslots = self:GetCapacity() - self.inv:GetItemCount()
