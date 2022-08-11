@@ -88,6 +88,8 @@ local PRONE_SPEED = 800 --900 would be crouching with walk key held
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 300
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
@@ -278,6 +280,8 @@ local PRONE_SPEED = 800 --900 would be crouching with walk key held
 			tab.Name = "#scav.scavcan.kar98"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 15
 			tab.FireFunc = function(self,item)
 				local bullet = {}
@@ -498,6 +502,8 @@ local PRONE_SPEED = 800 --900 would be crouching with walk key held
 			tab.Name = "#scav.scavcan.m1911"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 21
 			tab.FireFunc = function(self,item)
 				local bullet = {}
@@ -544,6 +550,8 @@ local PRONE_SPEED = 800 --900 would be crouching with walk key held
 			tab.anim = ACT_VM_FIDGET
 			tab.chargeanim = ACT_VM_IDLE
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 500
 			tab.Heat = 0
 			tab.Overheated = false

@@ -79,6 +79,8 @@ local eject = "brass"
 			PrecacheParticleSystem("scav_exp_smoke_1")
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 7
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 3
 			if SERVER then
 				tab.FireFunc = function(self,item)
@@ -191,6 +193,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.ak47"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
@@ -327,6 +331,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.awp"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 40
 			
 				local bullet = {}
@@ -386,6 +392,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.deagle"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 42
 			local bullet = {}
 					bullet.Num = 1
@@ -440,6 +448,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.elites"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 150
 			local bullet = {}
 					bullet.Num = 1
@@ -698,6 +708,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.glock"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 140
 			local bullet = {}
 					bullet.Num = 1
@@ -803,6 +815,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m4a1"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
@@ -939,6 +953,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m249"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 300
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
@@ -1011,6 +1027,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.mac10"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 130
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
@@ -1083,6 +1101,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.mp5"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 150
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
@@ -1153,6 +1173,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.p228"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 65
 			local bullet = {}
 					bullet.Num = 1
@@ -1210,6 +1232,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.scoutsnipe"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 100
 			
 				local bullet = {}
@@ -1267,6 +1291,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.sg550"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
@@ -1336,6 +1362,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.sg552"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
@@ -1670,6 +1698,8 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.xm1014"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 39
 			local bullet = {}
 					bullet.Num = 6
@@ -1728,6 +1758,8 @@ local eject = "brass"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.chargeanim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 420
 				local bullet = {}
 					bullet.Num = 1
@@ -1759,7 +1791,7 @@ local eject = "brass"
 				end
 				tab.FireFunc = function(self,item)
 					item.shotsleft = 3
-					self:SetChargeAttack(ScavData.models["models/w_models/weapons/w_desert_rifle.mdl"].ChargeAttack,item)
+					self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 					return false
 				end
 			if SERVER then

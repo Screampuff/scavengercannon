@@ -19,6 +19,8 @@ util.PrecacheModel("models/scav/shells/shell_shotgun_tf2.mdl")
 util.PrecacheModel("models/scav/shells/shell_sniperrifle_tf2.mdl")
 util.PrecacheModel("models/scav/shells/shell_minigun_tf2.mdl")
 tf2shelleject = function(self,shelltype)
+	if not IsValid(self) then return end
+	if not IsValid(self.Owner) then return end
 	if not self.Owner:GetViewModel() then return end
 	if not game.SinglePlayer() and CLIENT then
 		local shell = shelltype or "pistol"
@@ -189,7 +191,10 @@ end
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_dumpster_device/c_dumpster_device.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_blackbox/c_blackbox.mdl"]
 				ScavData.CollectFuncs["models/weapons/c_models/c_liberty_launcher/c_liberty_launcher.mdl"] = function(self,ent) self:AddItem("models/weapons/w_models/w_rocket.mdl",5,0,1) end --5 rockets from Libery Launcher
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_liberty_launcher/c_liberty_launcher.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_liberty_launcher/c_liberty_launcher.mdl"]
-				ScavData.CollectFuncs["models/buildables/sentry3.mdl"] = function(self,ent) self:AddItem("models/buildables/sentry3_rockets.mdl",1,0) end --1 rocket from TF2 sentry (level 3)
+				ScavData.CollectFuncs["models/buildables/sentry3.mdl"] = function(self,ent) --4 rockets, 1 sentry from TF2 sentry (level 3)
+					self:AddItem("models/buildables/sentry3_rockets.mdl",4,0)
+					self:AddItem("models/buildables/sentry2.mdl",100,ent:GetSkin())
+				end
 				ScavData.CollectFuncs["models/weapons/c_models/c_drg_cowmangler/c_drg_cowmangler.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_rocketlauncher.mdl"]
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_drg_cowmangler/c_drg_cowmangler.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_rocketlauncher.mdl"]
 				ScavData.CollectFuncs["models/pickups/pickup_powerup_supernova.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_rocketlauncher.mdl"]
@@ -1695,7 +1700,7 @@ end
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_drg_pomson/c_drg_pomson.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),4,0) end
 				ScavData.CollectFuncs["models/weapons/c_models/c_drg_righteousbison/c_drg_righteousbison.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_drg_pomson/c_drg_pomson.mdl"]
 				ScavData.CollectFuncs["models/workshop/weapons/c_models/c_drg_righteousbison/c_drg_righteousbison.mdl"] = ScavData.CollectFuncs["models/weapons/c_models/c_drg_pomson/c_drg_pomson.mdl"]
-				ScavData.CollectFuncs["models/weapons/w_models/w_sapper.mdl"] = function(self,ent) self:AddItem(self.christmas and "models/weapons/c_models/c_sapper/c_sapper_xmas.mdl" or ScavData.FormatModelname(ent:GetModel()),8,math.floor(math.Rand(0,2))) end
+				ScavData.CollectFuncs["models/weapons/w_models/w_sapper.mdl"] = function(self,ent) self:AddItem(self.christmas and "models/weapons/c_models/c_sapper/c_sapper_xmas.mdl" or ScavData.FormatModelname(ent:GetModel()),8,math.random(0,1)) end
 				ScavData.CollectFuncs["models/weapons/w_models/w_sd_sapper.mdl"] = ScavData.CollectFuncs["models/weapons/w_stunbaton.mdl"]
 				ScavData.CollectFuncs["models/buildables/sd_sapper_dispenser.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sd_sapper.mdl"]
 				ScavData.CollectFuncs["models/workshop_partner/weapons/c_models/c_sd_sapper/c_sd_sapper.mdl"] = ScavData.CollectFuncs["models/weapons/w_models/w_sd_sapper.mdl"]
@@ -1790,6 +1795,9 @@ end
 			tab.chargeanim = nil
 			tab.RemoveOnCharge = false
 			tab.Level = 9
+			tab.MaxAmmo = 4
+			local identify = {} --all bfgs are the same
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			if SERVER then
 				tab.OnArmed = function(self,item,olditemname)
 					if item.ammo ~= olditemname then
@@ -1880,7 +1888,7 @@ end
 				return 0.025
 			end
 			tab.FireFunc = function(self,item)
-				self:SetChargeAttack(ScavData.models["models/props_vehicles/generatortrailer01.mdl"].ChargeAttack,item)
+				self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 				if SERVER then
 					self.Owner:EmitSound("HL1/ambience/particle_suck1.wav",100,200)
 					if not self.soundloops.bfgcharge then
@@ -1970,7 +1978,7 @@ end
 					end
 					self.soundloops.cannon:Play()
 				end
-				self:SetChargeAttack(ScavData.models["models/props_phx/cannonball.mdl"].ChargeAttack,item)
+				self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 				return false
 			end
 			if SERVER then
@@ -2312,7 +2320,7 @@ end
 						tracep.endpos = self.Owner:GetShootPos()+self:GetAimVector()*1024
 						tracep.filter = self.Owner
 						local tr = util.TraceHull(tracep)
-					self:SetChargeAttack(ScavData.models["models/props_wasteland/cranemagnet01a.mdl"].ChargeAttack,item)
+					self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 					if tr.Hit and ((tr.MatType == MAT_METAL) or (tr.MatType == MAT_GRATE)) then
 						if not IsValid(tr.Entity) then
 							tr.Entity = game.GetWorld()
@@ -2391,7 +2399,7 @@ end
 					return 0.01
 				end
 				tab.FireFunc = function(self,item)
-					self:SetChargeAttack(ScavData.models["models/props_wasteland/cranemagnet01a.mdl"].ChargeAttack,item)
+					self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 					return false
 				end
 			end
@@ -2626,7 +2634,7 @@ end
 				ScavData.CollectFuncs["models/props_badlands/barrel01.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),2,ent:GetSkin()) end
 				ScavData.CollectFuncs["models/props_hydro/water_barrel_cluster2.mdl"] = function(self,ent) self:AddItem("models/props_badlands/barrel01.mdl",10,0) self:AddItem("models/props_badlands/barrel01.mdl",6,0) end --eight barrels (x2 ea) from clusters
 				ScavData.CollectFuncs["models/props_hydro/water_barrel_cluster3.mdl"] = ScavData.CollectFuncs["models/props_hydro/water_barrel_cluster2.mdl"]
-				ScavData.CollectFuncs["models/weapons/c_models/urinejar.mdl"] = function(self,ent) self:AddItem(self.christmas and "models/weapons/c_models/c_xms_urinejar.mdl" or ScavData.FormatModelname(ent:GetModel()),1,math.floor(math.Rand(0,2)),1) end
+				ScavData.CollectFuncs["models/weapons/c_models/urinejar.mdl"] = function(self,ent) self:AddItem(self.christmas and "models/weapons/c_models/c_xms_urinejar.mdl" or ScavData.FormatModelname(ent:GetModel()),1,math.random(0,1),1) end
 				--L4D/2
 				ScavData.CollectFuncs["models/infected/boomer.mdl"] = function(self,ent) self:AddItem(IsMounted(550) --[[L4D2]] and "models/w_models/weapons/w_eq_bile_flask.mdl" or ScavData.FormatModelname(ent:GetModel()),3,0) end --three boomer biles from a boomer/boomette
 				ScavData.CollectFuncs["models/props_debris/dead_cow_smallpile.mdl"] = function(self,ent) self:AddItem("models/props_debris/dead_cow.mdl",1,ent:GetSkin(),4) end
@@ -3192,13 +3200,13 @@ end
 						ef:SetAttachment(att)
 					util.Effect("ef_scav_muzzlesplash",ef)
 					if totalStatuses > 0 then
-						self:EmitSound("ambient/water/rain_drip"..math.floor(math.Rand(1,5))..".wav",75,140,0.25)
+						self:EmitSound("ambient/water/rain_drip"..math.random(1,4)..".wav",75,140,0.25)
 					end
 					local continuefiring = self:ProcessLinking(item) and self:StopChargeOnRelease()
 					if not continuefiring then
 						if SERVER then
 							self.soundloops.showerrun:Stop()
-							self.Owner:EmitSound("ambient/water/rain_drip"..math.floor(math.Rand(1,5))..".wav",75,100,0.5)
+							self.Owner:EmitSound("ambient/water/rain_drip"..math.random(1,4)..".wav",75,100,0.5)
 							self:SetChargeAttack()
 							self:SetBarrelRestSpeed(0)
 						else
@@ -3211,7 +3219,7 @@ end
 					end
 				end
 				tab.FireFunc = function(self,item)
-					self:SetChargeAttack(ScavData.models["models/props_wasteland/shower_system001a.mdl"].ChargeAttack,item)
+					self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 					if SERVER then
 						self.Owner:EmitSound("buttons/lever2.wav")
 						self.soundloops.showerrun = CreateSound(self.Owner,"ambient/water/water_run1.wav")
@@ -3335,7 +3343,7 @@ end
 					tab.Cooldown = 2
 					if SERVER then
 						self.Owner:SetHealth(math.min(self.Owner:GetMaxHealth(),self.Owner:Health()+50))
-						self.Owner:EmitSound(IsMounted(440) --[[TF2]] and "vo/SandwichEat09.mp3" or "physics/flesh/flesh_squishy_impact_hard"..math.floor(math.Rand(1,5))..".wav",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound(IsMounted(440) --[[TF2]] and "vo/SandwichEat09.mp3" or "physics/flesh/flesh_squishy_impact_hard"..math.random(1,4)..".wav",75,100,1,CHAN_VOICE)
 						return self:TakeSubammo(item,1)
 					end
 				end
@@ -3344,8 +3352,8 @@ end
 				--CSS
 				ScavData.CollectFuncs["models/props/cs_italy/bananna_bunch.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),5,0) end
 				--TF2
-				ScavData.CollectFuncs["models/weapons/c_models/c_sandwich/c_sandwich.mdl"] = function(self,ent) self:AddItem(self.christmas and "models/weapons/c_models/c_sandwich/c_sandwich_xmas.mdl" or ScavData.FormatModelname(ent:GetModel()),1,math.floor(math.Rand(0,2)),1) end
-				ScavData.CollectFuncs["models/items/plate.mdl"] = function(self,ent) self:AddItem(self.christmas and "models/items/plate_sandwich_xmas.mdl" or ScavData.FormatModelname(ent:GetModel()),1,math.floor(math.Rand(0,2)),1) end
+				ScavData.CollectFuncs["models/weapons/c_models/c_sandwich/c_sandwich.mdl"] = function(self,ent) self:AddItem(self.christmas and "models/weapons/c_models/c_sandwich/c_sandwich_xmas.mdl" or ScavData.FormatModelname(ent:GetModel()),1,math.random(0,1),1) end
+				ScavData.CollectFuncs["models/items/plate.mdl"] = function(self,ent) self:AddItem(self.christmas and "models/items/plate_sandwich_xmas.mdl" or ScavData.FormatModelname(ent:GetModel()),1,math.random(0,1),1) end
 			end
 		ScavData.RegisterFiremode(tab,"models/food/burger.mdl")
 		ScavData.RegisterFiremode(tab,"models/food/hotdog.mdl")
@@ -3428,7 +3436,7 @@ end
 						end,
 						[1] = function(self)
 							self.Owner:InflictStatusEffect("DamageX",15,1.5)
-							self.Owner:EmitSound("ambient/lair/yeti_statue_growl".. math.floor(math.Rand(1,7)) ..".wav",75,100,1,CHAN_VOICE)
+							self.Owner:EmitSound("ambient/lair/yeti_statue_growl"..math.random(1,6)..".wav",75,100,1,CHAN_VOICE)
 						end,
 					}
 					if IsValid(self.Owner) then itemfx[tab.Identify[item.ammo]](self) end
@@ -3436,7 +3444,7 @@ end
 				end
 				--TF2
 				ScavData.CollectFuncs["models/props_island/steroid_drum_cluster.mdl"] = function(self,ent) self:AddItem("models/props_island/steroid_drum.mdl",1,0,8) end
-				ScavData.CollectFuncs["models/weapons/c_models/c_buffpack/c_buffpack.mdl"] = function(self,ent) self:AddItem(self.christmas and "models/weapons/c_models/c_buffpack/c_buffpack_xmas.mdl" or ScavData.FormatModelname(ent:GetModel()),1,math.floor(math.Rand(0,2))) end
+				ScavData.CollectFuncs["models/weapons/c_models/c_buffpack/c_buffpack.mdl"] = function(self,ent) self:AddItem(self.christmas and "models/weapons/c_models/c_buffpack/c_buffpack_xmas.mdl" or ScavData.FormatModelname(ent:GetModel()),1,math.random(0,1)) end
 			end
 			tab.Cooldown = 2
 		ScavData.RegisterFiremode(tab,"models/weapons/w_package.mdl")
@@ -3518,7 +3526,7 @@ end
 					elseif SERVER then
 						self.Owner:SetHealth(math.min(self.Owner:GetMaxHealth(),self.Owner:Health()+25))
 						self.Owner:InflictStatusEffect("Radiation",-5,-1,self.Owner)
-						self.Owner:EmitSound(tab.Identify[item.ammo] == 1 and "player/whiskey_glug"..math.floor(math.Rand(1,5))..".wav" or "ambient/levels/canals/toxic_slime_gurgle4.wav",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound(tab.Identify[item.ammo] == 1 and "player/whiskey_glug"..math.random(1,4)..".wav" or "ambient/levels/canals/toxic_slime_gurgle4.wav",75,100,1,CHAN_VOICE)
 						self.Owner:InflictStatusEffect("Drunk",10,.25)
 						return self:TakeSubammo(item,1)
 					end
@@ -3532,16 +3540,14 @@ end
 				ScavData.CollectFuncs["models/weapons/w_whiskey.mdl"] = function(self,ent)
 					self:AddItem(ScavData.FormatModelname(ent:GetModel()),1,0,1)
 					local voice = {"voice","voice2","voice4"}
-					local rand = math.floor(math.Rand(1,3))
-					self.Owner:EmitSound("player/" .. voice[math.floor(math.Rand(1,4))] .. "/whiskey_passwhiskey".. rand .. ".wav",75,100,1,CHAN_VOICE)
+					self.Owner:EmitSound("player/"..voice[math.random(3)].."/whiskey_passwhiskey"..math.random(2)..".wav",75,100,1,CHAN_VOICE)
 				end
 				ScavData.CollectFuncs["models/weapons/w_whiskey2.mdl"] = ScavData.CollectFuncs["models/weapons/w_whiskey.mdl"]
 				ScavData.CollectFuncs["models/items_fof/whiskey_world.mdl"] = ScavData.CollectFuncs["models/weapons/w_whiskey.mdl"]
 				ScavData.CollectFuncs["models/elpaso/barrel2.mdl"] = function(self,ent)
 					self:AddItem(ScavData.FormatModelname(math.random() < .5 and "models/weapons/w_whiskey.mdl" or "models/weapons/w_whiskey2.mdl"),5,0)
 					local voice = {"voice","voice2","voice4"}
-					local rand = math.floor(math.Rand(1,3))
-					self.Owner:EmitSound("player/" .. voice[math.floor(math.Rand(1,4))] .. "/howl_yeehaw".. rand .. ".wav",75,100,1,CHAN_VOICE)
+					self.Owner:EmitSound("player/" .. voice[math.random(3)].."/howl_yeehaw"..math.random(2)..".wav",75,100,1,CHAN_VOICE)
 				end
 				ScavData.CollectFuncs["models/elpaso/barrel2_small.mdl"] = ScavData.CollectFuncs["models/elpaso/barrel2.mdl"]
 			end
@@ -3642,7 +3648,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 				return 0.1
 			end
 			tab.FireFunc = function(self,item)
-				self:SetChargeAttack(ScavData.models["models/items/car_battery01.mdl"].ChargeAttack,item)
+				self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 				return false
 			end
 			if SERVER then
@@ -3780,7 +3786,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 				return 0.1
 			end
 			tab.FireFunc = function(self,item)
-				self:SetChargeAttack(ScavData.models["models/weapons/w_models/w_syringegun.mdl"].ChargeAttack,item)
+				self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 				return false
 			end
 			if SERVER then
@@ -4891,7 +4897,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					if IsValid(tr.Entity) then
 						--Okay, if I... if I chop you up in a meat grinder, and the only thing that comes out that's left of you is your eyeball, YOU'RE PROBABLY DEAD
 						if tr.Entity:Health() <= 4 then
-							if tab.Identify[item.ammo] == 1 and math.Rand(0,10) < 1 then
+							if tab.Identify[item.ammo] == 1 and math.random(10) == 1 then
 								if tr.Entity:IsNPC() or tr.Entity:IsPlayer() then
 									if (tr.Entity:GetBloodColor() == BLOOD_COLOR_RED or tr.Entity:GetBloodColor() == BLOOD_COLOR_ZOMBIE or tr.Entity:GetBloodColor() == BLOOD_COLOR_GREEN) then
 										tr.Entity:SetShouldServerRagdoll(false)
@@ -4973,9 +4979,9 @@ PrecacheParticleSystem("scav_exp_plasma")
 						edata:SetEntity(tr.Entity)
 						if tr.MatType == MAT_FLESH or tr.MatType == MAT_BLOODYFLESH or tr.MatType == MAT_ALIENFLESH or tr.MatType == MAT_ANTLION then
 							if tab.Identify[item.ammo] == 2 then
-								sound.Play("ambient/sawblade_impact"..math.floor(math.Rand(1,3))..".wav",tr.HitPos,75,100,0.25)
+								sound.Play("ambient/sawblade_impact"..math.random(2)..".wav",tr.HitPos,75,100,0.25)
 							else
-								sound.Play("npc/manhack/grind_flesh"..math.random(1,3)..".wav",tr.HitPos)
+								sound.Play("npc/manhack/grind_flesh"..math.random(3)..".wav",tr.HitPos)
 							end
 							--self.Owner:ViewPunch(Angle(math.Rand(-1,-3),0,0))
 							--if tr.MatType == MAT_FLESH or tr.MatType == MAT_BLOODYFLESH then
@@ -5540,7 +5546,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					return 0.025		
 				end
 			tab.FireFunc = function(self,item)
-				self:SetChargeAttack(ScavData.models["models/dav0r/hoverball.mdl"].ChargeAttack,item)
+				self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 				self.Owner:EmitSound("ambient/fire/gascan_ignite1.wav",100,90)
 				return false
 			end
@@ -5638,7 +5644,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 				end
 			end
 			tab.FireFunc = function(self,item)
-				self:SetChargeAttack(ScavData.models["models/weapons/w_models/w_minigun.mdl"].ChargeAttack,item)
+				self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 				if SERVER then
 					self.Owner:EmitSound("weapons/minigun_wind_up.wav")
 					self.soundloops.minigunspin = CreateSound(self.Owner,"weapons/minigun_spin.wav")
@@ -5735,7 +5741,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					end
 				end
 				ScavData.CollectFuncs["models/props/de_train/barrel.mdl"] = function(self,ent) if (ent:GetSkin() > 1) and (ent:GetSkin() < 7) then self:AddItem(ScavData.FormatModelname(ent:GetModel()),1,ent:GetSkin()) else self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,ent:GetSkin()) end end
-				ScavData.CollectFuncs["models/props/de_train/pallet_barrels.mdl"] = function(self,ent) self:AddItem("models/props/de_train/barrel.mdl",4,math.floor(math.Rand(2,6))) end
+				ScavData.CollectFuncs["models/props/de_train/pallet_barrels.mdl"] = function(self,ent) self:AddItem("models/props/de_train/barrel.mdl",4,math.random(2,5)) end
 			end
 			tab.Cooldown = 0.1
 			ScavData.RegisterFiremode(tab,"models/props/de_train/barrel.mdl")
@@ -6081,9 +6087,9 @@ PrecacheParticleSystem("scav_exp_plasma")
 					local choice = math.Rand(0,2)
 					local num = math.Rand(1,2)
 					if choice < 1 then
-						self:AddItem("models/w_models/weapons/w_eq_medkit.mdl",math.Round(num),0,1)
+						self:AddItem("models/w_models/weapons/w_eq_medkit.mdl",math.Round(num),0)
 					else
-						self:AddItem("models/w_models/weapons/w_eq_painpills.mdl",math.Round(num),0,1)
+						self:AddItem("models/w_models/weapons/w_eq_painpills.mdl",math.Round(num),0)
 					end
 				end
 				--CRATES
@@ -6112,7 +6118,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						function() self:AddItem("models/weapons/w_pistol.mdl",18,0) end,
 						function() self:AddItem("models/weapons/w_357.mdl",6,0) end,
 						function() self:AddItem("models/weapons/w_smg1.mdl",45,0) end,
-						function() self:AddItem("models/weapons/ar2_grenade.mdl",1,0) end,
+						function() self:AddItem("models/items/ar2_grenade.mdl",1,0) end,
 						function() self:AddItem("models/weapons/w_irifle.mdl",30,0) end,
 						function() self:AddItem("models/items/combine_rifle_ammo01.mdl",1,0) end,
 						function() self:AddItem("models/weapons/shotgun_shell.mdl",6,0) end,
@@ -6128,13 +6134,13 @@ PrecacheParticleSystem("scav_exp_plasma")
 						if self.Owner:Armor() * 3 <= self.Owner:GetMaxArmor() then
 							self:AddItem("models/items/battery.mdl",1,0)
 						end
-						for i=0,math.floor(math.Rand(0,3)) do
-							supplies[math.floor(math.Rand(1,#supplies+1))]()
+						for i=1,math.random(3) do
+							supplies[math.random(#supplies)]()
 						end
 						self.Owner:EmitSound("physics/wood/wood_box_break1.wav",75,math.Rand(90,120),.5)
 					else --Pot of Greed allows you to draw two cards
 						for i=1,2 do
-							supplies[math.floor(math.Rand(1,#supplies+1))]()
+							supplies[math.random(#supplies+1)]()
 						end
 						self.Owner:EmitSound("weapons/scav_gun/drawtwocards.wav",75)
 					end
@@ -6175,7 +6181,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						function() self:AddItem("models/weapons/w_pistol.mdl",18,0) end,
 						function() self:AddItem("models/weapons/w_357.mdl",6,0) end,
 						function() self:AddItem("models/weapons/w_smg1.mdl",45,0) end,
-						function() self:AddItem("models/weapons/ar2_grenade.mdl",1,0) end,
+						function() self:AddItem("models/items/ar2_grenade.mdl",1,0) end,
 						function() self:AddItem("models/weapons/w_irifle.mdl",30,0) end,
 						function() self:AddItem("models/items/combine_rifle_ammo01.mdl",1,0) end,
 						function() self:AddItem("models/weapons/shotgun_shell.mdl",6,0) end,
@@ -6198,8 +6204,8 @@ PrecacheParticleSystem("scav_exp_plasma")
 					if self.Owner:Armor() * 3 <= self.Owner:GetMaxArmor() then
 						self:AddItem("models/items/battery.mdl",1,0)
 					end
-					for i=0,math.floor(math.Rand(0,3)) do
-						supplies[math.floor(math.Rand(1,#supplies+1))]()
+					for i=1,math.random(3) do
+						supplies[math.random(#supplies)]()
 					end
 					self.Owner:EmitSound("vehicles/junker/radar_ping_friendly1.wav",75,100,.5)
 				end
@@ -6244,8 +6250,8 @@ PrecacheParticleSystem("scav_exp_plasma")
 						if self.Owner:Armor() * 3 <= self.Owner:GetMaxArmor() then
 							self:AddItem("models/pickups/pickup_powerup_defense.mdl",1,0)
 						end
-						for i=0,math.floor(math.Rand(0,3)) do
-							supplies[math.floor(math.Rand(1,#supplies+1))]()
+						for i=0,math.random(3) do
+							supplies[math.random(#supplies)]()
 						end
 						if ent:GetModel() == "models/props_halloween/halloween_gift.mdl" or
 							ent:GetModel() == "models/items/tf_gift.mdl" then
@@ -6255,7 +6261,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 						end
 					else
 						for i=1,2 do
-							supplies[math.floor(math.Rand(1,#supplies+1))]()
+							supplies[math.random(#supplies)]()
 						end
 						self.Owner:EmitSound("weapons/scav_gun/drawtwocards.wav",75)
 					end
@@ -6271,11 +6277,11 @@ PrecacheParticleSystem("scav_exp_plasma")
 				
 				--Give a random TF2 barrel from barrel crates
 				ScavData.CollectFuncs["models/props_mvm/barrel_crate.mdl"] = function(self,ent)
-					local choice = math.floor(math.Rand(0,10))
-					if choice == 0 then
+					local choice = math.random(10)
+					if choice == 1 then
 						self:AddItem("models/props_badlands/barrel01.mdl",2,0,1)
-					elseif choice == 1 then
-						self:AddItem("models/props_badlands/barrel03.mdl",10,math.floor(math.Rand(0,2)),1)
+					elseif choice == 2 then
+						self:AddItem("models/props_badlands/barrel03.mdl",10,math.random(0,1),1)
 					else
 						self:AddItem("models/props_hydro/water_barrel.mdl",1,0,1)
 					end
@@ -6284,56 +6290,54 @@ PrecacheParticleSystem("scav_exp_plasma")
 				--Uniform Locker (give us three random classes' stuff)
 				ScavData.CollectFuncs["models/props_gameplay/uniform_locker.mdl"] = function(self,ent)
 					local classpick = {
-						[0] = function()
+						[1] = function()
 							self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0)
 							self:AddItem("models/weapons/w_models/w_pistol.mdl",12,0)
 							self:AddItem("models/weapons/c_models/c_energy_drink/c_energy_drink.mdl",1,math.fmod(ent:GetSkin(),2)) end,
-						[1] = function()
+						[2] = function()
 							self:AddItem("models/weapons/w_models/w_rocket.mdl",4,0)
 							self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0)
 							self:AddItem("models/weapons/c_models/c_bugle/c_bugle.mdl",10,0) end,
-						[2] = function()
+						[3] = function()
 							self:AddItem("models/weapons/c_models/c_flamethrower/c_flamethrower.mdl",200,math.fmod(ent:GetSkin(),2))
 							self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0)
 							self:AddItem("models/weapons/w_models/w_flaregun_shell.mdl",5,math.fmod(ent:GetSkin(),2)) end,
-						[3] = function()
+						[4] = function()
 							self:AddItem("models/weapons/w_models/w_grenade_grenadelauncher.mdl",4,math.fmod(ent:GetSkin(),2))
 							self:AddItem("models/weapons/w_models/w_stickybomb.mdl",6,math.fmod(ent:GetSkin(),2))
 							self:AddItem("models/weapons/c_models/c_claymore/c_claymore.mdl",1,0) end,
-						[4] = function()
+						[5] = function()
 							self:AddItem("models/weapons/w_models/w_minigun.mdl",200,0)
 							self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0)
 							self:AddItem("models/weapons/c_models/c_sandwich/c_sandwich.mdl",1,0) end,
-						[5] = function()
+						[6] = function()
 							self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0)
 							self:AddItem("models/weapons/w_models/w_pistol.mdl",12,0)
 							self:AddItem("models/weapons/w_models/w_wrangler.mdl", SCAV_SHORT_MAX, math.fmod(ent:GetSkin(),2)) end,
-						[6] = function()
+						[7] = function()
 							self:AddItem("models/weapons/w_models/w_syringegun.mdl",40,ent:GetSkin())
 							self:AddItem("models/weapons/c_models/c_medigun/c_medigun.mdl", SCAV_SHORT_MAX, math.fmod(ent:GetSkin(),2))
 							self:AddItem("models/items/medkit_medium.mdl",1,0) end,
-						[7] = function()
-							local pickone = math.Rand(0,2)
-							if pickone < 1 then
+						[8] = function()
+							if math.random(2) == 1 then
 								self:AddItem("models/weapons/w_models/w_sniperrifle.mdl",25,0)
 							else
 								self:AddItem("models/weapons/w_models/w_arrow.mdl",3,0)
 							end
-							pickone = math.Rand(0,2)
-							if pickone < 1 then
+							if math.random(2) == 1 then
 								self:AddItem("models/weapons/w_models/w_smg.mdl",25,0)
 							else
 								self:AddItem("models/weapons/c_models/urinejar.mdl",1,0)
 							end
 							self:AddItem("models/weapons/c_models/c_machete/c_machete.mdl",1,0) end,
-						[8] = function()
+						[9] = function()
 							self:AddItem("models/weapons/w_357.mdl",6,0)
 							self:AddItem("models/weapons/w_models/w_sapper.mdl",8,0)
 							self:AddItem("models/weapons/w_models/w_knife.mdl",1,0)
 							self:AddItem("models/weapons/c_models/c_spy_watch.mdl",30,0) end 
 					}
 					for i=1,3 do
-						classpick[math.floor(math.Rand(0,9))]()
+						classpick[math.random(9)]()
 					end
 				end
 				
@@ -6384,11 +6388,11 @@ PrecacheParticleSystem("scav_exp_plasma")
 					self:AddItem("models/weapons/w_models/w_pistol.mdl",12,0)
 					self:AddItem("models/weapons/c_models/c_energy_drink/c_energy_drink.mdl",1,math.fmod(ent:GetSkin(),2))
 					if ScavData.FormatModelname(ent:GetModel()) == "models/bots/scout/bot_scout.mdl" then
-						self.Owner:EmitSound("vo/mvm/norm/scout_mvm_battlecry0".. math.floor(math.Rand(1,6)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/norm/scout_mvm_battlecry0"..math.random(5)..".mp3",75,100,1,CHAN_VOICE)
 					elseif ScavData.FormatModelname(ent:GetModel()) == "models/bots/scout_boss/bot_scout_boss.mdl" then
-						self.Owner:EmitSound("vo/mvm/mght/scout_mvm_m_battlecry0".. math.floor(math.Rand(1,6)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/mght/scout_mvm_m_battlecry0"..math.random(5)..".mp3",75,100,1,CHAN_VOICE)
 					else
-						self.Owner:EmitSound("vo/scout_battlecry0".. math.floor(math.Rand(1,6)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/scout_battlecry0"..math.random(5)..".mp3",75,100,1,CHAN_VOICE)
 					end
 				end
 				ScavData.CollectFuncs["models/player/hwm/scout.mdl"] = ScavData.CollectFuncs["models/player/scout.mdl"]
@@ -6401,11 +6405,11 @@ PrecacheParticleSystem("scav_exp_plasma")
 					self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0)
 					self:AddItem("models/weapons/c_models/c_bugle/c_bugle.mdl",10,0)
 					if ScavData.FormatModelname(ent:GetModel()) == "models/bots/soldier/bot_soldier.mdl" then
-						self.Owner:EmitSound("vo/mvm/norm/soldier_mvm_battlecry0".. math.floor(math.Rand(1,7)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/norm/soldier_mvm_battlecry0"..math.random(6)..".mp3",75,100,1,CHAN_VOICE)
 					elseif ScavData.FormatModelname(ent:GetModel()) == "models/bots/soldier_boss/bot_soldier_boss.mdl" then
-						self.Owner:EmitSound("vo/mvm/mght/soldier_mvm_m_battlecry0".. math.floor(math.Rand(1,7)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/mght/soldier_mvm_m_battlecry0"..math.random(6)..".mp3",75,100,1,CHAN_VOICE)
 					else
-						self.Owner:EmitSound("vo/soldier_battlecry0".. math.floor(math.Rand(1,7)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/soldier_battlecry0"..math.random(6)..".mp3",75,100,1,CHAN_VOICE)
 					end
 				end
 				ScavData.CollectFuncs["models/player/hwm/soldier.mdl"] = ScavData.CollectFuncs["models/player/soldier.mdl"]
@@ -6414,20 +6418,19 @@ PrecacheParticleSystem("scav_exp_plasma")
 				
 				--Pyro
 				ScavData.CollectFuncs["models/player/pyro.mdl"] = function(self,ent)
-					local pickone = math.Rand(0,2)
-					if pickone < 1 then
-						self:AddItem("models/weapons/c_models/c_flamethrower/c_flamethrower.mdl",200,math.fmod(ent:GetSkin(),2))
+					if math.random(2) == 1 then
+						self:AddItem("models/weapons/c_models/c_flamethrower/c_flamethrower.mdl",200,ent:GetSkin() % 2)
 					else
-						self:AddItem("models/weapons/c_models/c_flameball/c_flameball.mdl",40,math.fmod(ent:GetSkin(),2))
+						self:AddItem("models/weapons/c_models/c_flameball/c_flameball.mdl",40,ent:GetSkin() % 2)
 					end
 					self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0)
-					self:AddItem("models/weapons/w_models/w_flaregun_shell.mdl",5,math.fmod(ent:GetSkin(),2))
+					self:AddItem("models/weapons/w_models/w_flaregun_shell.mdl",5,ent:GetSkin() % 2)
 					if ScavData.FormatModelname(ent:GetModel()) == "models/bots/pyro/bot_pyro.mdl" then
-						self.Owner:EmitSound("vo/mvm/norm/pyro_mvm_battlecry0".. math.floor(math.Rand(1,3)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/norm/pyro_mvm_battlecry0"..math.random(2)..".mp3",75,100,1,CHAN_VOICE)
 					elseif ScavData.FormatModelname(ent:GetModel()) == "models/bots/pyro_boss/bot_pyro_boss.mdl" then
-						self.Owner:EmitSound("vo/mvm/mght/pyro_mvm_m_battlecry0".. math.floor(math.Rand(1,3)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/mght/pyro_mvm_m_battlecry0"..math.random(2)..".mp3",75,100,1,CHAN_VOICE)
 					else
-						self.Owner:EmitSound("vo/pyro_battlecry0".. math.floor(math.Rand(1,3)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/pyro_battlecry0"..math.random(2)..".mp3",75,100,1,CHAN_VOICE)
 					end
 				end
 				ScavData.CollectFuncs["models/player/hwm/pyro.mdl"] = ScavData.CollectFuncs["models/player/pyro.mdl"]
@@ -6436,20 +6439,19 @@ PrecacheParticleSystem("scav_exp_plasma")
 				
 				--Demoman
 				ScavData.CollectFuncs["models/player/demo.mdl"] = function(self,ent)
-					self:AddItem("models/weapons/w_models/w_grenade_grenadelauncher.mdl",4,math.fmod(ent:GetSkin(),2))
-					self:AddItem("models/weapons/w_models/w_stickybomb.mdl",6,math.fmod(ent:GetSkin(),2))
-					local pickone = math.Rand(0,2)
-					if pickone < 1 then
+					self:AddItem("models/weapons/w_models/w_grenade_grenadelauncher.mdl",4,ent:GetSkin() % 2)
+					self:AddItem("models/weapons/w_models/w_stickybomb.mdl",6,ent:GetSkin() % 2)
+					if math.random(2) == 1 then
 						self:AddItem("models/weapons/c_models/c_bottle/c_bottle.mdl",1,0)
 					else
 						self:AddItem("models/weapons/c_models/c_claymore/c_claymore.mdl",1,0)
 					end
 					if ScavData.FormatModelname(ent:GetModel()) == "models/bots/demo/bot_demo.mdl" then
-						self.Owner:EmitSound("vo/mvm/norm/demoman_mvm_battlecry0".. math.floor(math.Rand(1,8)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/norm/demoman_mvm_battlecry0"..math.random(7)..".mp3",75,100,1,CHAN_VOICE)
 					elseif ScavData.FormatModelname(ent:GetModel()) == "models/bots/demo_boss/bot_demo_boss.mdl" then
-						self.Owner:EmitSound("vo/mvm/mght/demoman_mvm_m_battlecry0".. math.floor(math.Rand(1,8)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/mght/demoman_mvm_m_battlecry0"..math.random(7)..".mp3",75,100,1,CHAN_VOICE)
 					else
-						self.Owner:EmitSound("vo/demoman_battlecry0".. math.floor(math.Rand(1,8)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/demoman_battlecry0"..math.random(7)..".mp3",75,100,1,CHAN_VOICE)
 					end
 				end
 				ScavData.CollectFuncs["models/player/hwm/demo.mdl"] = ScavData.CollectFuncs["models/player/demo.mdl"]
@@ -6462,11 +6464,11 @@ PrecacheParticleSystem("scav_exp_plasma")
 					self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0)
 					self:AddItem("models/weapons/c_models/c_sandwich/c_sandwich.mdl",1,0)
 					if ScavData.FormatModelname(ent:GetModel()) == "models/bots/heavy/bot_heavy.mdl" then
-						self.Owner:EmitSound("vo/mvm/norm/heavy_mvm_battlecry0".. math.floor(math.Rand(1,7)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/norm/heavy_mvm_battlecry0"..math.random(6)..".mp3",75,100,1,CHAN_VOICE)
 					elseif ScavData.FormatModelname(ent:GetModel()) == "models/bots/heavy_boss/bot_heavy_boss.mdl" then
-						self.Owner:EmitSound("vo/mvm/mght/heavy_mvm_m_battlecry0".. math.floor(math.Rand(1,7)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/mght/heavy_mvm_m_battlecry0"..math.random(6)..".mp3",75,100,1,CHAN_VOICE)
 					else
-						self.Owner:EmitSound("vo/heavy_battlecry0".. math.floor(math.Rand(1,7)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/heavy_battlecry0"..math.random(6)..".mp3",75,100,1,CHAN_VOICE)
 					end
 				end
 				ScavData.CollectFuncs["models/player/hwm/heavy.mdl"] = ScavData.CollectFuncs["models/player/heavy.mdl"]
@@ -6478,12 +6480,12 @@ PrecacheParticleSystem("scav_exp_plasma")
 					self:AddItem("models/weapons/shells/shell_shotgun.mdl",6,0)
 					self:AddItem("models/weapons/w_models/w_pistol.mdl",12,0)
 					self:AddItem("models/weapons/w_models/w_wrangler.mdl", SCAV_SHORT_MAX, math.fmod(ent:GetSkin(),2))
-					local voiceclipnum = math.floor(math.Rand(1,7))
+					local voiceclipnum = math.random(6)
 					if voiceclipnum > 1 then voiceclipnum = voiceclipnum + 1 end --no engineer_battlecry02.mp3
 					if ScavData.FormatModelname(ent:GetModel()) == "models/bots/engineer/bot_engineer.mdl" then
-						self.Owner:EmitSound("vo/mvm/norm/engineer_mvm_battlecry0".. voiceclipnum ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/norm/engineer_mvm_battlecry0"..voiceclipnum..".mp3",75,100,1,CHAN_VOICE)
 					else
-						self.Owner:EmitSound("vo/engineer_battlecry0".. voiceclipnum ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/engineer_battlecry0"..voiceclipnum..".mp3",75,100,1,CHAN_VOICE)
 					end
 				end
 				ScavData.CollectFuncs["models/player/hwm/engineer.mdl"] = ScavData.CollectFuncs["models/player/engineer.mdl"]
@@ -6495,9 +6497,9 @@ PrecacheParticleSystem("scav_exp_plasma")
 					self:AddItem("models/weapons/c_models/c_medigun/c_medigun.mdl", SCAV_SHORT_MAX, math.fmod(ent:GetSkin(),2))
 					self:AddItem("models/items/medkit_medium.mdl",1,0)
 					if ScavData.FormatModelname(ent:GetModel()) == "models/bots/medic/bot_medic.mdl" then
-						self.Owner:EmitSound("vo/mvm/norm/medic_mvm_battlecry0".. math.floor(math.Rand(1,7)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/norm/medic_mvm_battlecry0"..math.random(6)..".mp3",75,100,1,CHAN_VOICE)
 					else
-						self.Owner:EmitSound("vo/medic_battlecry0".. math.floor(math.Rand(1,7)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/medic_battlecry0"..math.random(6)..".mp3",75,100,1,CHAN_VOICE)
 					end
 				end
 				ScavData.CollectFuncs["models/player/hwm/medic.mdl"] = ScavData.CollectFuncs["models/player/medic.mdl"]
@@ -6519,9 +6521,9 @@ PrecacheParticleSystem("scav_exp_plasma")
 					end
 					self:AddItem("models/weapons/c_models/c_machete/c_machete.mdl",1,0)
 					if ScavData.FormatModelname(ent:GetModel()) == "models/bots/sniper/bot_sniper.mdl" then
-						self.Owner:EmitSound("vo/mvm/norm/sniper_mvm_battlecry0".. math.floor(math.Rand(1,7)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/norm/sniper_mvm_battlecry0"..math.random(6)..".mp3",75,100,1,CHAN_VOICE)
 					else
-						self.Owner:EmitSound("vo/sniper_battlecry0".. math.floor(math.Rand(1,7)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/sniper_battlecry0"..math.random(6)..".mp3",75,100,1,CHAN_VOICE)
 					end
 				end
 				ScavData.CollectFuncs["models/player/hwm/sniper.mdl"] = ScavData.CollectFuncs["models/player/sniper.mdl"]
@@ -6534,9 +6536,9 @@ PrecacheParticleSystem("scav_exp_plasma")
 					self:AddItem("models/weapons/w_models/w_knife.mdl",1,0)
 					self:AddItem("models/weapons/c_models/c_spy_watch.mdl",30,0)
 					if ScavData.FormatModelname(ent:GetModel()) == "models/bots/spy/bot_spy.mdl" then
-						self.Owner:EmitSound("vo/mvm/norm/spy_mvm_battlecry0".. math.floor(math.Rand(1,5)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/mvm/norm/spy_mvm_battlecry0"..math.random(4)..".mp3",75,100,1,CHAN_VOICE)
 					else
-						self.Owner:EmitSound("vo/spy_battlecry0".. math.floor(math.Rand(1,5)) ..".mp3",75,100,1,CHAN_VOICE)
+						self.Owner:EmitSound("vo/spy_battlecry0"..math.random(4)..".mp3",75,100,1,CHAN_VOICE)
 					end
 				end
 				ScavData.CollectFuncs["models/player/hwm/spy.mdl"] = ScavData.CollectFuncs["models/player/spy.mdl"]

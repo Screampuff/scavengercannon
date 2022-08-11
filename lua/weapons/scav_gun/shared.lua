@@ -1975,7 +1975,10 @@ if SERVER then
 			subammocounts[i] = subammo
 			for k,v in ipairs(self.inv.items) do
 				if ScavData.models[v.ammo] and ScavData.models[modelname] then
-					local maxammo = ScavData.models[v.ammo].MaxAmmo or ScavData.models[v.ammo].GetMaxAmmo(wep,data)
+					local maxammo = nil
+					if ScavData.models[v.ammo].MaxAmmo then
+						maxammo = ScavData.models[v.ammo].MaxAmmo or ScavData.models[v.ammo].GetMaxAmmo(wep,data)
+					end
 					local identify = ScavData.models[v.ammo].Identify or false
 
 					--most of this is for the couple models that have different firemodes depending on skins
