@@ -14,7 +14,7 @@ local dodsshelleject = function(self,shellsize)
 			attach = self:GetAttachment(self:LookupAttachment(eject))
 		end
 		if attach then
-			local brass = ents.CreateClientProp("models/scav/shells/shell_".. size ..".mdl")
+			local brass = ents.CreateClientProp("models/scav/shells/shell_"..size..".mdl")
 			if IsValid(brass) then
 				brass:SetPos(attach.Pos)
 				brass:SetAngles(attach.Ang)
@@ -45,7 +45,7 @@ local dodsshelleject = function(self,shellsize)
 		if attach then
 			local brass = ents.Create("prop_physics")
 			if IsValid(brass) then
-				brass:SetModel("models/scav/shells/shell_".. size ..".mdl")
+				brass:SetModel("models/scav/shells/shell_"..size..".mdl")
 				brass:PhysicsInit(SOLID_VPHYSICS)
 				brass:SetPos(attach.Pos)
 				brass:SetAngles(attach.Ang)
@@ -56,9 +56,9 @@ local dodsshelleject = function(self,shellsize)
 				brass:Spawn()
 				brass:DrawShadow(false)
 				brass.NoScav = true
-				if CLIENT then
-					brass:SetupBones()
-				end
+				-- if CLIENT then
+				-- 	brass:SetupBones()
+				-- end
 				local angShellAngles = self.Owner:EyeAngles()
 				--angShellAngles:RotateAroundAxis(Vector(0,0,1),90)
 				local vecShellVelocity = self.Owner:GetAbsVelocity()

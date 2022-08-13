@@ -18,6 +18,7 @@ util.PrecacheModel("models/scav/shells/shell_pistol_tf2.mdl")
 util.PrecacheModel("models/scav/shells/shell_shotgun_tf2.mdl")
 util.PrecacheModel("models/scav/shells/shell_sniperrifle_tf2.mdl")
 util.PrecacheModel("models/scav/shells/shell_minigun_tf2.mdl")
+
 tf2shelleject = function(self,shelltype)
 	if not IsValid(self) then return end
 	if not IsValid(self.Owner) then return end
@@ -26,7 +27,7 @@ tf2shelleject = function(self,shelltype)
 		local shell = shelltype or "pistol"
 		local attach = self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment(eject))
 		if attach then
-			local brass = ents.CreateClientProp("models/scav/shells/shell_" .. shell .."_tf2.mdl")
+			local brass = ents.CreateClientProp("models/scav/shells/shell_"..shell.."_tf2.mdl")
 			if IsValid(brass) then
 				brass:SetPos(attach.Pos)
 				brass:SetAngles(attach.Ang)
@@ -58,7 +59,7 @@ tf2shelleject = function(self,shelltype)
 		if attach then
 			local brass = ents.Create("prop_physics")
 			if IsValid(brass) then
-				brass:SetModel("models/scav/shells/shell_" .. shell .."_tf2.mdl")
+				brass:SetModel("models/scav/shells/shell_"..shell.."_tf2.mdl")
 				brass:PhysicsInit(SOLID_VPHYSICS)
 				brass:SetPos(attach.Pos)
 				brass:SetAngles(attach.Ang)
@@ -658,7 +659,7 @@ end
 					return self:TakeSubammo(item,1)
 				end
 				ScavData.CollectFuncs["models/props_interiors/vendingmachinesoda01a.mdl"] = function(self,ent) --nine grenades + door from vending machine
-					self:AddItem("models/props_junk/popcan01a.mdl",9,math.random(0,2),0)
+					self:AddItem("models/props_junk/popcan01a.mdl",9,math.random(0,2))
 					self:AddItem("models/props_interiors/VendingMachineSoda01a_door.mdl",1,0)
 				end
 				--CSS
