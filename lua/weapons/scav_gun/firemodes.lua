@@ -546,7 +546,7 @@ end
 		ScavData.RegisterFiremode(tab,"models/crossbow_bolt.mdl")
 		ScavData.RegisterFiremode(tab,"models/props_junk/harpoon002a.mdl")
 		ScavData.RegisterFiremode(tab,"models/mixerman3d/other/arrow.mdl")
-		ScavData.RegisterFiremode(tab,"models/props_c17/trappropeller_blade.mdl")
+		ScavData.RegisterFiremode(tab,"models/props_c17/trappropeller_blade.mdl") --TODO: make its own entity? needs to spiIiIiIin. Also, on occassion when fired in tight quarters, doesn't render?
 		--Ep2
 		ScavData.RegisterFiremode(tab,"models/props_mining/railroad_spike01.mdl")
 		--CSS
@@ -2628,8 +2628,10 @@ end
 					return self:TakeSubammo(item,1)
 				end
 				ScavData.CollectFuncs["models/zombie/poison.mdl"] = function(self,ent)
-					return {{"models/headcrabblack.mdl",ent:GetBodygroup(1)+ent:GetBodygroup(2)+ent:GetBodygroup(3)+ent:GetBodygroup(4),0},
-							{"models/zombie/poison.mdl",1,0,1}}
+					local items = {{"models/zombie/poison.mdl",1,ent:GetSkin()}}
+					local hccount = ent:GetBodygroup(1)+ent:GetBodygroup(2)+ent:GetBodygroup(3)+ent:GetBodygroup(4)
+					if hccount > 0 then table.insert(items,1,{"models/headcrabblack.mdl",hccount,0}) end
+					return items
 				end
 				ScavData.CollectFuncs["models/player/corpse1.mdl"] = function(self,ent) return {{"models/humans/corpse1.mdl",1,0}} end --playermodel conversion
 				--CSS
@@ -5877,40 +5879,34 @@ PrecacheParticleSystem("scav_exp_plasma")
 				--Breaking up big cluster props into smaller ones
 				ScavData.CollectFuncs["models/zombie/classic.mdl"] = function(self,ent)
 					--main reason for these zombie pickups is that we can't get the bodygroup in the gun, so we'll separate the headcrab if it's present
+					local items = {{"models/zombie/classic_legs.mdl",1,0},
+									{"models/zombie/classic_torso.mdl",1,0}}
 					if tobool(ent:GetBodygroup(ent:FindBodygroupByName("headcrab1"))) then
-						return {{"models/zombie/classic_torso.mdl",1,0},
-								{"models/zombie/classic_legs.mdl",1,0},
-								{"models/headcrabclassic.mdl",1,0}}
-					else
-						return {{"models/zombie/classic_legs.mdl",1,0},
-								{"models/zombie/classic_torso.mdl",1,0}}
+						table.insert(items,{"models/headcrabclassic.mdl",1,0})
 					end
+					return items
 				end
 				ScavData.CollectFuncs["models/zombie/classic_torso.mdl"] = function(self,ent)
+					local items = {{"models/zombie/classic_torso.mdl",1,0}}
 					if tobool(ent:GetBodygroup(ent:FindBodygroupByName("headcrab1"))) then
-						return {{"models/zombie/classic_torso.mdl",1,0},
-								{"models/headcrabclassic.mdl",1,0}}
-					else
-						return {{"models/zombie/classic_torso.mdl",1,0}}
+						table.insert(items,{"models/headcrabclassic.mdl",1,0})
 					end
+					return items
 				end
 				ScavData.CollectFuncs["models/zombie/fast.mdl"] = function(self,ent)
+					local items = {{"models/gibs/fast_zombie_legs.mdl",1,0},
+									{"models/gibs/fast_zombie_torso.mdl",1,0}}
 					if tobool(ent:GetBodygroup(ent:FindBodygroupByName("headcrab1"))) then
-						return {{"models/gibs/fast_zombie_legs.mdl",1,0},
-								{"models/gibs/fast_zombie_torso.mdl",1,0},
-								{"models/headcrab.mdl",1,0}}
-					else
-						return {{"models/gibs/fast_zombie_legs.mdl",1,0},
-								{"models/gibs/fast_zombie_torso.mdl",1,0}}
+						table.insert(items,{"models/headcrab.mdl",1,0})
 					end
+					return items
 				end
 				ScavData.CollectFuncs["models/zombie/fast_torso.mdl"] = function(self,ent)
+					local items = {{"models/gibs/fast_zombie_torso.mdl",1,0}}
 					if tobool(ent:GetBodygroup(ent:FindBodygroupByName("headcrab1"))) then
-						return {{"models/Gibs/fast_zombie_torso.mdl",1,0},
-								{"models/headcrab.mdl",1,0}}
-					else
-						return {{"models/Gibs/fast_zombie_torso.mdl",1,0}}
+						table.insert(items,{"models/headcrab.mdl",1,0})
 					end
+					return items
 				end
 				ScavData.CollectFuncs["models/props_junk/garbage128_composite001a.mdl"] = function(self,ent)
 					local items = {
@@ -6003,11 +5999,11 @@ PrecacheParticleSystem("scav_exp_plasma")
 					return items
 				end
 				ScavData.CollectFuncs["models/props_junk/garbage256_composite002a.mdl"] = function(self,ent)
-					local models = {}
+					local items = {}
 					for i=1,4 do
 						table.insert(models,{"models/props_junk/garbage_carboard00" .. tostring(math.Round(math.random(2))) .. "a.mdl",1,0})
 					end
-					return models
+					return items
 				end
 				ScavData.CollectFuncs["models/props_junk/garbage256_composite002b.mdl"] = ScavData.CollectFuncs["models/props_junk/garbage256_composite002a.mdl"]
 				ScavData.CollectFuncs["models/props_junk/ibeam01a_cluster01.mdl"] = function(self,ent) return {{"models/props_junk/ibeam01a.mdl",1,0,4}} end
