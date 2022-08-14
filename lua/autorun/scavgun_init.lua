@@ -409,6 +409,7 @@ end
 if SERVER then
 
 	ScavData.CollectFuncs = {}
+	ScavData.CollectFX = {}
 	
 	local angoffset0_0_0 = Angle(0,0,0)
 	local angoffset90_0_0 = Angle(90,0,0)
