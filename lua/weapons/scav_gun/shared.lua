@@ -295,8 +295,8 @@ end
 
 if SERVER then
 
-	ScavData.GiveOneOfItem = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()), 1, ent:GetSkin()) end
-	ScavData.GiveOneOfItemInf = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()), SCAV_SHORT_MAX, ent:GetSkin()) end
+	ScavData.GiveOneOfItem = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()), 1, ent:GetSkin()}} end
+	ScavData.GiveOneOfItemInf = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()), SCAV_SHORT_MAX, ent:GetSkin()}} end
 
 	local tracep = {}
 	tracep.mask = CONTENTS_SOLID
@@ -1403,10 +1403,12 @@ if CLIENT then
 		if not IsValid(self) then return end
 		self:DestroyWModel()
 		self.wmodel = ClientsideModel(self.WorldModel, RENDERGROUP_OPAQUE)
-		self.wmodel:SetParent(self:GetOwner()) --just a heads up, if you parent it to the weapon its pose parameters won't work because of bonemerging to existing bones
-		local meffects = bit.bor(EF_BONEMERGE,EF_NODRAW,EF_NOSHADOW)
-		self.wmodel:AddEffects(meffects)
-		self.wmodel:SetSkin(self:GetSkin())
+		if IsValid(self.wmodel) then
+			self.wmodel:SetParent(self:GetOwner()) --just a heads up, if you parent it to the weapon its pose parameters won't work because of bonemerging to existing bones
+			local meffects = bit.bor(EF_BONEMERGE,EF_NODRAW,EF_NOSHADOW)
+			self.wmodel:AddEffects(meffects)
+			self.wmodel:SetSkin(self:GetSkin())
+		end
 	end
 
 	function SWEP:DrawWorldModel()
@@ -1464,8 +1466,10 @@ if CLIENT then
 		"#scav.scavtips.inf",
 		"#scav.scavtips.passive",
 		"#scav.scavtips.acid2",
+		"#scav.scavtips.physshotgun",
 		"#scav.scavtips.rocketjump",
 		"#scav.scavtips.superphysjump",
+		"#scav.scavtips.flamethrowerjump",
 		"#scav.scavtips.shower",
 		"#scav.scavtips.crossfire"
 	}
@@ -1963,31 +1967,93 @@ if SERVER then
 
 	function SWEP:AddItem(--[[string]] modelname, --[[int]] subammo, --[[int]] data, --[[int]] number, --[[int, optional, if nil then the entry will be added to the end of the list]] pos)
 
+	if istable(modelname) then
+		pos = modelname[5]
+		number = modelname[4]
+		data = modelname[3]
+		subammo = modelname[2]
+		local str = modelname[1]
+		modelname = str
+	end
+		number = number or 1
+
+		--subammo stacking handling
+		local subammocounts = {}
+		for i=1,number do
+			subammocounts[i] = subammo
+			for k,v in ipairs(self.inv.items) do
+				if ScavData.models[v.ammo] and ScavData.models[modelname] then
+					local maxammo = nil
+					if ScavData.models[v.ammo].MaxAmmo then
+						maxammo = ScavData.models[v.ammo].MaxAmmo or ScavData.models[v.ammo].GetMaxAmmo(wep,data)
+					end
+					local identify = ScavData.models[v.ammo].Identify or false
+
+					--most of this is for the couple models that have different firemodes depending on skins
+					local itemtab = ScavData.models[v.ammo]
+					local vname = nil
+					if itemtab then
+						if itemtab.Name then
+							vname = itemtab.Name
+						elseif itemtab.GetName then
+							vname = itemtab.GetName(wep,v)
+						end
+					end
+					itemtab = ScavData.models[modelname]
+					local modelnamename = nil
+					if itemtab then
+						if itemtab.Name then
+							modelnamename = itemtab.Name
+						elseif itemtab.GetName then
+							modelnamename = itemtab.GetName(wep,data)
+						end
+					end
+
+					if vname and modelnamename and vname == modelnamename and									--firemodes are the same,
+						((identify and identify[v.ammo] == ScavData.models[modelname].Identify[modelname]) or	--items have identify tables that match, or...
+						(not identify and v.ammo == modelname)) and	 											--...no identify table but the same models,
+						maxammo and v.subammo < maxammo and														--items have max ammo values, and the item can still be added to,
+						v.subammo ~= SCAV_SHORT_MAX and subammo ~= SCAV_SHORT_MAX then							--neither item is infinite uses
+
+						local maxtoadd = maxammo - v.subammo
+
+						if subammocounts[i] > 0 then
+							v:SetSubammo(math.min(maxammo, v.subammo + subammocounts[i]))
+						end
+						subammocounts[i] = subammocounts[i] - maxtoadd
+					end
+				end
+			end
+		end
+	
 		local availableslots = self:GetCapacity() - self.inv:GetItemCount()
 
 		if availableslots <= 0 then
 			return
 		end
 
-		number = number or 1
 
 		for i=1,math.min(number, availableslots) do
 
-			local item = ScavItem(self.inv, pos)
+			if subammocounts[i] and subammocounts[i] > 0 then
 
-			if item then
-				item:SetAmmoType(modelname)
-				item:SetSubammo(subammo)
-				item:SetData(data)
-				item:SetMass(lookupmass(modelname))
-				item:FinishSetup()
-			end
+				local item = ScavItem(self.inv, pos)
 
-			item:AddOnClient(self.Owner)
+				if item then
+					item:SetAmmoType(modelname)
+					item:SetSubammo(subammocounts[i])
+					item:SetData(data)
+					item:SetMass(lookupmass(modelname))
+					item:FinishSetup()
+				end
 
-			local modeinfo = ScavData.models[item.ammo]
-			if modeinfo and modeinfo.OnPickup then
-				modeinfo.OnPickup(self,item)
+				item:AddOnClient(self.Owner)
+
+				local modeinfo = ScavData.models[item.ammo]
+				if modeinfo and modeinfo.OnPickup then
+					modeinfo.OnPickup(self,item)
+				end
+
 			end
 
 		end
@@ -2468,6 +2534,7 @@ if SERVER then
 			ef:SetAngles(ent:GetAngles())
 			ef:Spawn()
 			ParticleEffectAttach("scav_propdeath",PATTACH_ABSORIGIN_FOLLOW,ef,0)
+			--TODO: could ragdolls be made to pose like the original?
 		end
 	end
 
@@ -2613,9 +2680,78 @@ if SERVER then
 	end
 
 	function SWEP:CheckCanScav(ent)
-		if self.inv:GetItemCount() < self:GetCapacity() and self.Owner:CanScavPickup(ent) then
+
+		if not IsValid(ent) then return false end
+
+		if not IsValid(self) then return false end
+
+		if not IsValid(self.Owner) then return false end
+
+		if not self.Owner:CanScavPickup(ent) then
+			return false
+		end
+
+		if self.inv:GetItemCount() < self:GetCapacity() then
 			return true
 		end
+
+		--the gun is full. However, we might be able to stack the item.
+
+		local collectmodelname = ScavData.FormatModelname(ent:GetModel())
+		local modellist = {}
+
+		if ScavData.CollectFuncs[collectmodelname] then
+			PrintTable(ScavData.CollectFuncs[collectmodelname](self,ent))
+			modellist = ScavData.CollectFuncs[collectmodelname](self,ent)
+		else
+			modellist[1] = {collectmodelname}
+		end
+		for i=1,#modellist do
+			local modelname = modellist[i][1]
+			for k,v in pairs(self.inv.items) do
+				if ScavData.models[v.ammo] and ScavData.models[modelname] then
+
+					local maxammo = nil
+					if ScavData.models[v.ammo].MaxAmmo then
+						maxammo = ScavData.models[v.ammo].MaxAmmo or ScavData.models[v.ammo].GetMaxAmmo(wep,data)
+					end
+
+					local identify = ScavData.models[v.ammo].Identify or false
+
+					--most of this is for the couple models that have different firemodes depending on skins
+					local itemtab = ScavData.models[v.ammo]
+					local vname = nil
+					if itemtab then
+						if itemtab.Name then
+							vname = itemtab.Name
+						elseif itemtab.GetName then
+							vname = itemtab.GetName(wep,v)
+						end
+					end
+
+					itemtab = ScavData.models[modelname]
+					local modelnamename = nil
+					if itemtab then
+						if itemtab.Name then
+							modelnamename = itemtab.Name
+						elseif itemtab.GetName then
+							modelnamename = itemtab.GetName(wep,data)
+						end
+					end
+
+					if vname and modelnamename and vname == modelnamename and									--firemodes are the same,
+						((identify and identify[v.ammo] == ScavData.models[modelname].Identify[modelname]) or	--items have identify tables that match, or...
+						(not identify and v.ammo == modelname)) and	 											--...no identify table but the same models,
+						maxammo and v.subammo < maxammo and														--items have max ammo values, and the item can still be added to,
+						v.subammo ~= SCAV_SHORT_MAX then --and subammo ~= SCAV_SHORT_MAX then							--neither item is infinite uses
+
+						return true
+
+					end
+				end
+			end
+		end
+
 		return false
 	end
 
@@ -2636,11 +2772,19 @@ if SERVER then
 		local modelname = ScavData.FormatModelname(ent:GetModel())
 
 		if ScavData.CollectFuncs[modelname] then
-			ScavData.CollectFuncs[modelname](self,ent)
+			--ScavData.CollectFuncs[modelname](self,ent)
+			local collect = ScavData.CollectFuncs[modelname](self,ent)
+			for i=1,#collect do
+				self:AddItem(collect[i])
+			end
 		elseif string.find(modelname,"*%d",0,false) then
 			self:AddItem(modelname,1,0)
 		else
 			self:AddItem(modelname,1,ent:GetSkin())
+		end
+
+		if ScavData.CollectFX[modelname] then
+			ScavData.CollectFX[modelname](self,ent)
 		end
 
 		ent.NoScav = true

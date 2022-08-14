@@ -37,10 +37,12 @@ function EFFECT:Init(data)
 				part:SetThinkFunction(scav_healpartmove)
 				part:SetNextThink(CurTime()+0.1)
 				part:SetRollDelta(6.28)
-				if (GetViewEntity() ~= part.Owner) and (part.Owner:GetActiveWeapon():LookupAttachment("muzzle") ~= 0) then
-					part:SetPos(LerpVector(math.sqrt(part.life-CurTime()),part.endpos+part.ent:GetPos(),part.Owner:GetActiveWeapon():GetAttachment(part.Owner:GetActiveWeapon():LookupAttachment("muzzle")).Pos+part.vel*(CurTime()-part.StartTime)))
-				elseif IsValid(part.Owner:GetViewModel()) and part.Owner:GetViewModel():LookupAttachment("muzzle") ~= 0 then
-					part:SetPos(LerpVector(math.sqrt(part.life-CurTime()),part.endpos+part.ent:GetPos(),part.Owner:GetViewModel():GetAttachment(part.Owner:GetViewModel():LookupAttachment("muzzle")).Pos+part.vel*(CurTime()-part.StartTime)))
+				if IsValid(part.ent) then
+					if (GetViewEntity() ~= part.Owner) and (part.Owner:GetActiveWeapon():LookupAttachment("muzzle") > 0) then
+						part:SetPos(LerpVector(math.sqrt(part.life-CurTime()),part.endpos+part.ent:GetPos(),part.Owner:GetActiveWeapon():GetAttachment(part.Owner:GetActiveWeapon():LookupAttachment("muzzle")).Pos+part.vel*(CurTime()-part.StartTime)))
+					elseif IsValid(part.Owner:GetViewModel()) and part.Owner:GetViewModel():LookupAttachment("muzzle") > 0 then
+						part:SetPos(LerpVector(math.sqrt(part.life-CurTime()),part.endpos+part.ent:GetPos(),part.Owner:GetViewModel():GetAttachment(part.Owner:GetViewModel():LookupAttachment("muzzle")).Pos+part.vel*(CurTime()-part.StartTime)))
+					end
 				end
 			end
 --			self.em:Finish()
@@ -56,12 +58,13 @@ function scav_healpartmove(part)
 		part.vel = part.Owner:GetAimVector()*500+VectorRand()*50
 		part.firstthought = true
 	end
-	if (GetViewEntity() ~= part.Owner) and (part.Owner:GetActiveWeapon():LookupAttachment("muzzle") ~= 0) then
-		part:SetPos(LerpVector(math.sqrt(part.life-CurTime()),part.endpos+part.ent:GetPos(),part.Owner:GetActiveWeapon():GetAttachment(part.Owner:GetActiveWeapon():LookupAttachment("muzzle")).Pos+part.vel*(CurTime()-part.StartTime)))
-	elseif IsValid(part.Owner:GetViewModel()) and part.Owner:GetViewModel():LookupAttachment("muzzle") ~= 0 then
-		part:SetPos(LerpVector(math.sqrt(part.life-CurTime()),part.endpos+part.ent:GetPos(),part.Owner:GetViewModel():GetAttachment(part.Owner:GetViewModel():LookupAttachment("muzzle")).Pos+part.vel*(CurTime()-part.StartTime)))
+	if IsValid(part.ent) then
+		if (GetViewEntity() ~= part.Owner) and (part.Owner:GetActiveWeapon():LookupAttachment("muzzle") > 0) then
+			part:SetPos(LerpVector(math.sqrt(part.life-CurTime()),part.endpos+part.ent:GetPos(),part.Owner:GetActiveWeapon():GetAttachment(part.Owner:GetActiveWeapon():LookupAttachment("muzzle")).Pos+part.vel*(CurTime()-part.StartTime)))
+		elseif IsValid(part.Owner:GetViewModel()) and part.Owner:GetViewModel():LookupAttachment("muzzle") > 0 then
+			part:SetPos(LerpVector(math.sqrt(part.life-CurTime()),part.endpos+part.ent:GetPos(),part.Owner:GetViewModel():GetAttachment(part.Owner:GetViewModel():LookupAttachment("muzzle")).Pos+part.vel*(CurTime()-part.StartTime)))
+		end
 	end
-	
 end
 
 function EFFECT:Think()

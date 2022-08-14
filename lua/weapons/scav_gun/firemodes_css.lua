@@ -33,19 +33,19 @@ local eject = "brass"
 						--gamemode.Call("ScavFired",self.Owner,proj)
 						return true
 					end
-				--ScavData.CollectFuncs["models/weapons/w_suitcase_passenger.mdl"] = ScavData.GiveOneOfItem
-				ScavData.CollectFuncs["models/weapons/w_c4.mdl"] = function(self,ent) self:AddItem("models/weapons/w_c4_planted.mdl",1,0) end
-				--ScavData.CollectFuncs["models/weapons/w_c4_planted.mdl"] = ScavData.GiveOneOfItem
+				ScavData.CollectFuncs["models/weapons/w_c4.mdl"] = function(self,ent) return {{"models/weapons/w_c4_planted.mdl",1,0}} end
 				--DoD:S
-				ScavData.CollectFuncs["models/props_crates/tnt_crate1.mdl"] = function(self,ent) self:AddItem("models/weapons/w_tnt.mdl",1,0,3) end
-				ScavData.CollectFuncs["models/props_crates/tnt_crate2.mdl"] = function(self,ent) self:AddItem("models/weapons/w_tnt.mdl",1,0,3) end
-				ScavData.CollectFuncs["models/props_crates/tnt_dump.mdl"] = function(self,ent) self:AddItem("models/weapons/w_tnt.mdl",1,0,6) end
+				ScavData.CollectFuncs["models/props_crates/tnt_crate1.mdl"] = function(self,ent) return {{"models/weapons/w_tnt.mdl",1,0,3}} end
+				ScavData.CollectFuncs["models/props_crates/tnt_crate2.mdl"] = function(self,ent) return {{"models/weapons/w_tnt.mdl",1,0,3}} end
+				ScavData.CollectFuncs["models/props_crates/tnt_dump.mdl"] = function(self,ent) return {{"models/weapons/w_tnt.mdl",1,0,6}} end
 				--L4D/2
-				ScavData.CollectFuncs["models/props_waterfront/suitcase_open.mdl"] = function(self,ent) self:AddItem("models/props_unique/airport/luggage2.mdl",1,1,1) end
+				ScavData.CollectFuncs["models/props_waterfront/suitcase_open.mdl"] = function(self,ent) return {{"models/props_unique/airport/luggage2.mdl",1,1}} end
 				ScavData.CollectFuncs["models/props_unique/airport/luggage_pile1.mdl"] = function(self,ent)
+					local items = {}
 					for i=1,5 do
-						self:AddItem("models/props_unique/airport/luggage".. tostring(math.Round(math.random(4))) ..".mdl",1,math.Round(math.random()),1)
+						table.insert(items,{"models/props_unique/airport/luggage"..tostring(math.Round(math.random(4)))..".mdl",1,math.Round(math.random())})
 					end
+					return items
 				end
 			end
 			tab.Cooldown = 5
@@ -81,33 +81,36 @@ local eject = "brass"
 			PrecacheParticleSystem("scav_exp_smoke_1")
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 7
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 3
 			if SERVER then
 				tab.FireFunc = function(self,item)
-						if not IsValid(self.smokegrenade) then
-							self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
-							local proj = ents.Create("scav_projectile_smoke")
-							self.smokegrenade = proj
-							proj:SetModel(item.ammo)
-							proj.Owner = self.Owner
-							proj:SetOwner(self.Owner)
-							proj:SetPos(self.Owner:GetShootPos())
-							proj:SetAngles((self:GetAimVector():Angle():Up()*-1):Angle())
-							proj:Spawn()
-							proj:SetSkin(item.data)
-							proj:GetPhysicsObject():Wake()
-							proj:GetPhysicsObject():SetMass(1)
-							proj:GetPhysicsObject():EnableDrag(true)
-							proj:GetPhysicsObject():EnableGravity(true)
-							proj:GetPhysicsObject():ApplyForceOffset((self:GetAimVector()+Vector(0,0,0.1))*5000,Vector(0,0,3)) --self:GetAimVector():Angle():Up()*0.1
-							timer.Simple(0, function() proj:GetPhysicsObject():AddAngleVelocity(Vector(0,10000,0)) end)
-							self.Owner:SetAnimation(PLAYER_ATTACK1)
-							self.Owner:EmitSound(self.shootsound)				
-							return true
-						else
-							self.Owner:EmitSound("buttons/button18.wav")
-							return false
-						end
+					if not IsValid(self.smokegrenade) then
+						self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
+						local proj = ents.Create("scav_projectile_smoke")
+						self.smokegrenade = proj
+						proj:SetModel(item.ammo)
+						proj.Owner = self.Owner
+						proj:SetOwner(self.Owner)
+						proj:SetPos(self.Owner:GetShootPos())
+						proj:SetAngles((self:GetAimVector():Angle():Up()*-1):Angle())
+						proj:Spawn()
+						proj:SetSkin(item.data)
+						proj:GetPhysicsObject():Wake()
+						proj:GetPhysicsObject():SetMass(1)
+						proj:GetPhysicsObject():EnableDrag(true)
+						proj:GetPhysicsObject():EnableGravity(true)
+						proj:GetPhysicsObject():ApplyForceOffset((self:GetAimVector()+Vector(0,0,0.1))*5000,Vector(0,0,3)) --self:GetAimVector():Angle():Up()*0.1
+						timer.Simple(0, function() proj:GetPhysicsObject():AddAngleVelocity(Vector(0,10000,0)) end)
+						self.Owner:SetAnimation(PLAYER_ATTACK1)
+						self.Owner:EmitSound(self.shootsound)				
+						return self:TakeSubammo(item,1)
+					else
+						self.Owner:EmitSound("buttons/button18.wav")
+						return false
 					end
+				end
 			end
 			tab.Cooldown = 0.75
 		ScavData.RegisterFiremode(tab,"models/weapons/w_eq_smokegrenade.mdl")
@@ -126,6 +129,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.p90"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 150
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -139,7 +143,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(math.Rand(-0.2,0.2),math.Rand(-0.2,0.2),0),0.1)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -149,7 +153,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_P90.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -177,7 +182,7 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_smg_p90.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
+				ScavData.CollectFuncs["models/weapons/w_smg_p90.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),50,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_smg_p90.mdl")
@@ -190,6 +195,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.ak47"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -203,7 +211,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.3,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -213,7 +221,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_AK47.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -241,9 +250,9 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_rif_ak47.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),25,0) end
+				ScavData.CollectFuncs["models/weapons/w_rif_ak47.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),25,0}} end
 				--L4D2
-				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_ak47.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),40,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_ak47.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),40,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_ak47.mdl")
@@ -258,6 +267,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.aug"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -271,7 +281,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.3,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -281,7 +291,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_AUG.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -309,7 +320,7 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_rif_aug.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
+				ScavData.CollectFuncs["models/weapons/w_rif_aug.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_aug.mdl")
@@ -322,6 +333,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.awp"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 40
 			
 				local bullet = {}
 						bullet.Num = 1
@@ -334,7 +348,7 @@ local eject = "brass"
 						self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-						if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						if SERVER or not game.SinglePlayer() then
 							self.Owner:FireBullets(bullet)
 						end
 						self:MuzzleFlash2()
@@ -342,7 +356,8 @@ local eject = "brass"
 						if SERVER then
 							self.Owner:EmitSound("Weapon_AWP.Single")
 							self:AddBarrelSpin(300)
-						else
+						end
+						if CLIENT ~= game.SinglePlayer() then
 							timer.Simple(.4,function() 
 								self.Owner:EmitSound("weapons/awp/awp_bolt.wav",75,100,1)
 								local ef = EffectData()
@@ -358,11 +373,11 @@ local eject = "brass"
 						if SERVER then return self:TakeSubammo(item,1) end
 					end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_snip_awp.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,0) end
+				ScavData.CollectFuncs["models/weapons/w_snip_awp.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),10,0}} end
 				--L4D2
-				ScavData.CollectFuncs["models/w_models/weapons/w_sniper_awp.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),20,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_sniper_awp.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),20,0}} end
 				--TF2
-				ScavData.CollectFuncs["models/weapons/c_models/c_csgo_awp/c_csgo_awp.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,0) end
+				ScavData.CollectFuncs["models/weapons/c_models/c_csgo_awp/c_csgo_awp.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),10,0}} end
 			end
 			tab.Cooldown = 1.455
 		ScavData.RegisterFiremode(tab,"models/weapons/w_snip_awp.mdl")
@@ -379,6 +394,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.deagle"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 42
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.015,0.015,0)
@@ -391,7 +409,7 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -399,7 +417,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_Deagle.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -416,8 +435,8 @@ local eject = "brass"
 					if SERVER then return self:TakeSubammo(item,1) end
 				end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_pist_deagle.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),7,0) end
-				ScavData.CollectFuncs["models/w_models/weapons/w_desert_eagle.mdl"]	= function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),8,0) end
+				ScavData.CollectFuncs["models/weapons/w_pist_deagle.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),7,0}} end
+				ScavData.CollectFuncs["models/w_models/weapons/w_desert_eagle.mdl"]	= function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),8,0}} end
 			end
 			tab.Cooldown = 0.7
 		ScavData.RegisterFiremode(tab,"models/weapons/w_pist_deagle.mdl")
@@ -431,6 +450,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.elites"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 150
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -443,7 +465,7 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -451,7 +473,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_Elite.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -476,13 +499,13 @@ local eject = "brass"
 					end
 				end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_pist_elite_single.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),15,0) end
-				ScavData.CollectFuncs["models/weapons/w_pist_elite.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
+				ScavData.CollectFuncs["models/weapons/w_pist_elite_single.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),15,0}} end
+				ScavData.CollectFuncs["models/weapons/w_pist_elite.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
 				ScavData.CollectFuncs["models/weapons/w_pist_elite_dropped.mdl"] = ScavData.CollectFuncs["models/weapons/w_pist_elite.mdl"]
 				ScavData.CollectFuncs["models/weapons/w_eq_eholster_elite.mdl"] = ScavData.CollectFuncs["models/weapons/w_pist_elite_single.mdl"]
 				--L4D/2
-				ScavData.CollectFuncs["models/w_models/weapons/w_dual_pistol_1911.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
-				ScavData.CollectFuncs["models/w_models/weapons/w_pistol_1911.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),15,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_dual_pistol_1911.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
+				ScavData.CollectFuncs["models/w_models/weapons/w_pistol_1911.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),15,0}} end
 			end
 			tab.Cooldown = 0.3
 		ScavData.RegisterFiremode(tab,"models/weapons/w_pist_elite_single.mdl")
@@ -502,6 +525,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.famas"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 115
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -515,7 +539,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -525,7 +549,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_FAMAS.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -553,7 +578,7 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_rif_famas.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),25,0) end
+				ScavData.CollectFuncs["models/weapons/w_rif_famas.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),25,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_famas.mdl")
@@ -566,6 +591,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.fiveseven"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 120
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -578,7 +604,7 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -586,7 +612,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_FiveSeven.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -604,7 +631,7 @@ local eject = "brass"
 					if SERVER then return self:TakeSubammo(item,1) end
 				end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_pist_fiveseven.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),20,0) end
+				ScavData.CollectFuncs["models/weapons/w_pist_fiveseven.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),20,0}} end
 			end
 			tab.Cooldown = 0.3
 		ScavData.RegisterFiremode(tab,"models/weapons/w_pist_fiveseven.mdl")
@@ -617,6 +644,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.galil"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 125
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -630,7 +658,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -640,7 +668,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_Galil.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -668,7 +697,7 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_rif_galil.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),35,0) end
+				ScavData.CollectFuncs["models/weapons/w_rif_galil.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),35,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_galil.mdl")
@@ -681,6 +710,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.glock"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 140
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -699,7 +731,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_Glock.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -717,9 +750,9 @@ local eject = "brass"
 					if SERVER then return self:TakeSubammo(item,1) end
 				end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_pist_glock18.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),20,0) end
+				ScavData.CollectFuncs["models/weapons/w_pist_glock18.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),20,0}} end
 				--L4D2
-				ScavData.CollectFuncs["models/w_models/weapons/w_pistol_b.mdl"]	= function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),15,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_pistol_b.mdl"]	= function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),15,0}} end
 			end
 			tab.Cooldown = 0.3
 		ScavData.RegisterFiremode(tab,"models/weapons/w_pist_glock18.mdl")
@@ -734,6 +767,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m3super90"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 40
 			local bullet = {}
 					bullet.Num = 9
 					bullet.Spread = Vector(0.1,0.1,0)
@@ -745,14 +779,15 @@ local eject = "brass"
 					self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
 						self.Owner:EmitSound("Weapon_M3.Single")
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.5,function() 
 							if IsValid(self) then
 								local ef = EffectData()
@@ -769,7 +804,7 @@ local eject = "brass"
 					if SERVER then return self:TakeSubammo(item,1) end
 				end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_shot_m3super90.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),8,0) end
+				ScavData.CollectFuncs["models/weapons/w_shot_m3super90.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),8,0}} end
 			end
 			tab.Cooldown = 0.88
 		ScavData.RegisterFiremode(tab,"models/weapons/w_shot_m3super90.mdl")
@@ -782,6 +817,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m4a1"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -795,7 +833,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -805,7 +843,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_M4A1.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -833,9 +872,9 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_rif_m4a1.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
+				ScavData.CollectFuncs["models/weapons/w_rif_m4a1.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
 				--L4D
-				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_m16a2.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_m16a2.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),50,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_m4a1.mdl")
@@ -850,6 +889,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m4a1sil"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -863,7 +903,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					--self:MuzzleFlash2() --no flash on silenced weapon!
@@ -873,7 +913,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_M4A1.Silenced")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -901,7 +942,7 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_rif_m4a1_silencer.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
+				ScavData.CollectFuncs["models/weapons/w_rif_m4a1_silencer.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_m4a1_silencer.mdl")
@@ -914,6 +955,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.m249"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 300
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -927,7 +971,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -939,7 +983,8 @@ local eject = "brass"
 						self:SetBlockPoseInstant(1,4)
 						self:SetPanelPoseInstant(0.25,2)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -967,9 +1012,9 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_mach_m249para.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),100,0) end
+				ScavData.CollectFuncs["models/weapons/w_mach_m249para.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),100,0}} end
 				--L4D2
-				ScavData.CollectFuncs["models/w_models/weapons/w_m60.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),150,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_m60.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),150,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_mach_m249para.mdl")
@@ -984,6 +1029,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.mac10"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 130
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -997,7 +1045,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.7,math.Rand(-0.4,0.4),0),0.2,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1007,7 +1055,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_MAC10.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1035,10 +1084,10 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_smg_mac10.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
+				ScavData.CollectFuncs["models/weapons/w_smg_mac10.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
 				--L4D/2
-				ScavData.CollectFuncs["models/w_models/weapons/w_smg_uzi.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
-				ScavData.CollectFuncs["models/w_models/weapons/w_smg_a.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_smg_uzi.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),50,0}} end
+				ScavData.CollectFuncs["models/w_models/weapons/w_smg_a.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),50,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_smg_mac10.mdl")
@@ -1054,6 +1103,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.mp5"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 150
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1067,7 +1119,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-1,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1077,7 +1129,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_MP5Navy.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1105,9 +1158,9 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_smg_mp5.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
+				ScavData.CollectFuncs["models/weapons/w_smg_mp5.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
 				--L4D2
-				ScavData.CollectFuncs["models/w_models/weapons/w_smg_mp5.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_smg_mp5.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),50,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_smg_mp5.mdl")
@@ -1122,6 +1175,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.p228"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 65
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -1134,7 +1190,7 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1142,7 +1198,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_P228.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1160,9 +1217,9 @@ local eject = "brass"
 					if SERVER then return self:TakeSubammo(item,1) end
 				end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_pist_p228.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),13,0) end
+				ScavData.CollectFuncs["models/weapons/w_pist_p228.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),13,0}} end
 				--L4D2
-				ScavData.CollectFuncs["models/w_models/weapons/w_pistol_a.mdl"]	= function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),15,0) end --p220
+				ScavData.CollectFuncs["models/w_models/weapons/w_pistol_a.mdl"]	= function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),15,0}} end --p220
 			end
 			tab.Cooldown = 0.3
 		ScavData.RegisterFiremode(tab,"models/weapons/w_pist_p228.mdl")
@@ -1177,6 +1234,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.scoutsnipe"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 100
 			
 				local bullet = {}
 						bullet.Num = 1
@@ -1189,7 +1249,7 @@ local eject = "brass"
 						self.Owner:ScavViewPunch(Angle(-3,math.Rand(-0.2,0.2),0),0.4,true)
 						bullet.Src = self.Owner:GetShootPos()
 						bullet.Dir = self:GetAimVector()
-						if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+						if SERVER or not game.SinglePlayer() then
 							self.Owner:FireBullets(bullet)
 						end
 						self:MuzzleFlash2()
@@ -1197,7 +1257,8 @@ local eject = "brass"
 						if SERVER then
 							self.Owner:EmitSound("Weapon_Scout.Single")
 							self:AddBarrelSpin(300)
-						else
+						end
+						if CLIENT ~= game.SinglePlayer() then
 							timer.Simple(.5,function()
 								self.Owner:EmitSound("weapons/scout/scout_bolt.wav",75,100,1)
 								local ef = EffectData()
@@ -1213,10 +1274,10 @@ local eject = "brass"
 						if SERVER then return self:TakeSubammo(item,1) end
 					end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_snip_scout.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,0) end
+				ScavData.CollectFuncs["models/weapons/w_snip_scout.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),10,0}} end
 				--L4D/2
-				ScavData.CollectFuncs["models/w_models/weapons/w_sniper_scout.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),15,0) end
-				ScavData.CollectFuncs["models/w_models/weapons/w_sniper_mini14.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),15,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_sniper_scout.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),15,0}} end
+				ScavData.CollectFuncs["models/w_models/weapons/w_sniper_mini14.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),15,0}} end
 			end
 			tab.Cooldown = 1.25
 		ScavData.RegisterFiremode(tab,"models/weapons/w_snip_scout.mdl")
@@ -1232,6 +1293,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.sg550"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1245,7 +1309,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1254,7 +1318,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_SG550.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1282,9 +1347,9 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_snip_sg550.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
+				ScavData.CollectFuncs["models/weapons/w_snip_sg550.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
 				--L4D2
-				ScavData.CollectFuncs["models/w_models/weapons/w_sniper_military.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_sniper_military.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_snip_sg550.mdl")
@@ -1299,6 +1364,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.sg552"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 120
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1312,7 +1380,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1322,7 +1390,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_SG552.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1350,9 +1419,9 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_rif_sg552.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
+				ScavData.CollectFuncs["models/weapons/w_rif_sg552.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
 				--L4D2
-				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_sg552.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_sg552.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),50,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_rif_sg552.mdl")
@@ -1367,6 +1436,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.tmp"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 150
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1380,7 +1450,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					--self:MuzzleFlash2() --no flash on silenced weapon!
@@ -1390,7 +1460,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_TMP.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1418,7 +1489,7 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_smg_tmp.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),30,0) end
+				ScavData.CollectFuncs["models/weapons/w_smg_tmp.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),30,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_smg_tmp.mdl")
@@ -1431,6 +1502,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.ump45"
 			tab.anim = ACT_VM_RECOIL1
 			tab.Level = 2
+			tab.MaxAmmo = 125
 			tab.ChargeAttack = function(self,item)
 				if self.Owner:KeyDown(IN_ATTACK) then
 					local bullet = {}
@@ -1444,7 +1516,7 @@ local eject = "brass"
 						bullet.Dir = self:GetAimVector()
 						bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
 					self.Owner:ScavViewPunch(Angle(-0.5,math.Rand(-0.2,0.2),0),0.1,true)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1454,7 +1526,8 @@ local eject = "brass"
 						self.Owner:EmitSound("Weapon_UMP45.Single")
 						self:AddBarrelSpin(300)
 						self:TakeSubammo(item,1)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1482,7 +1555,7 @@ local eject = "brass"
 				return false
 			end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_smg_ump45.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),25,0) end
+				ScavData.CollectFuncs["models/weapons/w_smg_ump45.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),25,0}} end
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab,"models/weapons/w_smg_ump45.mdl")
@@ -1495,6 +1568,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.usp"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 112
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -1507,7 +1581,7 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
@@ -1515,7 +1589,8 @@ local eject = "brass"
 					if SERVER then
 						self.Owner:EmitSound("Weapon_USP.Single")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1533,7 +1608,7 @@ local eject = "brass"
 					if SERVER then return self:TakeSubammo(item,1) end
 				end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_pist_usp.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),12,0) end
+				ScavData.CollectFuncs["models/weapons/w_pist_usp.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),12,0}} end
 			end
 			tab.Cooldown = 0.3
 		ScavData.RegisterFiremode(tab,"models/weapons/w_pist_usp.mdl")
@@ -1546,6 +1621,7 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.uspsil"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			tab.MaxAmmo = 112
 			local bullet = {}
 					bullet.Num = 1
 					bullet.AccuracyOffset = Vector(0.0,0.0,0)
@@ -1558,19 +1634,16 @@ local eject = "brass"
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
 					bullet.Spread = self:GetAccuracyModifiedCone(bullet.AccuracyOffset)
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					--self:MuzzleFlash2() --no flash on silenced weapon!
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
-						if item.ammo == "models/w_silencer.mdl" then --HL:S
-							self.Owner:EmitSound("weapons/pl_gun2.wav")
-						else
-							self.Owner:EmitSound("Weapon_USP.SilencedShot")
-						end
+						self.Owner:EmitSound(item.ammo == "models/w_silencer.mdl" and "weapons/pl_gun2.wav" or "Weapon_USP.SilencedShot")
 						self:AddBarrelSpin(300)
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						if item.ammo == "models/w_silencer.mdl" then --HL:S
 							timer.Simple(.025,function()
 								if not self.Owner:GetViewModel() then return end
@@ -1610,8 +1683,8 @@ local eject = "brass"
 					if SERVER then return self:TakeSubammo(item,1) end
 				end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_pist_usp_silencer.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),12,0) end
-				--ScavData.CollectFuncs["models/w_silencer.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),17,0) end --no phys model
+				ScavData.CollectFuncs["models/weapons/w_pist_usp_silencer.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),12,0}} end
+				--ScavData.CollectFuncs["models/w_silencer.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),17,0}} end --no phys model
 			end
 			tab.Cooldown = 0.3
 		--CSS
@@ -1627,6 +1700,9 @@ local eject = "brass"
 			tab.Name = "#scav.scavcan.xm1014"
 			tab.anim = ACT_VM_SECONDARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 39
 			local bullet = {}
 					bullet.Num = 6
 					bullet.Spread = Vector(0.1,0.1,0)
@@ -1638,14 +1714,15 @@ local eject = "brass"
 					self.Owner:ScavViewPunch(Angle(-5,math.Rand(-0.2,0.2),0),0.5)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self:GetAimVector()
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self:MuzzleFlash2()
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					if SERVER then
 						self.Owner:EmitSound("Weapon_XM1014.Single")
-					else
+					end
+					if CLIENT ~= game.SinglePlayer() then
 						timer.Simple(.025,function()
 							if not self.Owner:GetViewModel() then return end
 							local ef = EffectData()
@@ -1662,9 +1739,9 @@ local eject = "brass"
 					if SERVER then return self:TakeSubammo(item,1) end
 				end
 			if SERVER then
-				ScavData.CollectFuncs["models/weapons/w_shot_xm1014.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),7,0) end
-				ScavData.CollectFuncs["models/w_models/weapons/w_autoshot_m4super.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,0) end
-				ScavData.CollectFuncs["models/w_models/weapons/w_shotgun_spas.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),10,0) end
+				ScavData.CollectFuncs["models/weapons/w_shot_xm1014.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),7,0}} end
+				ScavData.CollectFuncs["models/w_models/weapons/w_autoshot_m4super.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),10,0}} end
+				ScavData.CollectFuncs["models/w_models/weapons/w_shotgun_spas.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),10,0}} end
 			end
 			tab.Cooldown = 0.88
 		ScavData.RegisterFiremode(tab,"models/weapons/w_shot_xm1014.mdl")
@@ -1683,6 +1760,9 @@ local eject = "brass"
 			tab.anim = ACT_VM_PRIMARYATTACK
 			tab.chargeanim = ACT_VM_PRIMARYATTACK
 			tab.Level = 2
+			local identify = {}
+			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
+			tab.MaxAmmo = 420
 				local bullet = {}
 					bullet.Num = 1
 					bullet.Spread = Vector(0.015,0.015,0)
@@ -1693,7 +1773,7 @@ local eject = "brass"
 				tab.ChargeAttack = function(self,item)
 					bullet.Src = self.Owner:GetShootPos()
 					bullet.Dir = self.Owner:GetAimVector()
-					if not game.SinglePlayer() or (game.SinglePlayer() and SERVER) then
+					if SERVER or not game.SinglePlayer() then
 						self.Owner:FireBullets(bullet)
 					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
@@ -1713,13 +1793,13 @@ local eject = "brass"
 				end
 				tab.FireFunc = function(self,item)
 					item.shotsleft = 3
-					self:SetChargeAttack(ScavData.models["models/w_models/weapons/w_desert_rifle.mdl"].ChargeAttack,item)
+					self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
 					return false
 				end
 			if SERVER then
 				--L4D2
-				ScavData.CollectFuncs["models/w_models/weapons/w_desert_rifle.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname(ent:GetModel()),50,0) end
-				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_b.mdl"] = function(self,ent) self:AddItem(ScavData.FormatModelname("models/w_models/weapons/w_desert_rifle.mdl"),50,0) end
+				ScavData.CollectFuncs["models/w_models/weapons/w_desert_rifle.mdl"] = function(self,ent) return {{ScavData.FormatModelname(ent:GetModel()),50,0}} end
+				ScavData.CollectFuncs["models/w_models/weapons/w_rifle_b.mdl"] = function(self,ent) return {{ScavData.FormatModelname("models/w_models/weapons/w_desert_rifle.mdl"),50,0}} end
 			end
 			tab.Cooldown = 0
 		--L4D2

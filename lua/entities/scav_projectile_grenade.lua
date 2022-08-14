@@ -15,7 +15,7 @@ function ENT:Initialize()
 	self.Entity:SetMoveType(MOVETYPE_VPHYSICS)
 	self.Entity:SetSolid(SOLID_VPHYSICS)
 	self.dettime = CurTime()+2
-	self.firstbounce = 0
+	self.bounce = false
 	if SERVER then
 		for k,v in ipairs(ents.GetAll()) do
 			if v:IsNPC() then
@@ -77,9 +77,13 @@ if SERVER then
 
 	function ENT:Think()
 		if self.NextSound < CurTime() then --staggering the sound emission to give the appearance of reaction times in the NPCs
-			self.DangerPoint:Fire("EmitAISound",nil,0)
-			self.NextSound = CurTime()+0.5
-			--debugoverlay.Sphere(self.DangerSound:GetPos(),100,0.5,color_red,false)
+			if IsValid(self.DangerPoint) then
+				self.DangerPoint:Fire("EmitAISound",nil,0)
+				self.NextSound = CurTime()+0.5
+				--debugoverlay.Sphere(self.DangerSound:GetPos(),100,0.5,color_red,false)
+			else
+				self.DangerPoint = self:CreateDangerSound()
+			end
 		end
 		if (self.dettime < CurTime()) or self.shouldexplode then
 			if not self.expl then

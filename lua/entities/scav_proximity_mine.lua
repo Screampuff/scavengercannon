@@ -70,6 +70,12 @@ function ENT:Think()
 			
 			for i=1,table.getn(tab),1 do
 				if IsValid(tab[i]) and (tab[i]:IsPlayer() or tab[i]:IsNPC() or tab[i]:IsNextBot()) and (ownerless or not tab[i]:IsFriendlyToPlayer(self.Owner)) then
+					--spawn protection, don't go off (but warn) for five seconds
+					if tab[i]:IsPlayer() and tab[i].JustSpawned and self.ready then
+						local olddetrange = self.DetonationRange
+						self.DetonationRange = -1
+						timer.Simple(5,function() if IsValid(self) then self.DetonationRange = olddetrange end end)
+					end
 					if tab[i]:GetPos():Distance(self:GetPos()) < self.DetonationRange then
 						self.Explode = true
 						break

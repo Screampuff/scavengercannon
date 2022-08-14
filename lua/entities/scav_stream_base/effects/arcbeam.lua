@@ -101,6 +101,13 @@ if SERVER then
 					dmg:SetDamageForce(vector_origin)
 					ent:TakeDamageInfo(dmg)
 					self.LastDamage = CurTime()
+					--hitent:Fire("StartRagdollBoogie",1,0)
+					if ent:GetClass() == "prop_ragdoll" then
+						for i=0,ent:GetPhysicsObjectCount()-1 do
+							local force = ent:GetPhysicsObjectNum(i):GetMass() * 200
+							ent:GetPhysicsObjectNum(i):ApplyForceCenter(VectorRand(force * -1,force))
+						end
+					end
 				end
 				ent:EmitSound(table.Random(shocksounds))
 			end
@@ -121,6 +128,13 @@ if SERVER then
 					dmg:SetDamageForce(vector_origin)
 					tr.Entity:TakeDamageInfo(dmg)
 					self.LastDamage = CurTime()
+					--hitent:Fire("StartRagdollBoogie",1,0)
+					if tr.Entity:GetClass() == "prop_ragdoll" then
+						for i=0,tr.Entity:GetPhysicsObjectCount()-1 do
+							local force = tr.Entity:GetPhysicsObjectNum(i):GetMass() * 200
+							tr.Entity:GetPhysicsObjectNum(i):ApplyForceCenter(VectorRand(force * -1,force))
+						end
+					end
 				end
 			else
 				self.LastDamage = CurTime()

@@ -487,7 +487,7 @@ function ITEM:Remove(silent,pl,ignoredelay) --Calling this on the server will se
 			end
 			
 			--add a slight, client-defined delay between different firemodes
-			if SERVER and delay then
+			if SERVER and delay and IsValid(self.parent.Owner.Owner) and self.parent.Owner.Owner:Alive() then
 				if k == 1 and olditem then
 					local newitem = self.parent.items[2]
 					if newitem then

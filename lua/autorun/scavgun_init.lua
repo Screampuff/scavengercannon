@@ -90,6 +90,12 @@ ScavDropUsefulRagdoll_npcs = {
 	["monster_alien_slave"] = true, --vortigaunt beam
 	["monster_human_assassin"] = true, --cloak/silenced USPs
 }
+if SERVER then
+	hook.Add("PlayerSpawn","Scav_JustSpawned",function(ply,transition)
+		ply.JustSpawned = true
+		timer.Simple(0.125,function() if IsValid(ply) then ply.JustSpawned = false end end)
+	end)
+end
 
 local function SetupScavPickupOverrides(state)
 	for i=1,game.MaxPlayers() do
@@ -104,10 +110,6 @@ local function SetupScavPickupOverrides(state)
 		hook.Remove("PlayerSpawn","Scav_DisableTouchPickup")
 		hook.Remove("PlayerGiveSWEP","Scav_DisableTouchPickup")
 	elseif tonumber(state) < 3 then
-		hook.Add("PlayerSpawn","Scav_DisableTouchPickup",function(ply,transition) --stops checks from denying weapons/items on spawn
-			ply.JustSpawned = true
-			timer.Simple(0,function() ply.JustSpawned = false end)
-		end)
 		hook.Add("PlayerGiveSWEP","Scav_DisableTouchPickup",function(ply,weapon,sweptable) --stops checks from denying weapons from spawnmenu
 			ply.SWEPSpawned = weapon
 			timer.Simple(0,function() ply.SWEPSpawned = "nil" end)
@@ -132,10 +134,6 @@ local function SetupScavPickupOverrides(state)
 			end
 		end)
 	else
-		hook.Add("PlayerSpawn","Scav_DisableTouchPickup",function(ply,transition)
-			ply.JustSpawned = true
-			timer.Simple(0,function() ply.JustSpawned = false end)
-		end)
 		hook.Add("PlayerGiveSWEP","Scav_DisableTouchPickup",function(ply,weapon,sweptable)
 			ply.SWEPSpawned = weapon
 			timer.Simple(0,function() ply.SWEPSpawned = "nil" end)
@@ -274,11 +272,17 @@ ScavData.OKClasses = {
 	prop_physics = 1,
 	prop_physics_respawnable = 1,
 	prop_physics_multiplayer = 1,
+	simple_physics_prop = 1, --created by phys_convert
 	prop_ragdoll = 1,
 	helicopter_chunk = 1,
+	grenade_helicopter = 1,
 	gib = 1,
 	scav_projectile_rocket = 1,
 	rpg_missile = 1,
+	apc_missile = 1,
+	npc_grenade_frag = 1,
+	npc_grenade_bugbait = 1,
+	hunter_flechette = 1,
 	phys_magnet = 1,
 	prop_ragdoll_attached = 1,
 	gmod_wire_hoverdrivecontroler = 1,
@@ -288,7 +292,11 @@ ScavData.OKClasses = {
 	scav_c4 = 1,
 	scav_tripmine = 1,
 	scav_proximity_mine = 1,
+	weapon_striderbuster = 1,
+	npc_satchel = 1, --SLAM
+	npc_tripmine = 1, --SLAM
 	npc_rollermine = 1, --can't leave corpses, so, gotta let them get taken here
+	item_item_crate = 1,
 	weapon_physgun = 2,
 	weapon_physcannon = 2,
 	weapon_crowbar = 2,
@@ -314,7 +322,6 @@ ScavData.OKClasses = {
 	weapon_blackholegun = 2,
 	weapon_backuppistol = 2,
 	weapon_alchemygun = 2,
-	item_item_crate = 2,
 	item_healthkit = 2,
 	item_healthvial = 2,
 	item_grubnugget = 2,
@@ -322,29 +329,30 @@ ScavData.OKClasses = {
 	item_battery = 2,
 	item_suitcharger = 2,
 	item_box_srounds = 2, --old entity name, can be seen in some HL2 maps
+	item_large_box_srounds = 2, --"
 	item_ammo_pistol = 2,
 	item_ammo_pistol_large = 2,
 	item_ammo_357 = 2,
 	item_ammo_357_large = 2,
 	item_box_mrounds = 2, --old entity name, can be seen in some HL2 maps
+	item_large_box_mrounds = 2, --"
 	item_ammo_smg1 = 2,
 	item_ammo_smg1_large = 2,
 	item_ar2_grenade = 2, --old entity name, can be seen in some HL2 maps
 	item_ammo_smg1_grenade = 2,
 	grenade_ar2 = 2,
 	item_box_lrounds = 2, --old entity name, can be seen in some HL2 maps
+	item_large_box_lrounds = 2, --"
 	item_ammo_ar2 = 2,
 	item_ammo_ar2_large = 2,
 	item_ammo_ar2_altfire = 2,
 	item_box_buckshot = 2,
 	item_ammo_crossbow = 2,
-	npc_grenade_frag = 2,
+	item_ml_grenade = 2, --old entity name, can be seen in some HL2 maps
 	item_rpg_round = 2,
-	rpg_missle = 2,
-	apc_missle = 2,
-	npc_grenade_bugbait = 2,
-	grenade_helicopter = 2,
-	weapon_striderbuster = 2,
+	item_flare_round = 2, --defined in code, don't think it's actually ever used
+	item_box_flare_rounds = 2, --"
+	item_box_sniper_rounds = 2, --"
 	npc_barnacle = 2, --can't leave corpses, so, gotta let them get taken here
 	combine_mine = 2, --ditto
 	scav_bounding_mine = 2, --ditto
@@ -401,6 +409,7 @@ end
 if SERVER then
 
 	ScavData.CollectFuncs = {}
+	ScavData.CollectFX = {}
 	
 	local angoffset0_0_0 = Angle(0,0,0)
 	local angoffset90_0_0 = Angle(90,0,0)
