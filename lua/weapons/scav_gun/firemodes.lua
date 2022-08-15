@@ -6592,7 +6592,7 @@ PrecacheParticleSystem("scav_exp_plasma")
 					elseif ent:GetBodygroup(2) == 1 then
 						return {{"models/shotgunshell.mdl",8,0}}
 					else
-						return {{}}
+						return {{"models/w_grenade.mdl",1,0}}
 					end
 				end
 				ScavData.CollectFX["models/hgrunt.mdl"] = function(self,ent)
