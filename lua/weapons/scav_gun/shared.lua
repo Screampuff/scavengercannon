@@ -247,10 +247,29 @@ function SWEP:ProcessLinking(item)
 
 			local newitem = self:GetNextItem()
 
-			if newitem and (ScavData.models[newitem.ammo] == ScavData.models[item.ammo]) then
-				self.chargeitem = newitem
+			if newitem then
+
+				local newinfo = ScavData.models[newitem.ammo]
+				local oldinfo = ScavData.models[item.ammo]
+
+				local newname = newinfo.Name and newinfo.Name or "#scav.scavcan.unknown"
+				local oldname = oldinfo.Name and oldinfo.Name or "#scav.scavcan.unknown"
+
+				local newstyle = newinfo.Identify and newinfo.Identify[newitem.ammo] or -1
+				local oldstyle = oldinfo.Identify and oldinfo.Identify[item.ammo] or -1
+
+				if newstyle == oldstyle and newname == oldname then
+					self.chargeitem = newitem
+				else
+					self.ChargeAttack = nil
+					self.chargeitem = nil
+				end
+
 			else
+
 				self.ChargeAttack = nil
+				self.chargeitem = nil
+				
 			end
 
 			item:Remove()
@@ -259,6 +278,7 @@ function SWEP:ProcessLinking(item)
 
 		if not self:GetCurrentItem() or (ScavData.GetFiremode(item.ammo) ~= ScavData.GetFiremode(self:GetCurrentItem().ammo) or (self:GetCurrentItem().subammo <= 0)) or not self.Owner:KeyDown(IN_ATTACK) then
 			self.ChargeAttack = nil
+			self.chargeitem = nil
 		end
 
 		return self.ChargeAttack ~= nil
@@ -273,7 +293,16 @@ function SWEP:ProcessLinking(item)
 
 				self.predicteditem = 2
 
-				if ScavData.GetFiremode(item.ammo) == ScavData.GetFiremode(predicteditem.ammo) then
+				local newinfo = ScavData.models[predicteditem.ammo]
+				local oldinfo = ScavData.models[item.ammo]
+
+				local newname = newinfo.Name and newinfo.Name or "#scav.scavcan.unknown"
+				local oldname = oldinfo.Name and oldinfo.Name or "#scav.scavcan.unknown"
+
+				local newstyle = newinfo.Identify and newinfo.Identify[predicteditem.ammo] or -1
+				local oldstyle = oldinfo.Identify and oldinfo.Identify[item.ammo] or -1
+
+				if newstyle == oldstyle and newname == oldname then
 					self.chargeitem = predicteditem
 				else
 					self.ChargeAttack = nil
