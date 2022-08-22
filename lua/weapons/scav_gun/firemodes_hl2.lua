@@ -626,11 +626,13 @@ local eject = "brass"
 			tab.Level = 4
 			local identify = {
 				--[HL2] = 0,
+				--[[HL:S]]["models/w_grenade.mdl"] = 1,
 			}
 			tab.Identify = setmetatable(identify, {__index = function() return 0 end} )
 			tab.MaxAmmo = 10
 			if SERVER then
 				tab.FireFunc = function(self,item)
+					local tab = ScavData.models[self.inv.items[1].ammo]
 					self.Owner:ViewPunch(Angle(-5,math.Rand(-0.1,0.1),0))
 					local proj = self:CreateEnt("npc_grenade_frag")
 					proj.Owner = self.Owner
@@ -639,9 +641,35 @@ local eject = "brass"
 					proj:SetAngles((self:GetAimVector():Angle():Right()):Angle())
 					proj:Spawn()
 					proj:SetModel(item.ammo)
-					proj:GetPhysicsObject():ApplyForceOffset((self:GetAimVector())*5000,Vector(0,0,3)) --+Vector(0,0,0.1)
-					timer.Simple(0, function() proj:GetPhysicsObject():AddAngleVelocity(Vector(-5000,5000,0)) end)
+					proj:GetPhysicsObject():ApplyForceOffset((self:GetAimVector())*2000,Vector(0,0,3))
+					timer.Simple(0, function() proj:GetPhysicsObject():AddAngleVelocity(Vector(1000,1000,0)) end)
 					proj:Fire("SetTimer",2,"0")
+					if tab.Identify[item.ammo] == 1 then
+						proj:AddCallback("PhysicsCollide",function(ent,data)
+							if ( data.Speed > 50 ) then
+								ent:EmitSound(Sound("weapons/grenade_hit"..math.random(3)..".wav"))
+							end
+						end)
+						if proj:GetInternalVariable("m_flNextBlipTime") then
+							proj:SetSaveValue("m_flNextBlipTime",CurTime() + 1000)
+						end
+						timer.Simple(0,function()
+							local fxent = nil
+							if IsValid(proj) and proj:GetInternalVariable("m_pGlowTrail") then
+								fxent = proj:GetInternalVariable("m_pGlowTrail")
+								if IsValid(fxent) then
+									fxent:Remove()
+								end
+							end
+							if IsValid(proj) and proj:GetInternalVariable("m_pMainGlow") then
+								fxent = proj:GetInternalVariable("m_pMainGlow")
+								if IsValid(fxent) then
+									fxent:Remove()
+								end
+							end
+						end)
+					end
+					proj:SetSaveValue("m_pGlowTrail",nil)
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
 					self.Owner:EmitSound(self.shootsound)
 					--gamemode.Call("ScavFired",self.Owner,proj)
@@ -668,6 +696,8 @@ local eject = "brass"
 		--DoD:S
 		ScavData.RegisterFiremode(tab,"models/weapons/w_frag.mdl")
 		ScavData.RegisterFiremode(tab,"models/weapons/w_stick.mdl")
+		--HL:S
+		ScavData.RegisterFiremode(tab,"models/w_grenade.mdl")
 		--L4D/2
 		ScavData.RegisterFiremode(tab,"models/w_models/weapons/w_eq_pipebomb.mdl")
 
@@ -2233,9 +2263,18 @@ local eject = "brass"
 						tr.Entity:TakeDamageInfo(dmg)
 					end
 					self.Owner:SetAnimation(PLAYER_ATTACK1)
-					sound.Play("npc/vort/vort_explode2.wav" ,tr.HitPos)
+					local soundfx = {
+						[0] = function(tr)
+							sound.Play("npc/vort/vort_explode2.wav" ,tr.HitPos)
+						end,
+						[1] = function(tr)
+							sound.Play("weapons/electro4.wav",tr.HitPos,75,math.Rand(140,160))
+						end
+					}
+					soundfx[tab.Identify[item.ammo]](tr)
 					self.soundloops.scavvort:Stop()
 					self:SetBlockPose(0,4)
+					self:TakeSubammo(item,1)
 				else
 					if self.Owner == GetViewEntity() then
 						util.ParticleTracerEx("vortigaunt_beam",self.Owner:GetViewModel():GetAttachment(self.Owner:GetViewModel():LookupAttachment("muzzle")).Pos,self.Owner:GetEyeTraceNoCursor().HitPos,false,0,-1)
@@ -2257,38 +2296,54 @@ local eject = "brass"
 					end
 					util.Effect("StunstickImpact",ef)
 				end
-				self.Owner:EmitSound("npc/vort/vort_explode1.wav",75,100,.5)
-				self.Owner:EmitSound("npc/vort/attack_shoot.wav",75,100,.25) --God why is this so LOUD all of a sudden
+				local soundfx = {
+					[0] = function(self)
+						self.Owner:EmitSound("npc/vort/vort_explode1.wav",75,100,.5)
+						self.Owner:EmitSound("npc/vort/attack_shoot.wav",75,100,.25) --God why is this so LOUD all of a sudden
+					end,
+					[1] = function(self)
+						self.Owner:EmitSound("weapons/electro4.wav",75,math.Rand(140,160))
+						self.Owner:EmitSound("hassault/hw_shoot1.wav",75,math.Rand(130,160))
+					end
+				}
+				soundfx[tab.Identify[item.ammo]](self)
+				self:ProcessLinking(item)
 				self:SetChargeAttack()
 				return 0.5
 			end
-				tab.FireFunc = function(self,item)
-					self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
-					if SERVER then
-						if self.Owner.snd_scavvort then
-							self.Owner.snd_scavvort:Stop()
-						end
-						if not self.soundloops.scavvort then
-							self.soundloops.scavvort = CreateSound(self.Owner,"npc/vort/attack_charge.wav")
-						end
+			tab.FireFunc = function(self,item)
+				local tab = ScavData.models[self.inv.items[1].ammo]
+				self:SetChargeAttack(ScavData.models[self.inv.items[1].ammo].ChargeAttack,item)
+				if SERVER then
+					if self.Owner.snd_scavvort then
+						self.Owner.snd_scavvort:Stop()
+					end
+					if not self.soundloops.scavvort then
+						self.soundloops.scavvort = CreateSound(self.Owner,tab.Identify[item.ammo] == 0 and "npc/vort/attack_charge.wav" or "debris/zap4.wav")
+					end
+					if self.soundloops.scavvort then
 						self.soundloops.scavvort:PlayEx(.5,100)
-						self:SetBlockPose(1,4)
-						return self:TakeSubammo(item,1)
-					else
-						ParticleEffectAttach("scav_vm_vort",PATTACH_POINT_FOLLOW,self.Owner:GetViewModel(),self:LookupAttachment("muzzle"))
-						if GetConVar("cl_scav_high"):GetBool() then
-							self.dlight = DynamicLight(0)
-								self.dlight.Pos = self.Owner:GetShootPos()
-								self.dlight.r = 110
-								self.dlight.g = 200
-								self.dlight.b = 75
-								self.dlight.Brightness = .625
-								self.dlight.Size = 512
-								self.dlight.Decay = 250
-								self.dlight.DieTime = CurTime() + 1.5
+						if tab.Identify[item.ammo] == 1 then
+							self.soundloops.scavvort:ChangePitch(140,1.5)
 						end
 					end
+					self:SetBlockPose(1,4)
+					return false
+				else
+					ParticleEffectAttach("scav_vm_vort",PATTACH_POINT_FOLLOW,self.Owner:GetViewModel(),self:LookupAttachment("muzzle"))
+					if GetConVar("cl_scav_high"):GetBool() then
+						self.dlight = DynamicLight(0)
+							self.dlight.Pos = self.Owner:GetShootPos()
+							self.dlight.r = 110
+							self.dlight.g = 200
+							self.dlight.b = 75
+							self.dlight.Brightness = .625
+							self.dlight.Size = 512
+							self.dlight.Decay = 250
+							self.dlight.DieTime = CurTime() + 1.5
+					end
 				end
+			end
 			if SERVER then
 				ScavData.CollectFuncs["models/vortigaunt.mdl"] = function(self,ent) return {{ent:GetModel(),4,ent:GetSkin()}} end
 				ScavData.CollectFuncs["models/vortigaunt_slave.mdl"] = ScavData.CollectFuncs["models/vortigaunt.mdl"]
