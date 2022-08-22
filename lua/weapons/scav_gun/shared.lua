@@ -2730,7 +2730,7 @@ if SERVER then
 		local modellist = {}
 
 		if ScavData.CollectFuncs[collectmodelname] then
-			PrintTable(ScavData.CollectFuncs[collectmodelname](self,ent))
+			--PrintTable(ScavData.CollectFuncs[collectmodelname](self,ent))
 			modellist = ScavData.CollectFuncs[collectmodelname](self,ent)
 		else
 			modellist[1] = {collectmodelname}

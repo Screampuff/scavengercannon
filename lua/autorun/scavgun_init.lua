@@ -273,6 +273,8 @@ ScavData.OKClasses = {
 	prop_physics_respawnable = 1,
 	prop_physics_multiplayer = 1,
 	simple_physics_prop = 1, --created by phys_convert
+	physics_cannister = 1,
+	scav_projectile_canister = 1,
 	prop_ragdoll = 1,
 	helicopter_chunk = 1,
 	grenade_helicopter = 1,
@@ -589,8 +591,10 @@ if SERVER then
 		(GetConVar("scav_override_pickups"):GetInt() >= 3 and ent:IsWeapon())) and
 		ent:GetMoveType() == MOVETYPE_VPHYSICS and not ent.NoScav then
 			if ent:GetClass() == "npc_rollermine" and not ent:GetInternalVariable("m_bHackedByAlyx") then return false end
+			if ent:GetClass() == "physics_cannister" and ent:GetInternalVariable("m_active") then return false end --sounds get stuck looping on if scavved while active
 			return true
 		end
+		return false
 	end
 	
 	local function NewViewPunch(angles,duration)
