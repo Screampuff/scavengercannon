@@ -85,6 +85,13 @@ hook.Add("Initialize","SetupStatusHook",function()
 		return false
 	end
 end)
+
+saverestore.AddSaveHook("scavstatusreset",function(save) --purge status effects on players before map save
+	for i,v in pairs(player.GetAll()) do
+		Status2.PurgeEnt(v)
+		v.StatusTable = nil
+	end
+end)
 	
 if SERVER then
 	util.AddNetworkString("StatusInflict")
@@ -172,9 +179,13 @@ function Status2.RemoveInstance(stat)
 			if v == stat then
 				table.remove(stat.Owner.StatusTable,k)
 				break
-			end
-		end
-		for k,v in ipairs(Status2.AllInstances) do
+			end	ent.StatusTable = tab
+			tab.ent = ent
+			tab.statustype = statustype
+			tab.duration = duration
+			tab.value = value
+			tab.inflictor = inflictor
+			tab.infinite = infinite
 			if v == stat then
 				table.remove(Status2.AllInstances,k)
 				break
@@ -197,7 +208,9 @@ function Status2.PurgeEnt(self)
 		return
 	end
 	for i=1,#self.StatusTable do
-		self.StatusTable[1]:Finish()
+		if self.StatusTable[1].Finish then
+			self.StatusTable[1]:Finish()
+		end
 		Status2.RemoveInstance(self.StatusTable[1])
 	end
 end

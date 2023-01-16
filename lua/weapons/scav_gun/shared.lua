@@ -295,9 +295,13 @@ function SWEP:ProcessLinking(item)
 
 				local newinfo = ScavData.models[predicteditem.ammo]
 				local oldinfo = ScavData.models[item.ammo]
+				local newname = "#scav.scavcan.unknown"
+				local oldname = "#scav.scavcan.unknown"
 
-				local newname = newinfo.Name and newinfo.Name or "#scav.scavcan.unknown"
-				local oldname = oldinfo.Name and oldinfo.Name or "#scav.scavcan.unknown"
+				if newinfo and oldinfo then
+					newname = newinfo.Name and newinfo.Name
+					oldname = oldinfo.Name and oldinfo.Name
+				end
 
 				local newstyle = newinfo.Identify and newinfo.Identify[predicteditem.ammo] or -1
 				local oldstyle = oldinfo.Identify and oldinfo.Identify[item.ammo] or -1

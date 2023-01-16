@@ -275,11 +275,17 @@ function SWEP:Deploy()
 end
 
 function SWEP:OnRemove()
+
 	if SERVER then
 		self:DestroyWaypoints()
-		self.SoundRattle:Stop()
-		self.SoundCharge:Stop()
+		if self.SoundRattle then
+			self.SoundRattle:Stop()
+		end
+		if self.SoundCharge then
+			self.SoundCharge:Stop()
+		end
 	end
+
 end
 
 function SWEP:Holster()
@@ -287,8 +293,12 @@ function SWEP:Holster()
 		return false
 	end
 	if SERVER then
-		self.SoundRattle:Stop()
-		self.SoundCharge:Stop()
+		if self.SoundRattle then
+			self.SoundRattle:Stop()
+		end
+		if self.SoundCharge then
+			self.SoundCharge:Stop()
+		end
 	end
 	if game.SinglePlayer() then
 		self:CallOnClient("Holster")
