@@ -179,13 +179,9 @@ function Status2.RemoveInstance(stat)
 			if v == stat then
 				table.remove(stat.Owner.StatusTable,k)
 				break
-			end	ent.StatusTable = tab
-			tab.ent = ent
-			tab.statustype = statustype
-			tab.duration = duration
-			tab.value = value
-			tab.inflictor = inflictor
-			tab.infinite = infinite
+			end
+		end
+		for k,v in ipairs(Status2.AllInstances) do
 			if v == stat then
 				table.remove(Status2.AllInstances,k)
 				break
@@ -573,10 +569,12 @@ local STATUS = {}
 				self.Owner:SetNPCState(NPC_STATE_NONE)
 			elseif self.Owner:IsNPC() then
 				self.Owner:SetSchedule(SCHED_NONE)
-			elseif _ZetasInstalled and self.Owner:GetClass() == "npc_zetaplayer" then --Zeta Player specific
+			elseif self.Owner:GetClass() == "npc_zetaplayer" then --Zeta Player specific
 				self.Owner:CancelMove()
 				self.Owner:StopLooking()
 				self.Owner:SetState('jailed/held')
+			elseif self.Owner:GetClass() == "npc_lambdaplayer" then --Lambda Player specific
+				self.Owner:Freeze(true)
 			elseif IsValid(self.Owner:GetPhysicsObject()) and self.Owner:GetMoveType() == MOVETYPE_VPHYSICS then
 				local phys = self.Owner:GetPhysicsObject()
 				if IsValid(phys) then
@@ -644,7 +642,7 @@ local STATUS = {}
 						end
 					end
 				end
-				if ent:IsNPC() then
+				if ent:IsNPC() and IsValid(attacker) then
 					gamemode.Call("OnNPCKilled",ent,attacker,inflictor)
 				end
 				ent:Remove()
@@ -713,6 +711,9 @@ local STATUS = {}
 			end
 			if _ZetasInstalled and self.Owner:GetClass() == "npc_zetaplayer" then --Zeta Player specific
 				self.Owner:SetState('idle')
+			end
+			if self.Owner:GetClass() == "npc_lambdaplayer" then --Lambda Player specific
+				self.Owner:UnLock()
 			end
 			if not self.Owner:IsPlayer() then
 				self.Owner:SetMaterial(self.mat)
