@@ -97,18 +97,29 @@ end
 
 
 function SWEP:Scavenge(ent)
-	local modelname = ScavData.FormatModelname(ent:GetModel())
+	if not IsValid(ent) then return end
 	ent.NoScav = true
-	local ef = EffectData()
-	ef:SetRadius(ent:OBBMaxs():Distance(ent:OBBMins())/2)
-	ef:SetEntity(self.Owner)
-	ef:SetOrigin(ent:GetPos())
-	util.Effect("scav_pickup",ef,nil,true)
-	local pickup = ents.Create("scav_bhg_pickup")
-	pickup:SetModel(ent:GetModel())
-	pickup:SetPos(ent:GetPos())
-	pickup:SetAngles(ent:GetAngles())
-	pickup:Spawn()
+	if not ent:GetNoDraw() then
+		local ef = EffectData()
+		ef:SetRadius(ent:OBBMaxs():Distance(ent:OBBMins())/2)
+		ef:SetEntity(self.Owner)
+		ef:SetOrigin(ent:GetPos())
+		util.Effect("scav_pickup",ef,nil,true)
+		local pickup = ents.Create("scav_bhg_pickup")
+		pickup:SetModel(ent:GetModel())
+		pickup:SetPos(ent:GetPos())
+		pickup:SetAngles(ent:GetAngles())
+		pickup:Spawn()
+	end
 	self:AddAmmo(ent:GetPhysicsObject():GetMass())
 	ent:Remove()
+end
+
+
+function SWEP:CreateSoundRattle()
+	if IsValid(self.Owner) then return CreateSound(self.Owner,"ambient/machines/train_wheels_loop1.wav") end
+end
+
+function SWEP:CreateSoundCharge()
+	if IsValid(self.Owner) then return CreateSound(self.Owner,"ambient/levels/labs/teleport_active_loop1.wav") end
 end

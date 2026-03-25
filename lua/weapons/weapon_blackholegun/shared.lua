@@ -147,6 +147,8 @@ end
 function SWEP:PrimaryAttack()
 	if (self.ChargeTime == 0) and (self:GetAmmo() >= 50) and IsFirstTimePredicted() then
 		if SERVER then
+			if not self.SoundRattle then self.SoundRattle = self:CreateSoundRattle() end
+			if not self.SoundCharge then self.SoundCharge = self:CreateSoundCharge() end
 			self.SoundRattle:PlayEx(50,170)
 			self.SoundCharge:Play()
 			local ef = ents.Create("scav_stream_bhgcharge")
@@ -175,8 +177,8 @@ function SWEP:PrimaryRelease()
 
 	local charge = math.floor(self.Charge)
 	if SERVER then
-		self.SoundRattle:Stop()
-		self.SoundCharge:Stop()
+		if self.SoundRattle then self.SoundRattle:Stop() end
+		if self.SoundCharge then self.SoundCharge:Stop() end
 		util.ScreenShake(self.Owner:GetShootPos(),charge/20,5,2,4000)
 		if IsValid(self.ChargeEffect) then
 			self.ChargeEffect:Kill()
@@ -263,8 +265,8 @@ function SWEP:Deploy()
 			timer.Simple(0.1, function() screenresetondeploy(self) end)
 			self.FirstDeploy = false
 		end
-		self.SoundRattle = CreateSound(self.Owner,"ambient/machines/train_wheels_loop1.wav")
-		self.SoundCharge = CreateSound(self.Owner,"ambient/levels/labs/teleport_active_loop1.wav")
+		self.SoundRattle = self:CreateSoundRattle()
+		self.SoundCharge = self:CreateSoundCharge()
 	end
 	if CLIENT then
 		self.DeployedTime = CurTime()
@@ -278,12 +280,8 @@ function SWEP:OnRemove()
 
 	if SERVER then
 		self:DestroyWaypoints()
-		if self.SoundRattle then
-			self.SoundRattle:Stop()
-		end
-		if self.SoundCharge then
-			self.SoundCharge:Stop()
-		end
+		if self.SoundRattle then self.SoundRattle:Stop() end
+		if self.SoundCharge then self.SoundCharge:Stop() end
 	end
 
 end
@@ -293,12 +291,8 @@ function SWEP:Holster()
 		return false
 	end
 	if SERVER then
-		if self.SoundRattle then
-			self.SoundRattle:Stop()
-		end
-		if self.SoundCharge then
-			self.SoundCharge:Stop()
-		end
+		if self.SoundRattle then self.SoundRattle:Stop() end
+		if self.SoundCharge then self.SoundCharge:Stop() end
 	end
 	if game.SinglePlayer() then
 		self:CallOnClient("Holster")

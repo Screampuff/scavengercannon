@@ -125,7 +125,7 @@ else
 	end)
 
 	function ENT:OnRemove()
-		self.SoundLoop:Stop()
+		if self.SoundLoop then self.SoundLoop:Stop() end
 		if SERVER and IsValid(self.WayPoint) then
 			self.WayPoint:DestroyPath()
 		end

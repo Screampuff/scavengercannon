@@ -2,18 +2,14 @@
 local SWEP = SWEP
 local ScavData = ScavData
 
-local state
-if CLIENT then
-	state = "Client - "
-else
-	state = "Server - "
-end
+local INVREADSIZE = 16 -- -32768 to 32767 --size for reading from ScavInventories
+local IDREADSIZE = 9 -- -256 to 255 --inv ids
 
 CreateConVar("scav_itemdebug",0,FCVAR_REPLICATED)
 
 local function debugprint(infotype,message)
 	if GetConVar("scav_itemdebug"):GetBool() then
-		print(state..infotype..": "..message)
+		print(infotype..": "..message)
 	end
 end
 
@@ -76,7 +72,7 @@ function INVENTORY:AddOnClient(pl)
 	end
 	
 	net.Start("scv_invadd")
-		net.WriteInt(self.ID,16)
+		net.WriteInt(self.ID,INVREADSIZE)
 		net.WriteEntity(self.Owner)
 	net.Send(pl or self:GetRecipientFilter())
 	
@@ -89,7 +85,7 @@ end
 if CLIENT then
 	net.Receive("scv_invadd",function()
 	
-		local id = net.ReadInt(16)
+		local id = net.ReadInt(INVREADSIZE)
 		local inv = ScavInventories[id]
 		local owner = net.ReadEntity()
 		
@@ -113,6 +109,7 @@ function ScavInventory(weapon)
 end
 
 function ReinitializeScavInventory(inv)
+	if not inv or type(inv) ~= "table" then ErrorNoHaltWithStack("No Scav Inventory to Reinitialize, got " .. type(inv) .. ", expected table!") end
 	table.Inherit(inv,INVENTORY)
 	for _,v in ipairs(inv.items) do
 		v.parent = inv
@@ -121,7 +118,7 @@ function ReinitializeScavInventory(inv)
 end
 
 function INVENTORY:FindVacantID()
-	for i=1,255 do
+	for i=1,math.pow(2,IDREADSIZE-1) do
 		if not self.itemids[i] then
 			return i
 		end
@@ -151,12 +148,12 @@ function INVENTORY:Remove() --Calling this on the server will send a net message
 	
 	if SERVER and (type(rf) == "Player" or type(rf) == "CRecipientFilter") then
 		net.Start("scv_invrem")
-			net.WriteInt(self.ID,16)
+			net.WriteInt(self.ID,INVREADSIZE)
 		net.Send(rf)
 	end
 
 	for _,v in pairs(self.itemids) do
-		v:Remove(true)
+		v:Remove(true, nil, true)
 	end
 	
 	ScavInventories[self.ID] = nil
@@ -165,7 +162,7 @@ end
 	
 if CLIENT then
 	net.Receive("scv_invrem",function()
-		local inv = ScavInventories[net.ReadInt(16)]
+		local inv = ScavInventories[net.ReadInt(INVREADSIZE)]
 		if inv then
 			inv:Remove()
 		end
@@ -198,15 +195,15 @@ end
 
 function INVENTORY:ClearOnClient(pl)
 	net.Start("scv_invclr")
-		net.WriteInt(self.inv:GetID(),16)
+		net.WriteInt(self.ID, INVREADSIZE)
 	net.Send(pl or self:GetRecipientFilter())
 end
 	
 if CLIENT then
 	net.Receive("scv_invclr",function()
-		local inv = ScavInventories[net:ReadInt(16)]
+		local inv = ScavInventories[net.ReadInt(INVREADSIZE)]
 		if inv then
-			for _,v in ipairs(inv:GetItemIDs()) do
+			for _, v in ipairs(inv:GetItemIDs()) do
 				v:Remove()
 			end
 		end
@@ -214,7 +211,7 @@ if CLIENT then
 end
 		
 function INVENTORY:AddAllToClient(pl)
-	for _,v in ipairs(self.items) do
+	for _, v in ipairs(self.items) do
 		v:AddOnClient(pl)
 	end
 end
@@ -245,8 +242,8 @@ function INVENTORY:ShiftItems(amt,pl)
 	
 	if SERVER then
 		net.Start("scv_invshft")
-			net.WriteInt(self.ID,16)
-			net.WriteInt(amt,9)
+			net.WriteInt(self.ID,INVREADSIZE)
+			net.WriteInt(amt,IDREADSIZE)
 		net.Send(self:GetRecipientFilter())
 	end
 	
@@ -258,9 +255,9 @@ end
 	
 if CLIENT then
 	net.Receive("scv_invshft",function()
-		local inv = ScavInventories[net.ReadInt(16)]
+		local inv = ScavInventories[net.ReadInt(INVREADSIZE)]
 		if inv then
-			local amt = net.ReadInt(9)
+			local amt = net.ReadInt(IDREADSIZE)
 			inv:ShiftItems(amt)
 		end
 	end)
@@ -272,11 +269,11 @@ if SERVER then
 
 	function INVENTORY:SendSnapshot()
 		net.Start("scv_snap")
-			net.WriteInt(self.ID,16)
+			net.WriteInt(self.ID,INVREADSIZE)
 			local amt = #self.items
-			net.WriteInt(amt,9)
+			net.WriteInt(amt,IDREADSIZE)
 			for i=1,amt do
-				net.WriteInt(self.items[i].ID,9)
+				net.WriteInt(self.items[i].ID,IDREADSIZE)
 			end
 		net.Send(self:GetRecipientFilter())
 	end
@@ -284,14 +281,14 @@ if SERVER then
 else
 
 	net.Receive("scv_snap",function()
-		local inv = ScavInventories[net.ReadInt(16)]
-		local amt = net.ReadInt(9)
+		local inv = ScavInventories[net.ReadInt(INVREADSIZE)]
+		local amt = net.ReadInt(IDREADSIZE)
 		if inv then
 			for k,v in pairs(inv.items) do
 				inv.items[k] = nil
 			end
 			for i=1,amt do
-				inv.items[i] = inv.itemids[net.ReadInt(9)]
+				inv.items[i] = inv.itemids[net.ReadInt(IDREADSIZE)]
 			end
 		end
 	end)
@@ -364,44 +361,44 @@ end
 	
 function ITEM:AddOnClient(pl)
 
-	if not IsValid(pl) then return end
+	--if not IsValid(pl) then return end
 
 	net.Start("scv_itmadd")
-		net.WriteInt(self:GetParentID(),16)
-		net.WriteInt(self.ID,9)
+		net.WriteInt(self:GetParentID(),INVREADSIZE)
+		net.WriteInt(self.ID, IDREADSIZE)
 		if self.pos ~= 1 then  --instead of sending the absolute position, which could get messy, we'll send the ID of the item we're above, 0 if we're not above anything
-			net.WriteInt(self.parent.items[self.pos-1]:GetID(),9)
+			net.WriteInt(self.parent.items[self.pos - 1]:GetID(), IDREADSIZE)
 		else
-			net.WriteInt(0,9)
+			net.WriteInt(0, IDREADSIZE)
 		end
 		net.WriteString(self.ammo)
-		net.WriteInt(self.subammo,16)
-		net.WriteInt(self.data,16)
+		net.WriteInt(self.subammo, 16)
+		net.WriteInt(self.data, 16)
 		net.WriteFloat(self.mass)
 	net.Send(pl or self.parent:GetRecipientFilter())
 	
 end
 
 function ReinitializeScavItem(item)
-	table.Inherit(item,ITEM)
+	table.Inherit(item, ITEM)
 end
 	
 if CLIENT then
 
 	net.Receive("scv_itmadd",function()
 	
-		local invid = net.ReadInt(16)
+		local invid = net.ReadInt(INVREADSIZE)
 		
 		local inv = ScavInventories[invid]
 		if not inv then
 			return
 		end
-		local id = net.ReadInt(9)
+		local id = net.ReadInt(IDREADSIZE)
 		if inv.itemids[id] then
 			inv.itemids[id]:Remove()
 		end
 		
-		local idofprev = net.ReadInt(9)
+		local idofprev = net.ReadInt(IDREADSIZE)
 		local model = net.ReadString()
 		local subammo = net.ReadInt(16)
 		local data = net.ReadInt(16)
@@ -436,13 +433,13 @@ if CLIENT then
 
 		local self = inv.Owner
 		
-		if IsValid(self) then return end
+		if not IsValid(self) then return end
 		
 		if ScavData.models[item.ammo] and ScavData.models[item.ammo].OnPickup then
-			ScavData.models[item.ammo].OnPickup(self,item)
+			ScavData.models[item.ammo].OnPickup(self, item)
 		end
 		if inv:GetItemCount() == 1 and ScavData.models[item.ammo] and ScavData.models[item.ammo].OnArmed then
-			ScavData.models[item.ammo].OnArmed(self,item,"")
+			ScavData.models[item.ammo].OnArmed(self, item, "")
 		end
 		
 	end)
@@ -463,10 +460,36 @@ function ITEM:Remove(silent,pl,ignoredelay) --Calling this on the server will se
 
 	local delay = not ignoredelay
 	if SERVER then
+		--Check for Recycling Bin
+		local garbage = nil
+		for _, v in pairs(self.parent.Owner.inv.items) do
+			if ScavData.models[v.ammo] and ScavData.models[v.ammo].Name == "#scav.scavcan.recyclebin" then
+				garbage = ScavData.models[v.ammo].On
+				break
+			end
+		end
+		if garbage then
+			--If we've got an Alchemy or Black Hole Gun, give it to'em
+			local spent = false
+			for _, v in ipairs(ents.FindByClass("weapon_alchemygun")) do
+				if v.Owner == self.parent.Owner.Owner then
+					spent = self.parent.Owner:give(v, self.ammo, self.data)
+					break
+				end
+			end
+			if not spent then
+				for _, v in ipairs(ents.FindByClass("weapon_blackholegun")) do
+					if v.Owner == self.parent.Owner.Owner then
+						spent = self.parent.Owner:give(v, self.ammo, self.data)
+						break
+					end
+				end
+			end
+		end
 		if not silent then
 			net.Start("scv_itmrem")
-				net.WriteInt(self.parent.ID,16)
-				net.WriteInt(self.ID,9)
+				net.WriteInt(self.parent.ID,INVREADSIZE)
+				net.WriteInt(self.ID,IDREADSIZE)
 			net.Send(pl or self.parent:GetRecipientFilter())
 		end
 	end
@@ -475,7 +498,7 @@ function ITEM:Remove(silent,pl,ignoredelay) --Calling this on the server will se
 		self.parent.Owner:OnItemRemoved(self)
 	end
 	
-	for k,v in ipairs(self.parent.items) do
+	for k, v in ipairs(self.parent.items) do
 		if v == self then
 			local postremoved = nil
 			local olditem = self.parent.items[k]
@@ -505,7 +528,7 @@ function ITEM:Remove(silent,pl,ignoredelay) --Calling this on the server will se
 								prop = ents.Create("prop_ragdoll")
 							elseif util.IsValidProp(olditem.ammo) then
 								prop = ents.Create("prop_physics")
-							elseif string.find(olditem.ammo,"*%d",0,false) then
+							elseif string.find(olditem.ammo, "*%d", 0, false) then
 								prop = ents.Create("func_physbox")
 							end
 
@@ -516,7 +539,7 @@ function ITEM:Remove(silent,pl,ignoredelay) --Calling this on the server will se
 								local phys = prop:GetPhysicsObject()
 								local mass = 0
 						
-								for i=0,prop:GetPhysicsObjectCount()-1 do --setup bone positions
+								for i=0,prop:GetPhysicsObjectCount() - 1 do --setup bone positions
 									local phys = prop:GetPhysicsObjectNum(i)
 									if IsValid(phys) then
 										mass = mass + phys:GetMass()
@@ -531,23 +554,23 @@ function ITEM:Remove(silent,pl,ignoredelay) --Calling this on the server will se
 							newfiremode = newitem:GetFiremodeTable().Name
 						end
 
-						local delaybuffer = self.parent.Owner.Owner:GetInfoNum("cl_scav_autoswitchdelay",.375) - oldfiremodedelay
+						local delaybuffer = self.parent.Owner.Owner:GetInfoNum("cl_scav_autoswitchdelay", 0.375) - oldfiremodedelay
 						if oldfiremode ~= newfiremode and delaybuffer > 0 then
 							net.Start("scv_s_time")
 								net.WriteEntity(self.parent.Owner)
-								net.WriteInt(math.floor(delaybuffer),32)
+								net.WriteInt(math.floor(delaybuffer), 32)
 								net.WriteFloat(delaybuffer - math.floor(delaybuffer))
 							net.Send(self.parent.Owner.Owner)
 							self.parent.Owner.nextfire = self.parent.Owner.nextfire + delaybuffer
 							if self.parent.Owner:IsValid() and self.parent.Owner.Owner:Alive() then
-								self.parent.Owner.Owner:EmitSound("npc/dog/dog_pneumatic1.wav",75,80,1)
+								self.parent.Owner.Owner:EmitSound("npc/dog/dog_pneumatic1.wav", 75, 80, 1)
 							end
 						end
 					end
 				end
 			end
 
-			table.remove(self.parent.items,k)
+			table.remove(self.parent.items, k)
 			self.valid = false
 			break
 		end
@@ -555,17 +578,17 @@ function ITEM:Remove(silent,pl,ignoredelay) --Calling this on the server will se
 	
 	self.parent.itemids[self.ID] = nil
 	self.parent.numberofitems = self.parent.numberofitems - 1
-	debugprint("items","dec itemcount to "..self.parent.numberofitems)
+	debugprint("items", "dec itemcount to " .. self.parent.numberofitems)
 	self.parent:Update()
 	
 end
 	
 if CLIENT then
 	net.Receive("scv_itmrem",function()
-		local inv = ScavInventories[net.ReadInt(16)]
+		local inv = ScavInventories[net.ReadInt(INVREADSIZE)]
 		if inv then
-			local id = net.ReadInt(9)
-				timer.Simple(0.05, function()if inv.itemids[id] then inv.itemids[id]:Remove() end end)
+			local id = net.ReadInt(IDREADSIZE)
+			timer.Simple(0.05, function() if inv.itemids[id] then inv.itemids[id]:Remove() end end)
 		end
 	end)
 	net.Receive("scv_s_time", function()
@@ -628,19 +651,17 @@ end
 function ITEM:SetSubammo(amount) --not networked
 
 	if type(amount) ~= "number" then
-		error("bad argument #2 to 'SetSubammo' (expected number, got "..type(amount)..")",2)
+		error("bad argument #2 to 'SetSubammo' (expected number, got " .. type(amount) .. ")", 2)
 	end
 	
 	self.subammo = amount
 	
 	if game.SinglePlayer() and SERVER then --in singleplayer, we send this to the client because the client doesn't run clientside firing code and can't predict it
 		net.Start("scv_setsub")
-			local rf = RecipientFilter()
-			rf:AddAllPlayers()
-			net.WriteInt(self.parent.ID,16)
-			net.WriteInt(self.ID,9)
-			net.WriteInt(self.subammo,16)
-		net.Send(rf)
+			net.WriteInt(self.parent.ID, INVREADSIZE)
+			net.WriteInt(self.ID, IDREADSIZE)
+			net.WriteInt(self.subammo, 16)
+		net.Broadcast()
 	end
 	
 end
@@ -767,8 +788,8 @@ function ITEM:TakeSubammo(amount)
 		net.Start("scv_setsub")
 			local rf = RecipientFilter()
 			rf:AddAllPlayers()
-			net.WriteInt(self.parent.ID,16)
-			net.WriteInt(self.ID,9)
+			net.WriteInt(self.parent.ID,INVREADSIZE)
+			net.WriteInt(self.ID,IDREADSIZE)
 			net.WriteInt(self.subammo,16)
 		net.Send(rf)
 	end
@@ -783,8 +804,8 @@ end
 	
 if CLIENT then
 	net.Receive("scv_setsub",function()
-		local inv = ScavInventories[net.ReadInt(16)]
-		local id = net.ReadInt(9)
+		local inv = ScavInventories[net.ReadInt(INVREADSIZE)]
+		local id = net.ReadInt(IDREADSIZE)
 		local amt = net.ReadInt(16)
 		if inv and id and amt and inv.itemids and inv.itemids[id] then
 			inv.itemids[id]:SetSubammo(amt)

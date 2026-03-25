@@ -3,14 +3,15 @@ ENT.Type = "anim"
 ENT.Base = "scav_stream_base"
 ENT.KillDelay = 2
 
-PrecacheParticleSystem("scav_plasmatorch")
+--PrecacheParticleSystem("scav_plasmatorch")
 
 function ENT:OnInit()	
 	if CLIENT then
-		--self:CreateParticleEffect("scav_plasmatorch",self:GetOwner():LookupAttachment("muzzle"))
+		--self:CreateParticleEffect("scav_plasmatorch", self:GetOwner():LookupAttachment("muzzle"))
 		self.points = {}
+		self.pointSampleTime = CurTime()
 	else
-		--self:EmitSound("ambient/energy/NewSpark09.wav")
+		self:EmitSound("ambient/energy/NewSpark09.wav")
 		self:EmitSound("ambient/energy/weld2.wav")
 	end
 end
@@ -58,30 +59,52 @@ if CLIENT then
 
 	local beammat = Material("effects/energysplash")
 	local beammat2 = Material("effects/bluespark")
-	CreateMaterial("scav_plasmablade_trail","UnlitGeneric",{
+	--[[CreateMaterial("scav_plasmablade_trail", "UnlitGeneric", {
 		["$basetexture"] = "models/debug/debugwhite",
 		["$vertexcolor"] = 1,
 		["$vertexalpha"] = 1
-		})
+		})]]
 	local trailmat = Material("effects/scav_bladetrail")
-	local glowcol = Color(255,255,255,255)
-	
+	local glowcol = Color(255, 255, 255, 255)
+	local beamsampleinterval = 0.0125
+
 	function ENT:Draw2()
 		local angpos = self:GetMuzzlePosAng()
 		local ang = angpos.Ang
-		local pos1 = angpos.Pos-ang:Forward()*5
-		local pos2 = pos1+ang:Forward()*70
-		local p = self.points	
+		local pos1 = angpos.Pos - ang:Forward() * 5
+		local pos2 = pos1 + ang:Forward() * 70
+		local p = self.points
+
 		if self:GetDeathTime() == 0 then
+			if self.pointSampleTime <= CurTime() then
+				table.insert(p, (pos1 + pos2) / 2)
+				while #p > 10 do
+					table.remove(p, 1)
+				end
+				self.pointSampleTime = CurTime() + beamsampleinterval / GetConVar("host_timescale"):GetFloat()
+			end
 			render.SetMaterial(beammat2)
-			glowcol.a = math.random(10,20)
-			local a = beammat2:GetMaterialFloat("$alpha")
-			beammat2:SetFloat("$alpha",math.Rand(0.05,0.2))
-			render.DrawBeam(pos1,pos2,math.random(14,29),1,0,glowcol)
-			beammat2:SetFloat("$alpha",a)
+			glowcol.a = math.random(10, 20)
+			local a = beammat2:GetFloat("$alpha")
+			beammat2:SetFloat("$alpha", math.Rand(0.05, 0.2))
+			render.DrawBeam(pos1, pos2, math.random(14, 29), 1, 0, glowcol)
+			--beammat2:SetFloat("$alpha", a)
 			render.SetMaterial(beammat)
-			render.DrawBeam(pos1,pos2,math.random(5,12),0,1,color_white)
+			render.DrawBeam(pos1, pos2, math.random(5, 12), 0, 1, color_white)
+		elseif self.pointSampleTime <= CurTime() then
+			table.remove(p, 1)
+			self.pointSampleTime = CurTime() + beamsampleinterval / GetConVar("host_timescale"):GetFloat()
 		end
+		if #p < 2 then return end
+
+		render.SetMaterial(trailmat)
+		render.StartBeam(#p)
+			for i = 1, #p do
+				local percent = i / #p
+				glowcol.a = 255 * percent
+				render.AddBeam(p[i], math.max(1, 48 * percent), 0, glowcol)
+			end
+		render.EndBeam()
 	end
 
 	function ENT:OnViewMode()
@@ -91,4 +114,4 @@ if CLIENT then
 	end
 end
 
-scripted_ents.Register(ENT,"scav_stream_pblade",true)
+scripted_ents.Register(ENT, "scav_stream_pblade", true)

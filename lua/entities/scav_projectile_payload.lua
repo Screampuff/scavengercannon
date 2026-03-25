@@ -40,13 +40,18 @@ end
 function ENT:Use()
 end
 
+local rotations = {
+	["models/props_phx/misc/flakshell_big.mdl"] = Angle(90,0,0),
+	["models/props_trainyard/cart_bomb_separate.mdl"] = Angle(180,0,0),
+	["models/swarmprops/techdeco/rocketmesh/rocketmesh_new.mdl"] = Angle(0,90,0),
+}
+
 function ENT:PhysicsUpdate()
 	local ang = self:GetPhysicsObject():GetVelocity():Angle()
-	if self.Entity:GetModel() == "models/props_phx/misc/flakshell_big.mdl" then
-		ang:Add(Angle(90,0,0))
-	elseif self.Entity:GetModel() == "models/props_trainyard/cart_bomb_separate.mdl" then
-		ang:Add(Angle(180,0,0))
+	if rotations[self.Entity:GetModel()] then
+		ang:Add(rotations[self.Entity:GetModel()])
 	end
+
 	self:SetLocalAngles(ang)
 end
 

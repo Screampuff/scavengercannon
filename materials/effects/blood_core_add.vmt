@@ -1,0 +1,8 @@
+"SpriteCard"
+{
+	// Original shader: BaseTimesVertexColorAlphaBlend
+	"$basetexture" "effects/blood_core"
+	$additive	1
+	$blendframes 0
+	$overbrightfactor 10
+}

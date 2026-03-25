@@ -2,8 +2,11 @@
 {
 	"$basetexture" "HUD/status/invulnoverlay"
 	"$envmap" "env_cubemap"
+	$envmaptint "{255 255 255}"
 	//"$vertexalpha" "1"
 	//"$vertexcolor" "1"
+	$envadd "{64 64 64}"
+	$white "[1 1 1]"
 	"$selfillum" "1"
 	"Proxies"
 	{
@@ -17,6 +20,17 @@
 		{
 			srcVar1 $color
 			resultVar $selfillumtint
+		}
+		"Add"
+		{
+			srcVar1 $color
+			srcVar2 $envadd
+			resultVar $envmaptint
+		}
+		"Equals"
+		{
+			srcVar1 $white
+			resultVar $color
 		}
 
 	}

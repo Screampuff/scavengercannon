@@ -96,13 +96,16 @@ function SWEP:CheckCanScav(ent)
 end
 
 function SWEP:Scavenge(ent)
+	if not IsValid(ent) then return end
 	local modelname = ScavData.FormatModelname(ent:GetModel())
 	ent.NoScav = true
-	local ef = EffectData()
-	ef:SetRadius(ent:OBBMaxs():Distance(ent:OBBMins())/2)
-	ef:SetEntity(self.Owner)
-	ef:SetOrigin(ent:GetPos())
-	util.Effect("scav_pickup",ef,nil,true)
+	if not ent:GetNoDraw() then
+		local ef = EffectData()
+		ef:SetRadius(ent:OBBMaxs():Distance(ent:OBBMins())/2)
+		ef:SetEntity(self.Owner)
+		ef:SetOrigin(ent:GetPos())
+		util.Effect("scav_pickup",ef,nil,true)
+	end
 	local modelinfo = self:GetAlchemyInfo(modelname)
 	local surfaceinfo = self:GetSurfaceInfo(modelinfo.material)
 	self:SetAmmo1(self:GetAmmo1()+surfaceinfo.metal*modelinfo.mass)

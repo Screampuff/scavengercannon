@@ -1,0 +1,17 @@
+UnlitGeneric
+{
+	$basetexture	"HUD/hack/manhack"
+	$translucent	1
+	$vertexalpha	1
+	$vertexcolor	1
+	$ignorez		1
+	proxies
+	{
+		AnimatedTexture
+		{
+			animatedTextureVar			$basetexture
+			animatedTextureFrameNumVar	$frame
+			animatedTextureFrameRate	16
+		}
+	}
+}

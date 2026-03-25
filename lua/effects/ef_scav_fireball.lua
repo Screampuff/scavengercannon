@@ -6,7 +6,7 @@ function EFFECT:Init(data)
 	self.Created = UnPredictedCurTime()
 	self.vel = data:GetStart()
 	self:SetAngles((self.vel:GetNormalized()):Angle())
-	if IsMounted(440) then --TF2
+	if TF2 then
 		timer.Simple(.00625,function() ParticleEffectAttach("projectile_fireball",PATTACH_ABSORIGIN_FOLLOW,self,0) end) --slight delay helps weapon not flash so violently when firing at things very close to you
 	else
 		ParticleEffectAttach("scav_projectile_fireball",PATTACH_ABSORIGIN_FOLLOW,self,0)
@@ -51,7 +51,7 @@ function EFFECT:Think()
 	tr = util.TraceHull(tracep)
 	if tr.Hit then
 		util.Decal("fadingscorch",tr.HitPos+tr.HitNormal,tr.HitPos-tr.HitNormal)
-		if IsMounted(440) then --TF2
+		if TF2 then
 			sound.Play("weapons/dragons_fury_impact.wav",self:GetPos(),75)
 		else
 			sound.Play("ambient/fire/mtov_flame2.wav",self:GetPos(),75,150,1)

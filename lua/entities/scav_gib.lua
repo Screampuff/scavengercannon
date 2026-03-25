@@ -20,7 +20,7 @@ if CLIENT then
 	["ValveBiped.Bip01_Spine1"] = 4,
 	["ValveBiped.Bip01_Spine4"] = 4,
 	["ValveBiped.Bip01_Spine2"] = 3,
-	["ValveBiped.Bip01_Head1"] = 3,
+	["ValveBiped.Bip01_Head1"] = 2,
 	["ValveBiped.Bip01_R_Clavicle"] = 1,
 	["ValveBiped.Bip01_L_Clavicle"] = 1,
 	["ValveBiped.Bip01_R_UpperArm"] = 5,

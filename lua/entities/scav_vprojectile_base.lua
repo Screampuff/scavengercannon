@@ -15,56 +15,49 @@ ENT.hashit = false
 ENT.Speed = 2000
 
 function ENT:PhysicsUpdate()
-
-	if self.dead then return end
+	if self.dead or CLIENT then return end
 	
-	if SERVER then
+	local delta = CurTime() - self.lastupdate
+	self.lastupdate = CurTime()
+	local phys = self:GetPhysicsObject()
 	
-		local delta = CurTime() - self.lastupdate
-		
-		if IsValid(self.target) and (not self.target:IsPlayer() or (self.target:IsPlayer() and self.target:Alive())) then
-			local vel = self:GetVelocity():Angle()
-			local vec1 = (self.target:GetPos() + self.target:OBBCenter() - self:GetPos()):Angle()
-			local amt = 45 * (CurTime() - self.Created) * delta
-			vel.p = math.ApproachAngle(vel.p,vec1.p,amt)
-			vel.y = math.ApproachAngle(vel.y,vec1.y,amt)
-			vel.r = math.ApproachAngle(vel.r,vec1.r,amt)
-			self:GetPhysicsObject():SetVelocity(vel:Forward() * self.Speed * self.SpeedScale)
+	if IsValid(self.target) and (not self.target:IsPlayer() or self.target:Alive()) then
+		if not IsValid(phys) then return end
+		local vel = self:GetVelocity():Angle()
+		local vec1 = (self.target:GetPos() + self.target:OBBCenter() - self:GetPos()):Angle()
+		local amt = 45 * (CurTime() - self.Created) * delta
+		vel.p = math.ApproachAngle(vel.p,vec1.p,amt)
+		vel.y = math.ApproachAngle(vel.y,vec1.y,amt)
+		vel.r = math.ApproachAngle(vel.r,vec1.r,amt)
+		phys:SetVelocity(vel:Forward() * self.Speed * self.SpeedScale)
+	else
+		self.target = NULL
+		if not IsValid(phys) then return end
+		if self.PhysInstantaneous then
+			phys:SetVelocityInstantaneous(phys:GetVelocity():GetNormalized() * self.Speed * self.SpeedScale)
 		else
-			if self.PhysInstantaneous then
-				self:GetPhysicsObject():SetVelocityInstantaneous(self:GetPhysicsObject():GetVelocity():GetNormalized() * self.Speed * self.SpeedScale)
-			else
-				self:GetPhysicsObject():SetVelocity(self:GetPhysicsObject():GetVelocity():GetNormalized() * self.Speed * self.SpeedScale)
-			end
-			self.target = NULL
+			phys:SetVelocity(phys:GetVelocity():GetNormalized() * self.Speed * self.SpeedScale)
 		end
-		
-		if self.Gravity then
-			self:GetPhysicsObject():AddVelocity(self.Gravity * delta)
-		end
-		
-		if self:GetVelocity():Length() ~= 0 then
-			self:SetLocalAngles(self:GetPhysicsObject():GetVelocity():GetNormalized():Angle())
-		end
-		
-		self.lastupdate = CurTime()
-		
+	end
+	
+	if self.Gravity then
+		phys:AddVelocity(self.Gravity * delta)
+	end
+	
+	if self:GetVelocity():Length() ~= 0 then
+		self:SetLocalAngles(phys:GetVelocity():GetNormalized():Angle())
 	end
 end
 
 function ENT:Initialize()
-
-	if self.Model then
-		self:SetModel(self.Model)
-	end
+	if self.Model then self:SetModel(self.Model) end
 	
 	self.Created = CurTime()
 	self:DrawShadow(false)
 	
 	if SERVER then
-	
-		self:PhysicsInitBox(self.BBMins,self.BBMaxs)
-		self:SetCollisionBounds(self.BBMins,self.BBMaxs)
+		self:PhysicsInitBox(self.BBMins, self.BBMaxs)
+		self:SetCollisionBounds(self.BBMins, self.BBMaxs)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetCollisionGroup(COLLISION_GROUP_PROJECTILE)
 		self.lastupdate = CurTime()
@@ -87,13 +80,11 @@ function ENT:Initialize()
 			end
 		
 		end
-		
 	else
 		self:SetMoveType(MOVETYPE_NONE)
 	end
 	
 	self:OnInit()
-	
 end
 
 function ENT:OnInit()
@@ -106,105 +97,110 @@ if CLIENT then
 	function ENT:Draw()
 		self:DrawModel()
 	end
+	return
 end
 
-if SERVER then
+--[[---------------------------------------------------------------------------
+		SERVER
+---------------------------------------------------------------------------]]--
 
-	ENT.target = NULL
-	ENT.SpeedScale = 1
-	ENT.PhysTrigger = true
-	ENT.TouchTrigger = true
-	ENT.RemoveOnImpact = true
-	ENT.StopOnPhys = true
-	ENT.NoDrawOnDeath = false
-	--ENT.RemoveDelay = 1 --this is a value that you can specify in your projectile to delay its removal (useful if it's got an OB Particle effect attached)
+ENT.target = NULL
+ENT.SpeedScale = 1
+ENT.PhysTrigger = true
+ENT.TouchTrigger = false
+ENT.RemoveOnImpact = true
+ENT.StopOnPhys = true
+ENT.NoDrawOnDeath = false
+--ENT.RemoveDelay = 1 --this is a value that you can specify in your projectile to delay its removal (useful if it's got an OB Particle effect attached)
 
-	function ENT:OnTakeDamage()
+function ENT:OnTakeDamage()
+end
+
+function ENT:PhysicsCollide(data,physobj)
+	if not self.PhysTrigger or self.hashit or data.HitEntity == self:GetOwner() then return end
+	self:OnPhys(data,physobj)
+	if self.StopOnPhys then
+		physobj:SetVelocity(vector_origin)
+		physobj:EnableMotion(false)
+		self.CollisionPos = self:GetPos()
+	end
+	timer.Simple(0, function()
+		if not IsValid(self) then return end
+		self:ProcessImpact(data.HitEntity)
+	end)
+end
+
+function ENT:OnPhys(data,physobj)
+end
+
+function ENT:ProcessImpact(hitent)
+
+	if self.dead then return end
+
+	if not IsValid(self.Owner) then
+		self.Owner = self
+		self:SetOwner(self)
 	end
 
-	function ENT:PhysicsCollide(data,physobj)
-		if self.PhysTrigger and not self.hashit and data.HitEntity ~= self:GetOwner() then
-			self:OnPhys(data,physobj)
-			if self.StopOnPhys then
-				physobj:SetVelocity(vector_origin)
-				physobj:EnableMotion(false)
-				self.CollisionPos = self:GetPos()
-			end
-			if not self.hashit then
-				timer.Simple(0, function() self:ProcessImpact(data.HitEntity) end)
-			end
+	if not self.hashit then
+		self.hashit = self:OnImpact(hitent)
+	end
+
+	if self.hashit and self.RemoveOnImpact then
+		if not self.RemoveDelay then
+			self:Remove()
+		else
+			self:DelayedDeath(self.RemoveDelay, self.NoDrawOnDeath)
 		end
 	end
 
-	function ENT:OnPhys(data,physobj)
+	self:SetMoveType(MOVETYPE_NONE)
+
+end
+
+function ENT:DelayedDeath(amt, nodraw)
+	self.dead = true
+	self:SetNoDraw(nodraw)
+	self:DrawShadow(false)
+	self:GetPhysicsObject():SetVelocity(vector_origin)
+	self:SetMoveType(MOVETYPE_NONE)
+	if self.CollisionPos then
+		self:SetPos(self.CollisionPos)
 	end
+	self:SetSolid(SOLID_NONE)
+	self:NextThink(amt + 1) --stop thinking
+	timer.Simple(amt, function()
+		if not IsValid(self) then return end
+		self:Remove()
+	end)
+end
 
-	function ENT:ProcessImpact(hitent)
+function ENT:StartTouch()
+end
 
-		if self.dead or hitent == NULL then
-			return
-		end
+function ENT:EndTouch()
+end
 
-		if not IsValid(self.Owner) then
-			self.Owner = self
-			self:SetOwner(self)
-		end
+function ENT:Touch(hitent)
+	if not IsValid(hitent) or hitent == self.Owner then return end
+	if self.hashit then return end
+	if hitent:GetSolid() == SOLID_NONE or (hitent:GetSolid() == SOLID_BSP and not self.TouchTrigger) then return end
+	
+	if string.find(hitent:GetClass(), "func_") then return end
+	self:OnTouch(hitent)
+	self.CollisionPos = self:GetPos()
+	self:ProcessImpact(hitent)
+end
 
-		if not self.hashit then
-			self.hashit = self:OnImpact(hitent)
-		end
+function ENT:OnTouch(hitent)
+end
 
-		if self.hashit and self.RemoveOnImpact then
-			if not self.RemoveDelay then
-				self:Remove()
-			else
-				self:DelayedDeath(self.RemoveDelay,self.NoDrawOnDeath)
-			end
-		end
+function ENT:Think()
+end
 
-		self:SetMoveType(MOVETYPE_NONE)
+function ENT:OnImpact(hitent)
+	return true
+end
 
-	end
-
-	function ENT:DelayedDeath(amt,nodraw)
-		self.dead = true
-		self:SetNoDraw(nodraw)
-		self:DrawShadow(false)
-		self:GetPhysicsObject():SetVelocity(vector_origin)
-		self:SetMoveType(MOVETYPE_NONE)
-		if self.CollisionPos then
-			self:SetPos(self.CollisionPos)
-		end
-		self:SetSolid(SOLID_NONE)
-		self:NextThink(amt + 1) --stop thinking
-		self:Fire("Kill",nil,amt)
-	end
-
-	function ENT:StartTouch()
-	end
-
-	function ENT:EndTouch()
-	end
-
-	function ENT:Touch(hitent)
-		if not self.hashit and self.TouchTrigger and hitent:GetSolid() ~= SOLID_NONE and hitent:GetSolid() ~= SOLID_VPHYSICS and hitent ~= self.Owner then
-			self:OnTouch(hitent)
-			self.CollisionPos = self:GetPos()
-			self:ProcessImpact(hitent)
-		end
-	end
-
-	function ENT:OnTouch(hitent)
-	end
-
-	function ENT:Think()
-	end
-
-	function ENT:OnImpact(hitent)
-		return true
-	end
-
-	function ENT:OnRemove()
-	end
-
+function ENT:OnRemove()
 end

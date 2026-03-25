@@ -102,11 +102,11 @@ if CLIENT then
 			local text
 			local mod = (CurTime()-currentmelt.StartMeltTime)%3
 			if (mod < 1) then
-				text = "Melting."
+				text = "#scav.alchemy.melt1"
 			elseif (mod < 2) then
-				text = "Melting.."
+				text = "#scav.alchemy.melt2"
 			else
-				text = "Melting..."
+				text = "#scav.alchemy.melt3"
 			end
 			local w,h = surface.GetTextSize(text)
 			surface.SetTextPos(xmid-w/2,ymid-h/2-8)

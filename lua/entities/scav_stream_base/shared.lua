@@ -24,7 +24,8 @@ function ENT:Initialize()
 end
 
 function ENT:SetupDataTables()
-	self:NetworkVar("Float",3,"DeathTime")
+	self:NetworkVar("Float", "DeathTime")
+	self:NetworkVar("Int", "Identify")
 	self:OnSetupDataTables()
 end
 

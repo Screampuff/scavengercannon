@@ -63,9 +63,13 @@ for k,v in pairs(SWEP.StockProps) do
 	util.PrecacheModel(v.model)
 end
 
+function SWEP:CreateHoldSound()
+	if IsValid(self) then return CreateSound(self,"weapons/physcannon/hold_loop.wav") end
+end
+
 function SWEP:Initialize()
 	self.LearnedProps = {}
-	self.HoldSound = CreateSound(self,"weapons/physcannon/hold_loop.wav")
+	self.HoldSound = self:CreateHoldSound()
 	self:SetHoldType("melee2") --TODO: change its model up and get this on a more reasonable 3rd person anim (shotgun, ar2, etc)
 	if SERVER then
 		self.CreatedItems = {}
@@ -78,7 +82,6 @@ function SWEP:Initialize()
 		self:CallOnClient("Initialize")
 	end
 	if self.Menu == nil and CLIENT then
-		print("no menu, creating!")
 		self.Menu = vgui.Create("alchmenu")
 		self.Menu:SetSkin("sg_menu")
 		self.Menu:SetVisible(false)
@@ -211,6 +214,7 @@ function SWEP:PrimaryAttack()
 				self.ActiveEffect = ef
 			end
 		end
+		if not self.HoldSound then self.HoldSound = self:CreateHoldSound() end
 		self.HoldSound:Play()
 	end
 	if game.SinglePlayer() then
@@ -262,7 +266,7 @@ function SWEP:PrimaryRelease()
 			gamemode.Call("PlayerSpawnedProp",self.Owner,model,prop)
 		end
 	end
-	self.HoldSound:Stop()
+	if self.HoldSound then self.HoldSound:Stop() end
 end
 
 local dragtrace = {}
@@ -308,7 +312,7 @@ function SWEP:SecondaryAttack()
 end
 
 function SWEP:KillGhost()
-	self.HoldSound:Stop()
+	if self.HoldSound then self.HoldSound:Stop() end
 	self.Ghost = NULL
 	self.M1Down = false
 	self:SetGhosting (false)

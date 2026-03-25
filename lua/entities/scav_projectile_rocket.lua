@@ -97,6 +97,10 @@ if SERVER then
 		local amount = dmginfo:GetDamage()
 		if dmginfo:IsExplosionDamage() and IsValid(inflictor) and ((inflictor:GetClass() == "scav_projectile_rocket") or (inflictor:GetClass() == "scav_projectile_grenade")) then
 			dmginfo:SetDamageForce(dmginfo:GetDamageForce()*20)
+			--Gunship ignores blast damage < 50
+			if ent:GetClass() == "npc_combinegunship" then
+				dmginfo:SetDamage(50)
+			end
 		end
 	end)
 

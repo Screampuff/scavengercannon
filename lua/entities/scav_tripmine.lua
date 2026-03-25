@@ -13,7 +13,7 @@ ENT.LastStartPos 	= Vector()
 ENT.LastHitPos 		= Vector()
 
 function ENT:SetupDataTables()
-	self:NetworkVar("Bool",0,"IsArmed")
+	self:NetworkVar("Bool", "IsArmed")
 end
 
 function ENT:Initialize()
@@ -39,7 +39,7 @@ function ENT:Think()
 			util.Effect("ef_scav_exp",edata)
 			
 			if IsValid(self.Owner) then
-				util.BlastDamage(self,self.Owner,self:GetPos(),200,100)
+				util.BlastDamage(self, self.Owner, self:GetPos(), 200, 100)
 			end
 			
 			self:Remove()
@@ -66,7 +66,7 @@ function ENT:Think()
 	else
 	
 		local pos = self:GetPos()
-		ScavData.SetRenderBoundsFromPoints(self,pos+self:OBBMins(),pos+self:OBBMaxs(),self.LastHitPos)
+		ScavData.SetRenderBoundsFromPoints(self, pos + self:OBBMins(), pos + self:OBBMaxs(), self.LastHitPos)
 		
 	end
 	
@@ -89,11 +89,9 @@ function ENT:SetArmed(state)
 	if SERVER then --we are sending a net message to inform the client of the change in arming, and using a dtvar so clients that learn about the mine later still know its state
 		self:SetIsArmed(state)
 		net.Start("scv_mine_arm")
-			local rf = RecipientFilter()
-			rf:AddAllPlayers()
 			net.WriteEntity(self)
 			net.WriteBool(state)
-		net.Send(rf)
+		net.Broadcast()
 	end
 	
 	self.AutomaticArm = false
@@ -107,21 +105,28 @@ end
 function ENT:OnArmed()
 	if SERVER then
 		self:EmitSound("weapons/mine_activate.wav")
-		self:Fire("SetBodyGroup",1,0)
+		self:Fire("SetBodyGroup", 1, 0)
 		self.NoScav = true
 	end
 end
 
 function ENT:OnDisarmed()
 	if SERVER then
-		self:EmitSound("weapons/mine_activate.wav",100,52)
-		self:Fire("SetBodyGroup",0,0)
+		self:EmitSound("weapons/mine_activate.wav", 100, 52)
+		self:Fire("SetBodyGroup", 0, 0)
 		self.NoScav = false
 	end
 end
 
 local traceinfo = {}
 	traceinfo.mask = MASK_SHOT
+
+local modelForward = {
+	["models/w_tripmine.mdl"] = true,
+	["models/weapons/w_tripmine.mdl"] = true,
+	["models/weapons/w_tripmine_mp.mdl"] = true,
+	["models/props_marines/triplaser.mdl"] = true,
+}
 
 function ENT:GetBeamTrace()
 
@@ -133,14 +138,15 @@ function ENT:GetBeamTrace()
 		local posang = self:GetAttachment(index_att)
 		vec_start = posang.Pos
 		ang_normal = posang.Ang
-		ang_normal = (-1 * ang_normal:Right()):Angle()
+		ang_normal = (-ang_normal:Right()):Angle()
 	else
 		vec_start = self:GetPos()
 		ang_normal = self:GetAngles():Up():Angle()
 	end
+	if modelForward[self:GetModel()] then ang_normal = self:GetAngles():Forward():Angle() end
 	
 	traceinfo.start = vec_start
-	traceinfo.endpos = vec_start+ang_normal:Forward() * self.Range
+	traceinfo.endpos = vec_start + ang_normal:Forward() * self.Range
 	traceinfo.filter = self
 	
 	local tr = util.TraceLine(traceinfo)
@@ -156,7 +162,7 @@ if CLIENT then
 
 	local mat_beam 		= Material("trails/laser")
 	local mat_bloom 	= Material("effects/scav_shine_HR")
-	local color_beam 	= Color(255,0,0,50)
+	local color_beam 	= Color(255, 0, 0, 50)
 
 	function ENT:Draw()
 		self:DrawModel()
@@ -179,9 +185,9 @@ if CLIENT then
 				local tr = v:GetBeamTrace()
 				local posang = v:GetAttachment(v:LookupAttachment("beam_attach"))
 				render.SetMaterial(mat_beam)
-				render.DrawBeam(tr.StartPos,tr.HitPos,8,0,0,color_beam)
+				render.DrawBeam(tr.StartPos, tr.HitPos, 8, 0, 0, color_beam)
 				render.SetMaterial(mat_bloom)
-				render.DrawSprite(tr.HitPos,2,2,color_beam)
+				render.DrawSprite(tr.HitPos, 2, 2, color_beam)
 			end
 		end
 	end)

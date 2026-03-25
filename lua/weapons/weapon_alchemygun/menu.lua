@@ -1,15 +1,33 @@
 AddCSLuaFile()
 
 local SWEP = SWEP or weapons.GetStored("weapon_alchemygun")
-local color_red = Color(255,0,0,255)
+
+
+local colorblind = GetConVar("cl_scav_colorblindmode"):GetBool()
+
+local color_red_base = Color(255,0,0,255)
 local color_red_colorblind = Color(190,76,0,255)
-local color_green = Color(0,255,0,255)
+local color_red = colorblind and color_red_colorblind or color_red_base
+local color_green_base = Color(0,255,0,255)
 local color_green_colorblind = Color(124,218,255,255)
+local color_green = colorblind and color_green_colorblind or color_green_base
+
+cvars.AddChangeCallback("cl_scav_colorblindmode", function(name, oldVal, newVal)
+	if tobool(newVal) then
+		color_red = color_red_colorblind
+		color_green = color_green_colorblind
+	else
+		color_red = color_red_base
+		color_green = color_green_base
+	end
+end)
+
+
 
 local function PlayerColor(self)
 	local bgcol = Vector(0,0,0)
 	if IsValid(LocalPlayer()) then
-		if LocalPlayer():Team() == 1001 then --unassigned
+		if LocalPlayer():Team() == TEAM_UNASSIGNED then
 			bgcol = LocalPlayer():GetPlayerColor()
 			self.BGColor = Color(bgcol.r * 255, bgcol.g * 255, bgcol.b * 255, 255)
 		else
@@ -350,17 +368,9 @@ function PANEL:Update()
 	end
 	for i=1,4 do
 		if self.wep.dt["Ammo"..i] < self.items[i].RealCost then
-			if not GetConVar("cl_scav_colorblindmode"):GetBool() then
-				self.items[i].Have:SetTextColor(color_red)
-			else
-				self.items[i].Have:SetTextColor(color_red_colorblind)
-			end
+			self.items[i].Have:SetTextColor(color_red)
 		else
-			if not GetConVar("cl_scav_colorblindmode"):GetBool() then
-				self.items[i].Have:SetTextColor(color_green)
-			else
-				self.items[i].Have:SetTextColor(color_green_colorblind)
-			end
+			self.items[i].Have:SetTextColor(color_green)
 		end
 	end
 	if self.Menu then
@@ -510,6 +520,7 @@ local HUD = vgui.Create("alch_HUD")
 	
 	cvars.AddChangeCallback("scav_ag_model",HUDUpdateCallback)
 	cvars.AddChangeCallback("scav_ag_skin",HUDUpdateCallback)
+	cvars.AddChangeCallback("cl_scav_colorblindmode", HUDUpdateCallback)
 
 	SWEP.HUD = HUD
 	

@@ -31,12 +31,12 @@ SWEP.SoundCharged = "buttons/button3.wav"
 PrecacheParticleSystem("scav_exp_bp")
 
 function SWEP:SetupDataTables()
-	self:NetworkVar("Int",0,"Charges")
+	self:NetworkVar("Int", "Charges")
 end
 
 function SWEP:ViewmodelAnimation(anim)
 	self:SendWeaponAnim(anim)
-	self.BeginIdle = CurTime()+self.Owner:GetViewModel():SequenceDuration()
+	self.BeginIdle = CurTime() + self.Owner:GetViewModel():SequenceDuration()
 end
 
 function SWEP:SetNextFire(time)
@@ -45,12 +45,13 @@ function SWEP:SetNextFire(time)
 end
 
 function SWEP:GetAmmo()
-	return math.floor(self.Weapon.Owner:GetEnergy()/self.ShotCost)
+	if self.ShotCost == 0 then return SCAV_SHORT_MAX end
+	return math.floor(self.Weapon.Owner:GetEnergy() / self.ShotCost)
 end
 
 function SWEP:TakeAmmo(amt)
 	if self.Owner:GetEnergy() >= amt then
-		self.Owner:SetEnergy(self.Owner:GetEnergy()-amt)
+		self.Owner:SetEnergy(self.Owner:GetEnergy() - amt)
 		return true
 	else
 		return false
@@ -61,11 +62,8 @@ function SWEP:CanFire(amt)
 	 --BIGASS TODO: this whole system is super archaic and weird, the client and server are never in sync if player energy is below max,
 	 --this is a very dirty fix for the gun sometimes firing on the server but not on the client. Both should be "return self:GetAmmo() > 0" in a just, sane world.
 	 --All I can tell is that client is behind server when firing, but ahead of it when recharging
-	if SERVER then
-		return self:GetAmmo() > 1
-	else
-		return self:GetAmmo() > 0
-	end
+	if game.SinglePlayer() or CLIENT then return self:GetAmmo() > 0 end
+	return self:GetAmmo() > 1
 end
 
 function SWEP:Initialize()
@@ -86,20 +84,20 @@ function SWEP:Think()
 			return
 		end
 	end
-	if (self.ChargeTime ~= 0) then
-		if (self.ForcedShots < self.MaxCharge) and (self.NextChargeUp < CurTime()) and self:CanFire(self.ShotCost) then
-			self:TakeAmmo(self.ShotCost)
-			self.NextChargeUp = CurTime() + 1/self.ChargeRate
-			self.ForcedShots = self.ForcedShots+1
-			self:SetCharges(self.ForcedShots)
-			if IsValid(self.BPChargeEffect) then
-				self.BPChargeEffect:SetChargeLevel(self.ForcedShots)
-			end
-		end
-		if not self.Owner:KeyDown(IN_ATTACK2) then
-			self:ReleaseCharge()
+	if self.ChargeTime == 0 then return end
+
+	if (self.ForcedShots < self.MaxCharge) and (self.NextChargeUp < CurTime()) and self:CanFire(self.ShotCost) then
+		self:TakeAmmo(self.ShotCost)
+		self.NextChargeUp = CurTime() + 1 / self.ChargeRate
+		self.ForcedShots = self.ForcedShots + 1
+		self:SetCharges(self.ForcedShots)
+		if IsValid(self.BPChargeEffect) then
+			self.BPChargeEffect:SetChargeLevel(self.ForcedShots)
 		end
 	end
+
+	if self.Owner:KeyDown(IN_ATTACK2) then return end
+	self:ReleaseCharge()
 end
 
 local bullet = {}
@@ -109,20 +107,20 @@ local bullet = {}
 	bullet.Damage = 0
 	bullet.TracerName = "ef_scav_tr1"
 	bullet.Spread = vector_origin
-	local callbackreturnstruct = {["damage"]=CLIENT,["effects"]=true}
-	function bullet.Callback(attacker,tr,dmginfo)
-		bullet.Damage = math.Clamp((120-tr.Entity:Health())/2,8,25)
+	local callbackreturnstruct = {["damage"] = CLIENT, ["effects"] = true}
+	function bullet.Callback(attacker, tr, dmginfo)
+		bullet.Damage = math.Clamp((120 - tr.Entity:Health()) / 2, 8, 25)
 		--print("bulletdamage: "..bullet.Damage)
-		dmginfo:SetDamage(math.Clamp((116-tr.Entity:Health())/2,8,25))
-		dmginfo:SetDamageType(bit.bor(DMG_BULLET,DMG_ENERGYBEAM))
-		local dodamage = gamemode.Call("PlayerTraceAttack",attacker,dmginfo,tr.Normal,tr)
+		dmginfo:SetDamage(math.Clamp((116 - tr.Entity:Health()) / 2, 8, 25))
+		dmginfo:SetDamageType(bit.bor(DMG_BULLET, DMG_ENERGYBEAM))
+		local dodamage = gamemode.Call("PlayerTraceAttack", attacker, dmginfo, tr.Normal, tr)
 		if SERVER then
 			local class = tr.Entity:GetClass()
 			if class == "prop_physics" or class == "prop_physics_respawnable" or class == "prop_physics_multiplayer" then
 				tr.Entity:SetHealth(1)
 				--print("setting ent health to 1: "..tostring(tr.Entity:Health()))
 			elseif class == "func_breakable_surf" then
-				tr.Entity:Fire("Shatter","(0.5,0.5,0)",0,attacker,attacker:GetWeapon("weapon_backuppistol"))
+				tr.Entity:Fire("Shatter", "(0.5, 0.5, 0)", 0, attacker, attacker:GetWeapon("weapon_backuppistol"))
 			end
 			--print(dodamage)
 			--if dodamage then
@@ -139,7 +137,7 @@ local bullet = {}
 			--makedlight(tr.HitPos)
 		end
 		--tr.Entity:TakeDamageInfo(dmginfo)
-		--return true,true
+		--return true, true
 		return callbackreturnstruct
 	end
 	
@@ -148,66 +146,63 @@ local bullet = {}
 		if not IsFirstTimePredicted() then
 			return
 		end
-		if CLIENT then
-			--print(CurTime(),"|",UnPredictedCurTime(),"[]",self.Owner:GetEnergy(),"|",self.Owner:GetPredictedEnergy())
-		end
+		--if CLIENT then
+			--print(CurTime(), "|", UnPredictedCurTime(), "[]", self.Owner:GetEnergy(), "|", self.Owner:GetPredictedEnergy())
+		--end
 		shots = shots or 1
 		if shots == 1 then
-			if CurTime()-self.LastFired > 0.5 then 
+			if CurTime() - self.LastFired > 0.5 then 
 				bullet.Spread = vector_origin
 			else
-				bullet.Spread = Vector(0.025,0.025,0)
+				bullet.Spread = Vector(0.025, 0.025, 0)
 			end
 		else
-			bullet.Spread = Vector(0.01*shots,0.01*shots,0)
+			bullet.Spread = Vector(0.01 * shots, 0.01 * shots, 0)
 		end
 		bullet.Num = shots
 		bullet.Dir = self.Owner:GetAimVector()
 		bullet.Src = self.Owner:GetShootPos()
 		self.Owner:FireBullets(bullet)
-		self:EmitSound(self.SoundShoot,100,200)
+		self:EmitSound(self.SoundShoot, 100, 200)
 		self.LastFired = CurTime()
-		--self:SetNextFire(UnPredictedCurTime()+self.Owner:GetUnPredictedEnergy())
+		--self:SetNextFire(UnPredictedCurTime() + self.Owner:GetUnPredictedEnergy())
 	end
 	
 	function SWEP:PrimaryAttack()
+		if not IsFirstTimePredicted() then return end
+
 		if self:CanFire(self.ShotCost) then
 			self:Shoot()
-			if IsFirstTimePredicted() then
-				self:TakeAmmo(self.ShotCost)
-			end
-		elseif IsFirstTimePredicted() then
+			self:TakeAmmo(self.ShotCost)
+		else
 			self:EmitSound(self.SoundEmpty)
 		end
 	end
 	
 	function SWEP:SecondaryAttack()
-		if not IsFirstTimePredicted() then
-			return
-		end
-		if self.ChargeTime == 0 then
-			self.ChargeTime = CurTime()
-			self.NextChargeUp = CurTime() + 1/self.ChargeRate
-			if SERVER then
-				local ef = ents.Create("scav_stream_bpcharge")
-				ef:SetOwner(self)
-				ef:Spawn()
-				self.BPChargeEffect = ef
-			end
-		end
+		if not IsFirstTimePredicted() then return end
+		if self.ChargeTime ~= 0 then return end
+
+		self.ChargeTime = CurTime()
+		self.NextChargeUp = CurTime() + 1 / self.ChargeRate
+
+		if CLIENT then return end
+
+		local ef = ents.Create("scav_stream_bpcharge")
+		ef:SetOwner(self)
+		ef:Spawn()
+		self.BPChargeEffect = ef
 	end
 	
 	function SWEP:ReleaseCharge()
-		if self.ForcedShots == 0 then
-			return
-		end
+		if self.ForcedShots == 0 then return end
+
 		self.ChargeTime = 0
 		self:Shoot(self.ForcedShots)
 		self.ForcedShots = 0
 		self:SetCharges(self.ForcedShots)
-		if IsValid(self.BPChargeEffect) then
-			self.BPChargeEffect:Kill()
-		end
+
+		if IsValid(self.BPChargeEffect) then self.BPChargeEffect:Kill() end
 	end
 	
 function SWEP:Deploy()

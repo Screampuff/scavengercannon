@@ -7,8 +7,8 @@ ENT.Author = "Ghor"
 ENT.Contact = "none"
 ENT.Purpose = "none"
 ENT.Instructions = "DON'T FUCKING SPAWN THIS SHIT I'M SERIOUS"
-ENT.mins = Vector(-24,-24,-24)
-ENT.maxs = Vector(24,24,24)
+ENT.mins = Vector(-24, -24, -24)
+ENT.maxs = Vector(24, 24, 24)
 ENT.lasttrace = 0
 ENT.PhysInstantaneous = true
 PrecacheParticleSystem("scav_hyper")
@@ -22,56 +22,66 @@ function ENT:Initialize()
 			self.filter = {self.Owner}
 		end
 	else
-		ParticleEffectAttach("scav_hyper",PATTACH_ABSORIGIN_FOLLOW,self,0)
-		self.vel = self:GetAngles():Forward()*2000
+		ParticleEffectAttach("scav_hyper", PATTACH_ABSORIGIN_FOLLOW, self, 0)
+		self.vel = self:GetAngles():Forward() * 2000
 		self.Weapon = self:GetOwner():GetActiveWeapon()
 		self.Owner = self:GetOwner()
 		self.Created = CurTime()
 	end
 	self:DrawShadow(false)
 	self.lasttrace = CurTime()
-
+	self.lastpos = vector_origin
 end
 
 
 function ENT:Think()
 	if CLIENT then
-		local vel = self.vel*(CurTime()-self.lasttrace)
-		self:SetPos(self:GetPos()+vel)
+		local vel = self.vel * (CurTime() - self.lasttrace)
+		self:SetPos(self:GetPos() + vel)
 	else
-		if self.Created+10 < CurTime() then
+		if self.Created * 10 < CurTime() then
 			self:Remove()
 			return
 		end
-		self:NextThink(CurTime()+0.05)
+		self:NextThink(CurTime() + 0.05)
 	--MOVEMENT CODE
 		local tr = {}
 		tr.Hit = true
-		local vel = self.vel*(CurTime()-self.lasttrace)
+		local vel = self.vel * (CurTime() - self.lasttrace)
 			local tracep = {}
 		tracep.start = self:GetPos()
 		tracep.filter = self.filter
-		tracep.endpos = self:GetPos()+vel
-		tracep.mask = MASK_SHOT-CONTENTS_SOLID
+		tracep.endpos = self:GetPos() + vel
+		tracep.mask = bit.band(MASK_SHOT, bit.bnot(CONTENTS_DEBRIS)) --- CONTENTS_SOLID
 		tracep.mins = self.mins
 		tracep.maxs = self.maxs
+		tracep.ignoreworld = true
+		local hitmax = 100
 		while (tr.Hit) do
 			tr = util.TraceHull(tracep)
 			if tr.Hit then
-				table.insert(self.filter,tr.Entity)
+				table.insert(self.filter, tr.Entity)
 				self:OnHit(tr)
 				if (tr.Entity:GetClass() == "npc_strider") then
 					break
 				end
 			else
-				self:SetPos(self:GetPos()+vel)
+				self:SetPos(self:GetPos() + vel)
+			end
+			hitmax = hitmax - 1
+			if hitmax < 0 then
+				self:Remove()
+				break
 			end
 		end
+		--GMod will refuse to move us out of the world, so we can assume we've hit the edge if we don't move
+		if self.lastpos:IsEqualTol(self:GetPos(), 0.000001) then self:Remove() end
 	end
 	self.lasttrace = CurTime()
+	self.lastpos = self:GetPos()
 end
 
-local DMG_HYPER = bit.bor(DMG_ENERGYBEAM,DMG_GENERIC,DMG_DIRECT,DMG_BLAST,DMG_PLASMA,DMG_FREEZE,DMG_SHOCK)
+local DMG_HYPER = bit.bor(DMG_ENERGYBEAM, DMG_GENERIC, DMG_DIRECT, DMG_BLAST, DMG_PLASMA, DMG_FREEZE, DMG_SHOCK)
 
 function ENT:OnHit(tr)
 	local hitent = tr.Entity
@@ -102,10 +112,10 @@ function ENT:OnHit(tr)
 		end
 		local a = ents.Create("env_explosion")
 		a:SetPos(tr.HitPos)
-		a:SetKeyValue("iMagnitude",0)
+		a:SetKeyValue("iMagnitude", 0)
 		a:Spawn()
-		a:Fire("Explode",1,"0")
-		a:Fire("kill",1,"1")
+		a:Fire("Explode", 1, 0)
+		a:Fire("kill", 1, 1)
 		
 
 	end
@@ -120,16 +130,22 @@ end
 function ENT:PhysicsUpdate()
 end
 
+hook.Add("OnCrazyPhysics", "ScavCleanupHyperbeam", function(ent, phys)
+	if ent:GetClass() == "scav_projectile_hyper" then
+		ent:Remove()
+	end
+end)
+
 if CLIENT then
 	function ENT:Draw()
 	end
 end
 
 if SERVER then
-	ENT.trmin = Vector(-24,-24,-24)
-	ENT.trmax = Vector(24,24,24)
+	ENT.trmin = Vector(-24, -24, -24)
+	ENT.trmax = Vector(24, 24, 24)
 
-	function ENT:PhysicsCollide(data,physobj)
+	function ENT:PhysicsCollide(data, physobj)
 	end
 
 	function ENT:StartTouch()

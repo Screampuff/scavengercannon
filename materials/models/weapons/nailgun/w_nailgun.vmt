@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	$basetexture			"models/Weapons/nailgun/w_nailgun"
+	$envmap					env_cubemap
+	$envmapmask				"models/Weapons/nailgun/w_nailgun_env"
+}

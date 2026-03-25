@@ -5,6 +5,7 @@ Patch
 	{
 		$basetexture		"models/weapons/scavenger/skins/sierra/scav"
 		$detail				"models/weapons/scavenger/skins/sierra/scav_detail"
-		$envmaptint			"[ 0.125 0.125 0.125 ]"
+		$envmapsaturation	0.75
+		$envmaptint			"[0.25 0.25 0.25]"
 	}
 }

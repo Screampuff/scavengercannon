@@ -4,15 +4,11 @@ ENT.Base = "scav_stream_base"
 ENT.KillDelay = 0
 ENT.Range = 350
 ENT.Cone = 50
-ENT.PosOffset = Vector(12,0,0)
+ENT.PosOffset = Vector(12, 0, 0)
 
 function ENT:OnInit()
 	if CLIENT then
-		if self:Getblue() then
-			self.ParticleName = "medicgun_beam_blue"
-		else
-			self.ParticleName = "medicgun_beam_red"
-		end
+		self.ParticleName = "scav_medigun_beam"
 	else
 		self.LastHeal = CurTime()
 		self.LastBeep = self.LastHeal
@@ -20,8 +16,7 @@ function ENT:OnInit()
 end
 
 function ENT:OnSetupDataTables()
-	self:NetworkVar("Entity",0,"endent")
-	self:NetworkVar("Bool",0,"blue")
+	self:NetworkVar("Entity", "EndEnt")
 end
 
 function ENT:OnKill()
@@ -31,8 +26,7 @@ function ENT:OnKill()
 end
 
 if SERVER then
-	PrecacheParticleSystem("medicgun_beam_red")
-	PrecacheParticleSystem("medicgun_beam_blue")
+	PrecacheParticleSystem("scav_medigun_beam")
 
 	function ENT:BeginSound()
 		if not self.sound then
@@ -53,7 +47,7 @@ if SERVER then
 		local currentang = self.Cone
 		for k,v in pairs(ents.FindInSphere(pos,self.Range)) do
 			if (v:IsNPC() or (v:IsPlayer() and v ~= self:GetPlayer() and v:Alive()) or v:IsNextBot()) and (v.Health and v.GetMaxHealth and v.SetHealth and v:GetMaxHealth() > 0) then
-				local entpos = v:GetPos()+v:OBBCenter()
+				local entpos = v:GetPos() + v:OBBCenter()
 				local dist = entpos:Distance(pos)
 				if (dist < currentdist) then
 					local ang = math.abs(self:EntAng(v,pos,dir))
@@ -68,43 +62,44 @@ if SERVER then
 		return ent
 	end
 	
-	function ENT:EntAng(ent,pos,dir)
-		local entpos = ent:GetPos()+ent:OBBCenter()
+	function ENT:EntAng(ent, pos, dir)
+		local entpos = ent:GetPos() + ent:OBBCenter()
 		local entang = ent:GetAngles()
-		local localpos,localang = WorldToLocal(entpos,entang,pos,dir:Angle())
-		local linedist = math.sqrt(localpos.z^2+localpos.y^2)
-		local ang = math.deg(math.atan2(localpos.x,linedist))-90
+		local localpos,localang = WorldToLocal(entpos, entang, pos, dir:Angle())
+		local linedist = math.sqrt(localpos.z ^ 2 + localpos.y ^ 2)
+		local ang = math.deg(math.atan2(localpos.x, linedist)) - 90
 		return ang
 	end
 	
 	function ENT:OnThink()
 		local ctime = CurTime()
 		local tr = self:GetTrace(self.Range)
-		local ent = self:Getendent()
+		local ent = self:GetEndEnt()
 		local pos = self:GetShootPos()
 		local ang = self:GetAimVector():Angle()
 		if IsValid(ent) then
-			local entpos = ent:GetPos()+ent:OBBCenter()
+			local entpos = ent:GetPos() + ent:OBBCenter()
 			local dist = entpos:Distance(pos)
 			if (dist > self.Range) or (ent:IsPlayer() and not ent:Alive()) or ((ent:IsNPC() or ent:IsNextBot()) and (ent.Health and ent:Health() <= 0)) then
-				self:Setendent(NULL)
+				self:SetEndEnt(NULL)
 				ent = NULL
 			else
-				if self.LastHeal+0.1 < ctime then
+				if self.LastHeal + 0.1 < ctime then
 					local dmg = DamageInfo()
-					ent:SetHealth(math.min(ent:Health()+22.5*(ctime-self.LastHeal),ent:GetMaxHealth()))
+					ent:SetHealth(math.min(ent:Health() + 22.5 * (ctime - self.LastHeal), ent:GetMaxHealth()))
 					self.LastHeal = CurTime()
 				end
 			end
 		end
 		if not IsValid(ent) then
 			self:EndSound()
-			local newent = self:SeekTarget(pos,ang:Forward())
+			local newent = self:SeekTarget(pos, ang:Forward())
 			if IsValid(newent) and (newent ~= self) then
 				self:BeginSound()
-				self:Setendent(newent)
+				self:SetEndEnt(newent)
+				self:GetOwner():SetNWFiremodeEnt(newent)
 			else
-				if self.LastBeep+0.5 < ctime then
+				if self.LastBeep + 0.5 < ctime then
 					self:EmitSound("weapons/medigun_no_target.wav")
 					self.LastBeep = ctime
 				end
@@ -124,9 +119,9 @@ if CLIENT then
 		local ang = angpos.Ang
 		self:SetPos(angpos.Pos)
 		self:SetAngles(angpos.Ang)
-		if IsValid(self:Getendent()) then
-			if not IsValid(self.CPoint1Ent) or (self.CPoint1Ent:GetParent() ~= self:Getendent()) then
-				self:StartBeam(self:Getendent())
+		if IsValid(self:GetEndEnt()) then
+			if not IsValid(self.CPoint1Ent) or (self.CPoint1Ent:GetParent() ~= self:GetEndEnt()) then
+				self:StartBeam(self:GetEndEnt())
 			end
 		else
 			self:StopBeam()
@@ -145,8 +140,8 @@ if CLIENT then
 	function ENT:StartBeam(ent)
 		self:StopBeam()
 		local cmodel = ClientsideModel("models/props_junk/popcan01a.mdl")
-			cmodel:AddEffects(bit.bor(EF_NODRAW,EF_NOSHADOW))
-			cmodel:SetPos(ent:GetPos()+ent:OBBCenter())
+			cmodel:AddEffects(bit.bor(EF_NODRAW, EF_NOSHADOW))
+			cmodel:SetPos(ent:GetPos() + ent:OBBCenter())
 			cmodel:SetParent(ent)
 			local att = ent:LookupAttachment("chest")
 			if att and (att ~= 0) then
@@ -159,8 +154,25 @@ if CLIENT then
 		local cpoint1 = {}
 			cpoint1.entity = cmodel
 			cpoint1.attachtype = PATTACH_ABSORIGIN_FOLLOW
-			print(self, ent, cmodel);
-		self:CreateParticleEffect(self.ParticleName,{cpoint0,cpoint1})
+		--PATTACH_WORLDORIGIN doesn't wanna work, so whatever
+		local cmodel2 = ClientsideModel("models/props_junk/popcan01a.mdl")
+			cmodel2:AddEffects(bit.bor(EF_NODRAW, EF_NOSHADOW))
+			--figure out the color we want
+			local colorpos, ownteam = vector_origin, self:GetOwner().Owner:Team()
+			--we're on a team, use that color
+			if ownteam ~= TEAM_UNASSIGNED then
+				colorpos = Vector(team.GetColor(ownteam):Unpack())
+			--no team, player color instead
+			else
+				colorpos = self:GetOwner().Owner:GetPlayerColor() * 255
+			end
+			cmodel2:SetPos(colorpos)
+		local cpoint2 = {}
+			cpoint2.entity = cmodel2
+			cpoint2.attachtype = PATTACH_ABSORIGIN
+			--print(self, ent, cmodel);
+		self:CreateParticleEffect(self.ParticleName, {cpoint0, cpoint1, cpoint2})
+		timer.Simple(0, function() if IsValid(cmodel2) then cmodel2:Remove() end end)
 	end
 	
 	function ENT:StopBeam()
@@ -177,4 +189,4 @@ if CLIENT then
 	end
 end
 
-scripted_ents.Register(ENT,"scav_stream_medigun",true)
+scripted_ents.Register(ENT, "scav_stream_medigun", true)

@@ -9,6 +9,7 @@ VertexlitGeneric
 	
 	$envmap				"env_cubemap"
 	$envmapmask			"models/weapons/scavenger/scav_spec"
+	$envmaptint			"[0.625 0.625 0.625]"
 	$envmapsaturation	0.2
 	
 	$selfillum			1

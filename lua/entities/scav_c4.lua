@@ -51,11 +51,7 @@ if SERVER then
 		if self.nextbeep < CurTime() then
 			local time = self:GetDetonateTime() - CurTime()
 			if time < 30 then
-				if IsMounted(240) then --CSS
-					self:EmitSound("weapons/c4/c4_beep1.wav")
-				else
-					self:EmitSound("hl1/fvox/beep.wav")
-				end
+				self:EmitSound(CSS and "weapons/c4/c4_beep1.wav" or "hl1/fvox/beep.wav")
 				self.nextbeep = self.nextbeep + math.Clamp(math.pow(time / 10,2),0.1,5)
 			end
 		end
@@ -68,11 +64,7 @@ if SERVER then
 				local rf = RecipientFilter()
 				rf:AddAllPlayers()
 				net.WriteVector(self:GetPos())
-				if IsMounted(240) then --CSS
-					net.WriteString("weapons/c4/c4_explode1.wav")
-				else
-					net.WriteString("npc/env_headcrabcanister/explosion.wav")
-				end
+				net.WriteString(CSS and "weapons/c4/c4_explode1.wav" or "npc/env_headcrabcanister/explosion.wav")
 			net.Send(rf)
 			
 			ParticleEffect("scav_exp_fireball3",self:GetPos(),Angle(0,0,0),Entity(0))

@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "particle/scav_virus"
+	"$translucent" 1
+}

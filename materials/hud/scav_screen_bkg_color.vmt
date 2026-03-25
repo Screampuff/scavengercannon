@@ -1,0 +1,8 @@
+UnlitGeneric
+{
+	$basetexture	"HUD/scav_screen_bkg_color"
+	$translucent	1
+	$vertexalpha	1
+	$vertexcolor	1
+	$ignorez		1
+}
