@@ -125,6 +125,7 @@ if SERVER then
 		mapchangestarted = true
 		
 		local vote = ScavData.GetWinningMapVote()
+		print(vote)
 		local mapandsetting = string.Explode("/",vote)
 		local map = mapandsetting[1]
 		local setting = mapandsetting[2]

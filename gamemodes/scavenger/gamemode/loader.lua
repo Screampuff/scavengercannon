@@ -32,7 +32,7 @@ end
 
 function meta:LoadFile(path)
 	self.filepath = path
-	local read = file.Read(path,"DATA")
+	local read = file.Read(path,"GAME")
 	local tab = {}
 	if read then
 		tab = util.JSONToTable(read)
