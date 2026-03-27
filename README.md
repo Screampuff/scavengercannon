@@ -7,5 +7,5 @@ Original addon by Ghor (Thank you creating this wonderful weapon <3).  Currently
 <br/><br/>
 DO NOT repost this on the workshop.  I will release it there when it's completely done and ready for the best experience for everyone.
 <br/><br/>
-THE SCAVENGER GAMEMODE IS BROKEN AND A HEAVY WORK IN PROGRESS.  It is currently being ported with the SDM tools to GM13 and will be broken until further notice.
+THE SCAVENGER GAMEMODE IS *SOMEWHAT BROKEN AND A WORK IN PROGRESS.  It is currently being ported with the SDM tools to GM13.
 <br/>
