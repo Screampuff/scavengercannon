@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
 ENT.Type            = "anim"
-ENT.Base            = "base_wire_entity"
+ENT.Base            = WireLib and "base_wire_entity" or "base_anim"
 
 ENT.PrintName       = "Scav Turret"
 ENT.Author          = "Ghor"
@@ -10,6 +10,8 @@ ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
 
 ENT.RenderGroup = RENDERGROUP_OPAQUE
+
+if not WireLib then return end
 
 function ENT:GetAimVector()
 	return self.Entity:GetAngles():Forward() * -1

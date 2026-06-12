@@ -131,11 +131,16 @@ devskins = {
 }
 
 function SWEP:Reskin(steamid)
-	if devskins[steamid] ~= nil then
-		if IsValid(self.Owner:GetViewModel()) and self.Owner:GetActiveWeapon():GetClass() == "scav_gun" then
-			self.Owner:GetViewModel():SetSubMaterial(0, devskins[steamid])
-		end
-	end
+	if not devskins[steamid] then return end
+
+	local vm = self.Owner:GetViewModel()
+	if not IsValid(vm) then return end
+
+	--ensure it's actually the Scav Cannon
+	local sc = self.Owner:GetActiveWeapon()
+	if not IsValid(sc) or sc:GetClass() ~= "scav_gun" then return end
+
+	vm:SetSubMaterial(0, devskins[steamid])
 end
 
 function SWEP:Initialize()
@@ -914,16 +919,6 @@ else
 		local vec = net.ReadVector()
 		LocalPlayer():EmitSound(net.ReadString(), math.Clamp(100 - EyePos():Distance(vec) / 50, 20, 100))
 	end)
-end
-
---Localize a Scav string, replacing any instances of %#% with the second, etc. arguments
-ScavLocalize = function(...)
-	local arg = {...}
-	local strang = language.GetPhrase(tostring(table.remove(arg, 1)))
-	for i, v in ipairs(arg) do
-		strang = string.Replace(strang, "%" .. i .. "%", language.GetPhrase(tostring(v)))
-	end
-	return strang
 end
 
 -----------------------------------------------------------------------------------------

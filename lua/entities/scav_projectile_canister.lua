@@ -3,7 +3,7 @@
 ]]
 
 AddCSLuaFile()
-DEFINE_BASECLASS("base_gmodentity")
+DEFINE_BASECLASS("base_anim")
 
 ENT.PrintName = "#scav.scavcan.canister"
 

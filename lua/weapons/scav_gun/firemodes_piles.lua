@@ -21,17 +21,17 @@ local tab = {}
 	tab.FireFunc = function(self, item)
 		local tab = ScavData.models["models/props/de_train/barrel.mdl"]
 		if (item.data > 1) and (item.data < 7) then
-			tab.Cooldown = ScavData.models["models/props/de_train/biohazardtank.mdl"].Cooldown
-			tab.anim = ScavData.models["models/props/de_train/biohazardtank.mdl"].anim
+			tab.Cooldown = SCAV_FIREMODES["DISEASESHOT"].Cooldown
+			tab.anim = SCAV_FIREMODES["DISEASESHOT"].anim
 			if SERVER then --no clientside firefunction here
-				return ScavData.models["models/props/de_train/biohazardtank.mdl"].FireFunc(self, item)
+				return SCAV_FIREMODES["DISEASESHOT"].FireFunc(self, item)
 			else
 				return true
 			end
 		else
-			tab.Cooldown = ScavData.models["models/props/de_nuke/nuclearcontainerboxclosed.mdl"].Cooldown
-			tab.anim = ScavData.models["models/props/de_nuke/nuclearcontainerboxclosed.mdl"].anim
-			return ScavData.models["models/props/de_nuke/nuclearcontainerboxclosed.mdl"].FireFunc(self, item)
+			tab.Cooldown = SCAV_FIREMODES["GAMMABEAM"].Cooldown
+			tab.anim = SCAV_FIREMODES["GAMMABEAM"].anim
+			return SCAV_FIREMODES["GAMMABEAM"].FireFunc(self, item)
 		end
 	end
 	if SERVER then
@@ -75,19 +75,19 @@ local tab = {}
 	tab.FireFunc = function(self, item)
 		local tab = ScavData.models["models/weapons/c_models/c_energy_drink/c_energy_drink.mdl"]
 		if item.data > 1 then
-			tab.Cooldown = ScavData.models["models/weapons/w_package.mdl"].Cooldown
-			tab.anim = ScavData.models["models/weapons/w_package.mdl"].anim
-			if SERVER then return ScavData.models["models/weapons/w_package.mdl"].FireFunc(self, item) end
+			tab.Cooldown = SCAV_FIREMODES["DAMAGEBOOST"].Cooldown
+			tab.anim = SCAV_FIREMODES["DAMAGEBOOST"].anim
+			if SERVER then return SCAV_FIREMODES["DAMAGEBOOST"].FireFunc(self, item) end
 		else
-			tab.Cooldown = ScavData.models["models/items/powerup_speed.mdl"].Cooldown
-			tab.anim = ScavData.models["models/items/powerup_speed.mdl"].anim
-			if SERVER then return ScavData.models["models/items/powerup_speed.mdl"].FireFunc(self, item) end
+			tab.Cooldown = SCAV_FIREMODES["STIMPACK"].Cooldown
+			tab.anim = SCAV_FIREMODES["STIMPACK"].anim
+			if SERVER then return SCAV_FIREMODES["STIMPACK"].FireFunc(self, item) end
 		end
 	end
 	if SERVER then
 		tab.OnArmed = function(self, item, olditemname)
 			if item:GetData() < 2 then
-				self.MaxAmmo = ScavData.models["models/items/powerup_speed.mdl"].MaxAmmo
+				self.MaxAmmo = SCAV_FIREMODES["STIMPACK"].MaxAmmo
 			end
 			self.Owner:EmitSound("player/pl_scout_dodge_can_open.wav")
 		end

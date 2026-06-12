@@ -84,6 +84,8 @@
 		ScavData.RegisterFiremode(tab, "models/props_marines/c4_explosive.mdl")
 		ScavData.RegisterFiremode(tab, "models/props_equipment/blastingkit01_c4.mdl")
 		
+		SCAV_FIREMODES["C4"] = tab
+		
 
 --[[==============================================================================================
 	--Smoke Grenade
@@ -133,6 +135,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/p_smoke_ger.mdl")
 		ScavData.RegisterFiremode(tab, "models/weapons/w_smoke_ger.mdl")
 		ScavData.RegisterFiremode(tab, "models/weapons/w_smoke_us.mdl")
+		
+		SCAV_FIREMODES["SMOKENADE"] = tab
 		
 --[[==============================================================================================
 	--P90
@@ -187,6 +191,8 @@
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab, "models/weapons/w_smg_p90.mdl", 50)
+		
+		SCAV_FIREMODES["P90"] = tab
 
 --[[==============================================================================================
 	--AK-47
@@ -245,6 +251,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_rif_ak47.mdl", 25)
 		--L4D2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_rifle_ak47.mdl", 40)
+		
+		SCAV_FIREMODES["AK47"] = tab
 
 --[[==============================================================================================
 	--AUG
@@ -299,6 +307,8 @@
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab, "models/weapons/w_rif_aug.mdl", 30)
+		
+		SCAV_FIREMODES["AUG"] = tab
 
 --[[==============================================================================================
 	--AWP
@@ -345,6 +355,8 @@
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_sniper_awp.mdl", 20)
 		--TF2
 		ScavData.RegisterFiremode(tab, "models/weapons/c_models/c_csgo_awp/c_csgo_awp.mdl", 25)
+		
+		SCAV_FIREMODES["AWP"] = tab
 
 --[[==============================================================================================
 	--Desert Eagle
@@ -390,6 +402,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_pist_deagle.mdl", 7)
 		--L4D/2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_desert_eagle.mdl", 8)
+		
+		SCAV_FIREMODES["DEAGLE"] = tab
 
 --[[==============================================================================================
 	--Elites
@@ -449,6 +463,8 @@
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_dual_pistol_1911.mdl", 30)
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_pistol_1911.mdl", 15)
 		
+		SCAV_FIREMODES["DUALELITES"] = tab
+		
 --[[==============================================================================================
 	--FAMAS
 ==============================================================================================]]--
@@ -502,6 +518,8 @@
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab, "models/weapons/w_rif_famas.mdl", 25)
+		
+		SCAV_FIREMODES["FAMAS"] = tab
 
 --[[==============================================================================================
 	--FiveSeven
@@ -545,6 +563,8 @@
 				end
 			tab.Cooldown = 0.3
 		ScavData.RegisterFiremode(tab, "models/weapons/w_pist_fiveseven.mdl", 20)
+		
+		SCAV_FIREMODES["FIVESEVEN"] = tab
 
 --[[==============================================================================================
 	--Galil
@@ -599,6 +619,8 @@
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab, "models/weapons/w_rif_galil.mdl", 35)
+		
+		SCAV_FIREMODES["GALIL"] = tab
 
 --[[==============================================================================================
 	--Glock
@@ -648,6 +670,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_glock_mp.mdl", 17)
 		ScavData.RegisterFiremode(tab, "models/weapons/w_9mmclip.mdl", 17)
 		ScavData.RegisterFiremode(tab, "models/weapons/w_9mmclip_mp.mdl", 17)
+		
+		SCAV_FIREMODES["GLOCK"] = tab
 
 --[[==============================================================================================
 	--m3super90
@@ -685,6 +709,8 @@
 				end
 			tab.Cooldown = 0.88
 		ScavData.RegisterFiremode(tab, "models/weapons/w_shot_m3super90.mdl", 8)
+		
+		SCAV_FIREMODES["M3SG"] = tab
 
 --[[==============================================================================================
 	--M4A1
@@ -743,6 +769,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_rif_m4a1.mdl", 30)
 		--L4D
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_rifle_m16a2.mdl", 50)
+		
+		SCAV_FIREMODES["M4A1"] = tab
 
 --[[==============================================================================================
 	--Silenced M4A1
@@ -797,6 +825,8 @@
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab, "models/weapons/w_rif_m4a1_silencer.mdl", 30)
+		
+		SCAV_FIREMODES["M4A1SILENCED"] = tab
 
 --[[==============================================================================================
 	--M249 Para
@@ -858,6 +888,8 @@
 		--L4D2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_m60.mdl", 150)
 		
+		SCAV_FIREMODES["M249"] = tab
+		
 --[[==============================================================================================
 	--MAC10
 ==============================================================================================]]--
@@ -915,6 +947,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_smg_mac10.mdl", 30)
 		--L4D/2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_smg_uzi.mdl", 50)
+		
+		SCAV_FIREMODES["MAC10"] = tab
 
 --[[==============================================================================================
 	--MP5
@@ -978,6 +1012,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_mp5_mp.mdl", 30)
 		ScavData.RegisterFiremode(tab, "models/weapons/w_9mmarclip.mdl", 30)
 		ScavData.RegisterFiremode(tab, "models/weapons/w_9mmarclip_mp.mdl", 30)
+		
+		SCAV_FIREMODES["MP5CSS"] = tab
 
 --[[==============================================================================================
 	--p228
@@ -1023,6 +1059,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_pist_p228.mdl", 13)
 		--L4D2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_pistol_a.mdl", 15) --p220
+		
+		SCAV_FIREMODES["P228"] = tab
 
 --[[==============================================================================================
 	--Scout
@@ -1069,6 +1107,8 @@
 		--L4D/2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_sniper_scout.mdl", 15)
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_sniper_mini14.mdl", 15)
+		
+		SCAV_FIREMODES["SCOUTSNIPER"] = tab
 
 --[[==============================================================================================
 	--sg550
@@ -1127,6 +1167,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_snip_g3sg1.mdl", 30)
 		--L4D2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_sniper_military.mdl", 30)
+		
+		SCAV_FIREMODES["SG550"] = tab
 
 --[[==============================================================================================
 	--sg552
@@ -1185,6 +1227,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_rif_sg552.mdl", 30)
 		--L4D2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_rifle_sg552.mdl", 50)
+		
+		SCAV_FIREMODES["SG552"] = tab
 
 --[[==============================================================================================
 	--TMP
@@ -1241,6 +1285,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_smg_tmp.mdl", 30)
 		--L4D/2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_smg_a.mdl", 50)
+		
+		SCAV_FIREMODES["TMP"] = tab
 
 --[[==============================================================================================
 	--UMP45
@@ -1295,6 +1341,8 @@
 			end
 			tab.Cooldown = 0
 		ScavData.RegisterFiremode(tab, "models/weapons/w_smg_ump45.mdl", 25)
+		
+		SCAV_FIREMODES["UMP"] = tab
 
 --[[==============================================================================================
 	--USP
@@ -1336,6 +1384,8 @@
 				end
 			tab.Cooldown = 0.3
 		ScavData.RegisterFiremode(tab, "models/weapons/w_pist_usp.mdl", 12)
+		
+		SCAV_FIREMODES["USPCSS"] = tab
 
 --[[==============================================================================================
 	--Silenced USP
@@ -1387,6 +1437,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_pist_usp_silencer.mdl", 12)
 		--HL:S
 		ScavData.RegisterFiremode(tab, "models/w_silencer.mdl"--[[, 17]]) --no phys model
+		
+		SCAV_FIREMODES["USPSILENCED"] = tab
 
 --[[==============================================================================================
 	--xm1014
@@ -1431,6 +1483,8 @@
 		--L4D/2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_autoshot_m4super.mdl", 10)
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_shotgun_spas.mdl", 10)
+		
+		SCAV_FIREMODES["XM1014"] = tab
 		
 --[[==============================================================================================
 	--SCAR
@@ -1483,3 +1537,5 @@
 		--L4D2
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_desert_rifle.mdl", 50)
 		ScavData.RegisterFiremode(tab, "models/w_models/weapons/w_rifle_b.mdl", 50)
+		
+		SCAV_FIREMODES["SCARRIFLE"] = tab

@@ -118,6 +118,7 @@ local bullet = {}
 			local class = tr.Entity:GetClass()
 			if class == "prop_physics" or class == "prop_physics_respawnable" or class == "prop_physics_multiplayer" then
 				tr.Entity:SetHealth(1)
+				tr.Entity:SetPhysicsAttacker(attacker)
 				--print("setting ent health to 1: "..tostring(tr.Entity:Health()))
 			elseif class == "func_breakable_surf" then
 				tr.Entity:Fire("Shatter", "(0.5, 0.5, 0)", 0, attacker, attacker:GetWeapon("weapon_backuppistol"))

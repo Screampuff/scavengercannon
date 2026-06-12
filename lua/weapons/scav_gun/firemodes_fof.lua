@@ -83,6 +83,8 @@
 		ScavData.RegisterFiremode(tab, "models/weapons/w_whiskey.mdl")
 		ScavData.RegisterFiremode(tab, "models/weapons/w_whiskey2.mdl")
 		ScavData.RegisterFiremode(tab, "models/items_fof/whiskey_world.mdl")
+		
+		SCAV_FIREMODES["WHISKEY"] = tab
 
 --Rest of these firemodes require assets from FoF (and most of these props are only present in it, too)
 if not FOF then return end
@@ -212,6 +214,8 @@ end
 				end
 			tab.Cooldown = 2
 		ScavData.RegisterFiremode(tab, "models/weapons/w_carbine.mdl")
+		
+		SCAV_FIREMODES["SMITHCARBINE"] = tab
 
 --[[==============================================================================================
 	--Coach Shotgun
@@ -313,6 +317,8 @@ end
 				end
 			tab.Cooldown = 3
 		ScavData.RegisterFiremode(tab, "models/weapons/w_coachgun.mdl", 4) --two just isn't enough
+		
+		SCAV_FIREMODES["COACHGUN"] = tab
 
 --[[==============================================================================================
 	--S&W Schofield
@@ -363,3 +369,5 @@ end
 			tab.Cooldown = 0.7
 		ScavData.RegisterFiremode(tab, "models/weapons/w_schofield.mdl", 6)
 		ScavData.RegisterFiremode(tab, "models/weapons/w_schofield2.mdl", 6)
+		
+		SCAV_FIREMODES["SCHOFIELD"] = tab
